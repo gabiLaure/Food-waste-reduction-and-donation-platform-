@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
 
+import '../widgets/food_category.dart';
+
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
 
@@ -14,20 +16,6 @@ class _FeedPageState extends State<FeedPage> {
   late Future<void> _initializeVideoPlayerFuture;
 
   DateTime selectedDate = DateTime.now();
-
-/*Future<void> _selectDate(BuildContext context) async {
-    final DateTime pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate != null && pickedDate != selectedDate) {
-      setState(() {
-        selectedDate = pickedDate;
-      });
-    }
-  }*/
 
   @override
   void initState() {
@@ -84,65 +72,15 @@ class _FeedPageState extends State<FeedPage> {
                 }
               },
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'Local community Care',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                      subtitle: Text(formattedDate),
-                      leading: Icon(Icons.fastfood_outlined),
-                    ),
-                    SizedBox(height: 16), // Add spacing between rows
-                    // Second row with elevated buttons
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              // Handle button 2 press
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // Adjust corner radius
-                              ),
-                            ),
-                            child: Text('Not Transferred'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Handle button 2 press
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[100],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // Adjust corner radius
-                              ),
-                            ),
-                            child: Text('Transferred'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            SizedBox(
+              height: 8,
             ),
+            FoodCategoriesPage(),
             SizedBox(
               height: 10,
             ),
             Text(
-              'Donation Transfers',
+              'My Sheduled Donation',
               textAlign: TextAlign.start,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
@@ -157,7 +95,16 @@ class _FeedPageState extends State<FeedPage> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15),
                       ),
-                      subtitle: Text(formattedDate),
+                      subtitle: Row(
+                        children: [
+                          Icon(Icons.watch_later_outlined),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text('Post your product and availability (Morning?)'),
+                        ],
+                      ),
+                      // Add more lines as needed
                       leading: Icon(Icons.lunch_dining),
                     ),
                     SizedBox(height: 16), // Add spacing between rows
@@ -204,7 +151,7 @@ class _FeedPageState extends State<FeedPage> {
               height: 10,
             ),
             Text(
-              'My Sheduled Donation',
+              'Donation Transfers',
               textAlign: TextAlign.start,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
@@ -214,13 +161,40 @@ class _FeedPageState extends State<FeedPage> {
                 child: Column(
                   children: [
                     ListTile(
+                      leading: Icon(Icons.fastfood_outlined),
                       title: Text(
                         'Local community Care',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15),
                       ),
-                      subtitle: Text(formattedDate),
-                      leading: Icon(Icons.fastfood_outlined),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.shopping_bag_outlined),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('7 kg'),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              Icon(Icons.watch_later_outlined),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('Collection (evening)'),
+                            ],
+                          ),
+
+                          // Add more lines as needed
+                        ],
+                      ),
                     ),
                     SizedBox(height: 16), // Add spacing between rows
                     // Second row with elevated buttons

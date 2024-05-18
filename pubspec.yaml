@@ -24,13 +24,19 @@ dependencies:
   intl: ^0.19.0
   table_calendar: ^3.1.1
   syncfusion_flutter_calendar: ^25.1.41
+  image_picker: ^1.1.1
+  flutter_cupernino_bottom_sheet: ^1.0.8
+  awesome_notifications: ^0.9.3+1
+  mysql_client: ^0.0.27
+  mysql1: ^0.20.0
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 
 flutter:
@@ -42,6 +48,15 @@ flutter:
     - assets/videos/
     - assets/caritas_logo.png
     - assets/pp.jpeg
+    - assets/fruits.jpeg
+    - assets/vegetables.jpeg
+    - assets/desserts.jpeg
+    - assets/grains.jpeg
+    - assets/sweets_snacks.jpeg
+    - assets/beverages.jpeg
+    - assets/herbes_spices.jpeg
+    - assets/baked_goods.jpeg
+    - assets/fat_oil.jpeg
     
   
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -63,4 +78,4 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
-  
+   

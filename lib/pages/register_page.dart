@@ -1,15 +1,3 @@
-/*import 'package:flutter/material.dart';
-
-class RegisterPage extends StatelessWidget {
-  const RegisterPage ({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      
-    );
-  }
-}*/
 import 'package:caritas/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
@@ -91,22 +79,21 @@ class _RegisterPageState extends State<RegisterPage> {
                 //print('Last Name: ${_lastNameController.text}');
                 //print('Email: ${_emailController.text}');
                 //print('Mobile Number: ${_mobileController.text}');
-                Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomePage()));
               },
               child: const Text('Register'),
             ),
             const SizedBox(height: 16),
             TextButton(
-                  onPressed: () {
-                    // Navigate to the registration page when "Register" is pressed
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    );
-                  },
-                  child: const Text("Already have an acount? Login"),
+              onPressed: () {
+                // Navigate to the registration page when "Register" is pressed
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+              child: const Text("Already have an acount? Login"),
             )
           ],
         ),

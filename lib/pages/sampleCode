@@ -1,3 +1,101 @@
+
+import 'package:flutter/material.dart';
+
+class ListingCreationPage extends StatefulWidget {
+  @override
+  State<ListingCreationPage> createState() => _ListingCreationPageState();
+}
+
+class _ListingCreationPageState extends State<ListingCreationPage> {
+  @override
+  Widget build(BuildContext context) {
+    List<bool> itemStates = [false, false, false]; // Initial states
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Listing Creation'),
+      ),
+      body: ListView.builder(
+        padding: EdgeInsets.all(16),
+        itemCount: itemStates.length,
+        itemBuilder: (context, index) {
+          return ListTile(children: [
+          GestureDetector(
+            onTap: () {
+              // Navigate to the page with information about allowed food types
+            },
+            )]
+            );
+        },
+        
+            Center(
+              child: Text(
+                'What type of food are allowed on Caritas?',
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          _buildListingType(),
+          _buildPhotos(),
+          _buildAddress(),
+          _buildTitle(),
+          _buildDescription(),
+          _buildAvailabilities(),
+          _buildFoodIcon(),
+          _buildMerchantSwitch(),
+          SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              // Validate and submit all responses
+            },
+            child: Text('Validate'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListingType() {
+    // Implement the widget for selecting the listing type
+    return Container();
+  }
+
+  Widget _buildPhotos() {
+    // Implement the widget for selecting/uploading photos
+    return Container();
+  }
+
+  Widget _buildAddress() {
+    // Implement the widget for selecting/picking address
+    return Container();
+  }
+
+  Widget _buildTitle() {
+    // Implement the widget for entering the title
+    return Container();
+  }
+
+  Widget _buildDescription() {
+    // Implement the widget for entering the description
+    return Container();
+  }
+
+  Widget _buildAvailabilities() {
+    // Implement the widget for selecting availabilities
+    return Container();
+  }
+
+  Widget _buildFoodIcon() {
+    // Implement the food icon message widget
+    return Container();
+  }
+
+  Widget _buildMerchantSwitch() {
+    // Implement the merchant switch widget
+    return Container();
+  }
+}
+
 /*import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -274,3 +372,16 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
+
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The INTERNET permission is required for development. Specifically,
+         the Flutter tool needs it to communicate with the running application
+         to allow setting breakpoints, to provide hot reload, etc.
+    -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+</manifest>
