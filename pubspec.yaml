@@ -29,6 +29,8 @@ dependencies:
   awesome_notifications: ^0.9.3+1
   mysql_client: ^0.0.27
   mysql1: ^0.20.0
+  flutter_chat_ui: ^1.6.13
+  get: ^4.6.6
   
 
 dev_dependencies:
@@ -57,6 +59,12 @@ flutter:
     - assets/herbes_spices.jpeg
     - assets/baked_goods.jpeg
     - assets/fat_oil.jpeg
+    - assets/images/asian_girl.jpg
+    - assets/images/old_man.jpg
+    - assets/images/african_child.jpg
+    - assets/images/children.jpg
+    - assets/images/wheelchair.jpg
+    - assets/images/african2.jpg
     
   
   # An image asset can refer to one or more resolution-specific "variants", see

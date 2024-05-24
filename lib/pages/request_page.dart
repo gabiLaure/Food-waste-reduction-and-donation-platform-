@@ -1,33 +1,18 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 
-class ListingCreationPage extends StatefulWidget {
+class RequestDonation extends StatefulWidget {
   @override
-  State<ListingCreationPage> createState() => _ListingCreationPageState();
+  State<RequestDonation> createState() => _RequestDonationState();
 }
 
-class _ListingCreationPageState extends State<ListingCreationPage> {
+class _RequestDonationState extends State<RequestDonation> {
   //String _output = '';
-  String _listingType = 'Donation'; // Default value
-  String _communityType = 'DORCAS Foundation'; // Default value
-
-  List<File> _selectedImages = [];
-
-  void _getImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        if (_selectedImages.length < 4) {
-          _selectedImages.add(File(pickedFile.path));
-        }
-      });
-    }
-  }
+  String _listingType = 'Request'; // Default value
 
   final TextEditingController _descriptionController =
       TextEditingController(); // Create the controller
@@ -62,29 +47,18 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
               ),
             ),
           ),
-          SizedBox(height: 16),
-          _buildListingType(),
           SizedBox(height: 24),
-          _buildLocalCommunity(),
-          SizedBox(height: 16),
-          _buildLocation(),
-
-          _buildPhotosContainer(),
-          //_buildSelectedImages(),
-          // _buildLocationSelectionButton(context),
+          _buildListingType(),
           _buildTitle(),
           _buildDescription(),
-          _buildAvailabilities(),
-          Divider(),
-          _buildBestBefore(),
-          _buildFoodIcon(),
-          _buildMerchantSwitch(),
+          //_buildAvailabilities(),
+          //Divider(),
           SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
               // Validate and submit all responses
             },
-            child: Text('Validate Donation'),
+            child: Text('Validate Request'),
           ),
         ],
       ),
@@ -113,185 +87,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     );
   }
 
-  Widget _buildLocalCommunity() {
-    // Implement the widget for selecting the listing type
-    return DropdownButtonFormField<String>(
-      value: _communityType,
-      onChanged: (newValue) {
-        setState(() {
-          _communityType = newValue!;
-        });
-      },
-      items: <String>[
-        'CEPREJED',
-        'ONDAPA',
-        'DORCAS Foundation',
-        'MSDAC',
-        'Fondation des Enfants Orphelins'
-      ].map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      decoration: InputDecoration(
-        labelText: 'Local Community',
-        border: OutlineInputBorder(),
-      ),
-    );
-  }
-
-  Widget _buildLocation() {
-    // Implement the food icon message widget
-    return Column(
-      children: [
-        ListTile(
-          leading: Icon(Icons.check_circle_outline),
-          title: Text(
-            'Location : ',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          subtitle: Text(selectedDate != null
-              ? selectedDate.toString()
-              : 'Select location'),
-          trailing: Icon(Icons.location_on_sharp),
-          onTap: () {
-            _showDatePicker(context);
-          },
-        ),
-        Divider(),
-      ],
-    );
-  }
-
-  Widget _buildPhotosContainer() {
-    // Implement the widget for selecting/uploading photos
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 10,
-        ),
-        ListTile(
-            leading: Icon(Icons.check_circle_outline),
-            title: Row(children: [
-              Text(
-                'Photos of the Food',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ])),
-        SizedBox(height: 8),
-        _buildSelectedImages(),
-        SizedBox(height: 8),
-        Visibility(
-          visible: _selectedImages.length < 4,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(150, 100), // Set the desired size
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ), // Rounded corners
-            onPressed: () {
-              _showImageSourceDialog();
-            },
-            icon: Icon(Icons.add), // Icon in the center
-            label: Text('Add Image'),
-          ),
-        ),
-        Visibility(
-          visible: _selectedImages.length == 4,
-          child: Text(
-            'You can add a maximum of 4 photos.',
-            style: TextStyle(color: Colors.red),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSelectedImages() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: _selectedImages.map((image) {
-        return Stack(
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: FileImage(image),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedImages.remove(image);
-                  });
-                },
-                child: const CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Colors.red,
-                  child: Icon(
-                    Icons.close,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      }).toList(),
-    );
-  }
-
-  void _showImageSourceDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(child: Text('Select Image Source')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(ImageSource.camera);
-                },
-                child: Text('Take Photo'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(ImageSource.gallery);
-                },
-                child: const Text('Choose from Gallery'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-//
   Widget _buildTitle() {
     // Implement the widget for entering the title
     return Padding(
@@ -515,61 +310,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           )
         ]);
       },
-    );
-  }
-
-  Widget _buildFoodIcon() {
-    // Implement the merchant switch widget
-    return const Column(
-      children: [
-        ListTile(
-          leading: Icon(
-            Icons.check_circle_outline,
-            color: Colors.blue,
-          ),
-          title: Row(
-            children: [
-              Icon(
-                Icons.fastfood_outlined,
-                size: 18,
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              Text(
-                'Food',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Divider(),
-      ],
-    );
-  }
-
-  Widget _buildMerchantSwitch() {
-    // Implement the merchant switch widget
-    return ListTile(
-      leading: Icon(Icons.check_circle_outline),
-      title: Text(
-        'I am a merchant',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      trailing: Switch(
-        value: isSwitched,
-        onChanged: (value) {
-          setState(() {
-            isSwitched = value; // Update the state when switched
-          });
-        },
-      ),
     );
   }
 }

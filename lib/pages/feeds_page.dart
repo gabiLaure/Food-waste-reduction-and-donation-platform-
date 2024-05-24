@@ -1,6 +1,9 @@
+import 'package:caritas/pages/listing_creation_page.dart';
+import 'package:caritas/pages/view_donation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
+import 'package:caritas/pages/view_donation.dart';
 
 import '../widgets/food_category.dart';
 
@@ -77,10 +80,10 @@ class _FeedPageState extends State<FeedPage> {
             ),
             FoodCategoriesPage(),
             SizedBox(
-              height: 10,
+              height: 14,
             ),
             Text(
-              'My Sheduled Donation',
+              'Donation Transfers',
               textAlign: TextAlign.start,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
@@ -101,7 +104,7 @@ class _FeedPageState extends State<FeedPage> {
                           SizedBox(
                             width: 5,
                           ),
-                          Text('Post your product and availability (Morning?)'),
+                          Text('Post your product and availability...'),
                         ],
                       ),
                       // Add more lines as needed
@@ -130,6 +133,12 @@ class _FeedPageState extends State<FeedPage> {
                           ElevatedButton(
                             onPressed: () {
                               // Handle button 2 press
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ListingCreationPage()),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green[100],
@@ -147,11 +156,11 @@ class _FeedPageState extends State<FeedPage> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            Text(
-              'Donation Transfers',
+            const Text(
+              'My Sheduled Donation',
               textAlign: TextAlign.start,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
@@ -163,7 +172,7 @@ class _FeedPageState extends State<FeedPage> {
                     ListTile(
                       leading: Icon(Icons.fastfood_outlined),
                       title: Text(
-                        'Local community Care',
+                        'Thanks for Sharing!',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15),
                       ),
@@ -177,6 +186,14 @@ class _FeedPageState extends State<FeedPage> {
                                 width: 5,
                               ),
                               Text('7 kg'),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Icon(Icons.location_on),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Text('100km'),
                             ],
                           ),
                           SizedBox(
@@ -196,40 +213,26 @@ class _FeedPageState extends State<FeedPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 16), // Add spacing between rows
                     // Second row with elevated buttons
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              // Handle button 2 press
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // Adjust corner radius
-                              ),
-                            ),
-                            child: Text('Not Transferred'),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Handle button 2 press
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DonationsFragment()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[100],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Adjust corner radius
                           ),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Handle button 2 press
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[100],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // Adjust corner radius
-                              ),
-                            ),
-                            child: Text('Transferred'),
-                          ),
-                        ],
+                        ),
+                        child: Text('View Donation'),
                       ),
                     ),
                   ],

@@ -31,6 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
+  final TextEditingController _password = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +71,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 labelText: 'Mobile Number',
               ),
             ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _password,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+              ),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
@@ -79,6 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 //print('Last Name: ${_lastNameController.text}');
                 //print('Email: ${_emailController.text}');
                 //print('Mobile Number: ${_mobileController.text}');
+                //print('Password: ${_passwordController.text}');
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => HomePage()));
               },

@@ -58,12 +58,12 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 // Validate credentials and perform login logic here
                 // For simplicity, let's just print the entered values
-               //print('Username: ${_usernameController.text}');
+                //print('Username: ${_usernameController.text}');
                 //print('Password: ${_passwordController.text}');
-              Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
               },
               child: const Text('Login'),
             ),
@@ -76,24 +76,25 @@ class _LoginPageState extends State<LoginPage> {
                     // Navigate to the registration page when "Register" is pressed
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const RegisterPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterPage()),
                     );
                   },
                   child: const Text("Don't have an account? Register"),
                 ),
                 TextButton(
-              onPressed: () {
-                // Navigate to the forgot password page when "Forgot Password" is pressed
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
-                );
-              },
-              child: const Text("Forgot Password?"),
-            ),
+                  onPressed: () {
+                    // Navigate to the forgot password page when "Forgot Password" is pressed
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordPage()),
+                    );
+                  },
+                  child: const Text("Forgot Password?"),
+                ),
               ],
             ),
-
           ],
         ),
       ),

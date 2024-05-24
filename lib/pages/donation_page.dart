@@ -1,3 +1,4 @@
+import 'package:caritas/pages/request_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -109,8 +110,7 @@ void _showDialog(BuildContext context) {
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => ListingCreationPage()),
+                  MaterialPageRoute(builder: (context) => RequestDonation()),
                 );
               },
               child: Center(child: Text('Make a Request')),

@@ -1,4 +1,7 @@
+import 'package:caritas/pages/login_page.dart';
 import 'package:flutter/material.dart';
+
+import '../pages/food_tips.dart';
 
 class FoodCategoriesPage extends StatelessWidget {
   final List<Map<String, String>> categories = [
@@ -14,13 +17,81 @@ class FoodCategoriesPage extends StatelessWidget {
     // Add more categories here
   ];
 
+  final List<Map<String, String>> tips = [
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    {
+      'image': 'assets/fruits.jpeg',
+      'foodName': 'Vegetables',
+      'foodDescription': 'A nutritious salad with fresh veggies and greens.',
+      'foodTip':
+          'Tips: 1. Conserve food by planning meals.\n 2. Properly store leftovers in airtight containers. \n 3. Reduce waste by recycling food scraps.'
+    },
+    // Add more categories here
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text('Food Category',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        Text('Food Tips',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         SizedBox(
           height: 8,
         ),
@@ -44,21 +115,90 @@ class FoodCategoryCard extends StatelessWidget {
   final String title;
   final String imageAsset;
 
-  FoodCategoryCard({required this.title, required this.imageAsset});
+  FoodCategoryCard({
+    required this.title,
+    required this.imageAsset,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: AssetImage(imageAsset),
-          ),
-          SizedBox(height: 8),
-          Text(title),
-        ],
+    return GestureDetector(
+      onTap: () {
+        // Handle the click action here
+        // For example, navigate to a new screen or perform an action.
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FoodDetailsPage(
+                    image: 'image',
+                    foodName: 'foodName',
+                    foodDescription: 'foodDescription',
+                    foodTip: 'foodTip',
+                  )),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: AssetImage(imageAsset),
+            ),
+            SizedBox(height: 8),
+            Text(title),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FoodCategoryTips extends StatelessWidget {
+  final String title;
+  final String imageAsset;
+  final String image;
+  final String foodName;
+  final String foodDescription;
+  final String foodTip;
+
+  FoodCategoryTips(
+      {required this.title,
+      required this.imageAsset,
+      required this.image,
+      required this.foodName,
+      required this.foodDescription,
+      required this.foodTip});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Handle the click action here
+        // For example, navigate to a new screen or perform an action.
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FoodDetailsPage(
+                    image: 'image',
+                    foodName: 'foodName',
+                    foodDescription: 'foodDescription',
+                    foodTip: 'foodTip',
+                  )),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: AssetImage(imageAsset),
+            ),
+            SizedBox(height: 8),
+            Text(title),
+          ],
+        ),
       ),
     );
   }
