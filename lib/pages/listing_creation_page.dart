@@ -1,10 +1,19 @@
-import 'dart:io';
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:io';
+import 'package:caritas/generators/uuid_generator.dart';
+import 'package:caritas/home.dart';
+import 'package:caritas/widgets/button_widgets.dart';
+import 'package:caritas/widgets/toast_messages.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
+import 'package:intl/intl.dart';
 
 class ListingCreationPage extends StatefulWidget {
   @override
@@ -15,8 +24,19 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   //String _output = '';
   String _listingType = 'Donation'; // Default value
   String _communityType = 'DORCAS Foundation'; // Default value
+  final String userProfileID =
+      FirebaseAuth.instance.currentUser!.uid.toString();
 
+  // Uploading Process
+  bool isStartToUpload = false;
+  bool isUploadComplete = false;
+  bool isAnError = false;
+  double? circularProgressVal;
   List<File> _selectedImages = [];
+  String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+  String formattedTime = DateFormat('kk:mm:a').format(DateTime.now());
+
+  String donationID = UUIDGenerator().uuidV4();
 
   void _getImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -28,6 +48,227 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
       });
     }
   }
+
+  void sendSuccessCode() {
+    //print("Post Add Success!");
+    Navigator.pop(context);
+    setState(() {
+      isStartToUpload = false;
+      isUploadComplete = true;
+    });
+    showAlertDialog(context);
+  }
+
+  void sendErrorCode(String error) {
+    ToastMessages().showErrorToast(error);
+    //print("Post Add Error!");
+
+    setState(() {
+      isStartToUpload = false;
+      isAnError = true;
+      isUploadComplete = true;
+    });
+    showAlertDialog(context);
+  }
+
+  showAlertDialog(BuildContext context) {
+    // show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: !isUploadComplete
+                  ? Center(child: Text("chargement du message"))
+                  : Center(child: Text("Chargement réussi")),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isUploadComplete)
+                    !isAnError
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              CircularProgressIndicator(
+                                value: circularProgressVal,
+                                strokeWidth: 6,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.teal.shade700),
+                              ),
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              Text(
+                                  "Veuillez attendre que votre message soit téléchargé.",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 16.0)
+                                      .copyWith(color: Colors.grey.shade900)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              Text("Erreur!",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              SizedBox(
+                                height: 50.0,
+                              ),
+                              ButtonWidget(
+                                  text: "Réessayer",
+                                  textColor: Colors.white,
+                                  color: Colors.red,
+                                  onClicked: () {
+                                    Navigator.pop(context);
+                                  }),
+                            ],
+                          )
+                  else
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              'assets/images/welcome.png',
+                              height: 50,
+                              width: 50,
+                            ),
+                            SizedBox(height: 30),
+                            Text("Le message a été chargé!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 22.0)
+                                    .copyWith(
+                                        color: Colors.grey.shade900,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 50),
+                            ButtonWidget(
+                                text: "Continue",
+                                textColor: Colors.white,
+                                color: Colors.indigo,
+                                onClicked: () {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          HomePage(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> uploadImageToStorage() async {
+    List<String> imageList = [];
+    try {
+      for (var image in _selectedImages) {
+        final ref = firebase_storage.FirebaseStorage.instance
+            .ref()
+            .child('donation_images/$userProfileID/$donationID');
+        await ref.putFile(image);
+        final imageUrl = await ref.getDownloadURL();
+        print("image URL: $imageUrl");
+        imageList.add(imageUrl);
+        // addDonToFireStore(imageUrl);
+      }
+      // add donnation to firestore with list of images
+      addDonToFireStore(imageList);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // add donnation to firestore with multiple images
+  Future<void> addDonToFireStore(List<String> imageList) async {
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userProfileID)
+        .collection('donations')
+        .doc(donationID)
+        .set({
+          'donationID': donationID,
+          // 'donorID': userProfileID,
+          'donationType': _listingType,
+          'communityType': _communityType,
+          'donationTitle': _controller.text,
+          'donationDescription': _descriptionController.text,
+          'donationDate': "$formattedDate, $formattedTime",
+          'donationImages': imageList,
+          'donationStatus': 'Pending',
+          'donationBestBefore': selectedDate,
+          'donationAvailability': selectedAction,
+        })
+        .then(
+          (value) => sendSuccessCode(),
+        )
+        .catchError((error) => sendErrorCode(error.toString()));
+  }
+
+  void validateDonation() {
+    if (_selectedImages.isEmpty) {
+      ToastMessages().showErrorToast('Please select at least one image');
+    } else if (_controller.text.isEmpty) {
+      ToastMessages().showErrorToast('Please enter a title');
+    } else if (_descriptionController.text.isEmpty) {
+      ToastMessages().showErrorToast('Please enter a description');
+    } else if (selectedAction.isEmpty) {
+      ToastMessages().showErrorToast('Please select an availability');
+    } else if (selectedDate == null) {
+      ToastMessages().showErrorToast('Please select a best before date');
+    } else {
+      setState(() {
+        isStartToUpload = true;
+        circularProgressVal = 0.1;
+      });
+      showAlertDialog(context);
+      uploadImageToStorage();
+    }
+  }
+  // Future<void> addDonToFireStore(String imageUrl) async {
+  //   try {
+  //     await FirebaseFirestore.instance.collection('donations').doc(donationID).set({
+  //       'donationID': donationID,
+  //       'donorID': userProfileID,
+  //       'donationType': _listingType,
+  //       'communityType': _communityType,
+  //       'donationTitle': _controller.text,
+  //       'donationDescription': _descriptionController.text,
+  //       'donationDate': formattedDate,
+  //       'donationTime': formattedTime,
+  //       'donationLocation': 'Kigali',
+  //       'donationImages': imageUrl,
+  //       'donationStatus': 'Pending',
+  //       'donationBestBefore': selectedDate,
+  //       'donationAvailability': selectedAction,
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   final TextEditingController _descriptionController =
       TextEditingController(); // Create the controller
@@ -82,6 +323,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
+              validateDonation();
               // Validate and submit all responses
             },
             child: Text('Validate Donation'),

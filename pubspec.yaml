@@ -31,6 +31,15 @@ dependencies:
   mysql1: ^0.20.0
   flutter_chat_ui: ^1.6.13
   get: ^4.6.6
+  # firebase packages
+  firebase_core: ^2.32.0
+  firebase_database: ^10.5.7
+  
+  firebase_auth: ^4.20.0
+  cloud_firestore: ^4.17.5
+  firebase_storage: ^11.7.7
+  uuid: ^3.0.7
+
   
 
 dev_dependencies:
@@ -65,6 +74,8 @@ flutter:
     - assets/images/children.jpg
     - assets/images/wheelchair.jpg
     - assets/images/african2.jpg
+    - assets/images/welcome.png
+    - assets/images/
     
   
   # An image asset can refer to one or more resolution-specific "variants", see

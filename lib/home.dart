@@ -1,4 +1,6 @@
 //import 'package:caritas/pages/feeds_page.dart';
+// ignore_for_file: prefer_const_constructors
+
 import 'package:caritas/pages/all_donation.dart';
 import 'package:caritas/pages/all_request_page.dart';
 import 'package:caritas/pages/donation_page.dart';
@@ -55,11 +57,11 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.notifications_active_outlined),
                   onPressed: () {
                     // Handle notification button click here
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NotificationsListPage()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => NotificationsListPage()),
+                    // );
                   },
                 ),
                 IconButton(
