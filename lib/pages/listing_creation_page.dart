@@ -211,7 +211,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
         .doc(donationID)
         .set({
           'donationID': donationID,
-          // 'donorID': userProfileID,
+          'donorID': userProfileID,
           'donationType': _listingType,
           'communityType': _communityType,
           'donationTitle': _controller.text,

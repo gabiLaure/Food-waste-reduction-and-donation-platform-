@@ -1,7 +1,15 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:io';
+import 'package:caritas/generators/uuid_generator.dart';
+import 'package:caritas/home.dart';
+import 'package:caritas/widgets/toast_messages.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 
@@ -16,16 +24,203 @@ class _RequestDonationState extends State<RequestDonation> {
 
   final TextEditingController _descriptionController =
       TextEditingController(); // Create the controller
-
+  final String userProfileID =
+      FirebaseAuth.instance.currentUser!.uid.toString();
+  String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+  String formattedTime = DateFormat('kk:mm:a').format(DateTime.now());
+  double? circularProgressVal;
   final TextEditingController _controller = TextEditingController();
   final int maxTitleLength = 50;
   final int maxDescriptionLength = 500;
 
   //bool _showCalendar = true;
   // Holds the selected action
-  String selectedAction = '';
+  String selectedAction = 'Request';
   DateTime? selectedDate;
   bool isSwitched = false;
+  bool isAnError = false;
+  bool isDonCreated = false;
+  bool isStartToCreate = false;
+  String donationID = UUIDGenerator().uuidV4();
+
+  void sendErrorCode(String error) {
+    ToastMessages().showErrorToast(error);
+    Navigator.pop(context);
+    //print("Post Add Error!");
+
+    setState(() {
+      isStartToCreate = false;
+      isAnError = true;
+      isDonCreated = false;
+      showAlertDialog(context);
+    });
+  }
+
+  void sendSuccessCode() {
+    //print("Post Add Success!");
+    Navigator.pop(context);
+    setState(() {
+      isStartToCreate = false;
+      isDonCreated = true;
+    });
+    showAlertDialog(context);
+  }
+
+  showAlertDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: !isDonCreated
+                  ? Center(child: Text("Creation de la demande"))
+                  : Center(child: Text("")),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isDonCreated)
+                    !isAnError
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              CircularProgressIndicator(
+                                value: circularProgressVal,
+                                strokeWidth: 6,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.indigo),
+                              ),
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              Text(
+                                "Veuillez patienter...",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              Text(
+                                "Error!",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 50.0,
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("Réessayez"),
+                              ),
+                            ],
+                          )
+                  else
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              'assets/images/welcome.png',
+                              height: 50,
+                              width: 50,
+                            ),
+                            SizedBox(height: 30),
+                            Text("Requête de don créé!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 22.0)
+                                    .copyWith(
+                                        color: Colors.grey.shade900,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 50),
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          HomePage(),
+                                    ),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                },
+                                child: Text("Continue"))
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            );
+          });
+        });
+  }
+
+  // void ifAnError() {
+  //   Navigator.pop(context);
+  //   setState(() {
+  //     isDonCreated = false;
+  //     isAnError = true;
+  //     //Navigator.pop(context);
+  //     showAlertDialog(context);
+  //   });
+  // }
+
+  void validateRequest() {
+    if (_controller.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
+        _listingType.isEmpty) {
+      ToastMessages().showInfoToast("Remplissez tous les champs");
+    } else {
+      addReqDonToFireStore();
+    }
+  }
+
+  // add request donation to firestore
+  Future<void> addReqDonToFireStore() async {
+    // add request donation to firestore
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userProfileID)
+        .collection('donations')
+        .doc(donationID)
+        .set({
+          'donationID': donationID,
+          'userProfileID': userProfileID,
+          'listingType': _listingType,
+          'title': _controller.text,
+          'description': _descriptionController.text,
+          'requestdate': "$formattedDate, $formattedTime",
+        })
+        .then(
+          (value) => sendSuccessCode(),
+        )
+        .catchError((error) => sendErrorCode(error.toString()));
+    // setState(() {
+    //   isDonCreated = true;
+    //   isAnError = false;
+    //   //Navigator.pop(context);
+    //   showAlertDialog(context);
+    // }
+    // );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +251,11 @@ class _RequestDonationState extends State<RequestDonation> {
           SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
+              addReqDonToFireStore();
+              // print(userProfileID);
+              // print(_controller.text);
+              // print(_descriptionController.text);
+              // print(_listingType);
               // Validate and submit all responses
             },
             child: Text('Validate Request'),

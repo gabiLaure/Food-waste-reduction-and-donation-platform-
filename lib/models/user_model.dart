@@ -36,4 +36,17 @@ class UserModelClass {
       profileImage: doc['profileImage'],
     );
   }
+  // model to document
+  Map<String, dynamic> toDocument() {
+    return {
+      "uuid": uuid,
+      "accountType": accountType,
+      "firstName": firstName,
+      "lastName": lastName,
+      "email": email,
+      "contactNumber": contactNumber,
+      "accountCreated": accountCreated,
+      "profileImage": profileImage
+    };
+  }
 }

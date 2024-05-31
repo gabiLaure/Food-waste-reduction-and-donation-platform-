@@ -8,6 +8,7 @@ import 'package:caritas/pages/login_page.dart';
 import 'package:caritas/pages/profile_page.dart';
 import 'package:caritas/pages/feeds_page.dart';
 import 'package:caritas/pages/notification_page.dart';
+import 'package:caritas/widgets/alert_dialogs.dart';
 
 import 'package:flutter/material.dart';
 
@@ -129,22 +130,29 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
+            // ListTile(
+            //   leading: Icon(Icons.fastfood_outlined),
+            //   title: Text('Food Tips'),
+            //   onTap: () {
+            //     // Handle navigation or other actions
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => FoodDetailsPage(
+            //           image: 'image',
+            //           foodName: 'foodName',
+            //           foodDescription: 'foodDescription',
+            //           foodTip: 'foodTip',
+            //         ), // Replace with your actual notification page
+            //       ),
+            //     );
+            //   },
+            // ),
             ListTile(
-              leading: Icon(Icons.fastfood_outlined),
-              title: Text('Food Tips'),
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
               onTap: () {
-                // Handle navigation or other actions
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FoodDetailsPage(
-                      image: 'image',
-                      foodName: 'foodName',
-                      foodDescription: 'foodDescription',
-                      foodTip: 'foodTip',
-                    ), // Replace with your actual notification page
-                  ),
-                );
+                SignOutAlertDialog().showAlert(context);
               },
             ),
             ListTile(
@@ -155,6 +163,8 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context);
               },
             ),
+            // logout button
+
             // Add more list items as needed
           ],
         ),

@@ -8,7 +8,8 @@ class ToastMessages {
       message,
       backgroundColor: Colors.green,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 5),
     );
   }
 
@@ -18,7 +19,8 @@ class ToastMessages {
       message,
       backgroundColor: Colors.red,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 5),
     );
   }
 
@@ -28,7 +30,8 @@ class ToastMessages {
       message,
       backgroundColor: Colors.blue,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 5),
     );
   }
 
@@ -38,7 +41,8 @@ class ToastMessages {
       message,
       backgroundColor: Colors.orange,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 5),
     );
   }
 }

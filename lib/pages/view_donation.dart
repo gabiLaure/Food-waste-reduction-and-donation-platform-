@@ -1,6 +1,10 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'dart:ui';
 
+import 'package:caritas/pages/feedback_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 FlutterView view = WidgetsBinding.instance.platformDispatcher.views.first;
@@ -256,12 +260,18 @@ class DonationsFragment extends StatelessWidget {
                                   decoration: BoxDecoration(
                                       color: Colors.purple[200],
                                       borderRadius: BorderRadius.circular(10)),
-                                  child: const Center(
+                                  child: Center(
+                                      child: GestureDetector(
+                                    onTap: () {
+                                      Get.to(GiveFeedbackPage());
+                                      print("clicked");
+                                      // Handle button press event
+                                    },
                                     child: Icon(
                                       Icons.message_rounded,
                                       color: Colors.white,
                                     ),
-                                  ),
+                                  )),
                                 ),
                                 SizedBox(height: 10),
                                 Text(

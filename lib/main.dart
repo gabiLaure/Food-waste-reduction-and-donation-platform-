@@ -3,10 +3,13 @@
 import 'package:caritas/home.dart';
 import 'package:caritas/pages/listing_creation_page.dart';
 import 'package:caritas/splash.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
+final user = FirebaseAuth.instance.currentUser;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -22,7 +25,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Flutter Demo",
       theme: ThemeData(
@@ -30,7 +33,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       //home: HomePage(),
-      home: SplashScreen(),
+      //home: SplashScreen(),
+      home: user == null ? SplashScreen() : HomePage(),
     );
   }
 }

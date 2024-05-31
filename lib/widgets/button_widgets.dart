@@ -34,3 +34,42 @@ class ButtonWidget extends StatelessWidget {
         ),
       );
 }
+
+class TextWithIconButtonWidget extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final bool iconToLeft;
+  final VoidCallback onClicked;
+
+  const TextWithIconButtonWidget({
+    Key? key,
+    required this.text,
+    required this.icon,
+    required this.iconToLeft,
+    required this.onClicked,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onClicked,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          textDirection: iconToLeft ? TextDirection.ltr : TextDirection.rtl,
+          children: [
+            Icon(
+              icon,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            SizedBox(
+              width: 10.0,
+            ),
+            Text(text,
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                  color: Theme.of(context).textTheme.labelLarge!.color,
+                  fontWeight: FontWeight.bold,
+                )),
+          ],
+        ),
+      );
+}
