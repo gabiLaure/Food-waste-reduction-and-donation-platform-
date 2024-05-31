@@ -31,6 +31,10 @@ dependencies:
   mysql1: ^0.20.0
   flutter_chat_ui: ^1.6.13
   get: ^4.6.6
+  smooth_page_indicator: ^1.1.0
+  google_fonts: ^6.2.1
+
+
   
 
 dev_dependencies:
@@ -59,12 +63,17 @@ flutter:
     - assets/herbes_spices.jpeg
     - assets/baked_goods.jpeg
     - assets/fat_oil.jpeg
+    - assets/malnutrition.jpeg
+    - assets/education.jpeg
+    - assets/emotion.jpeg
     - assets/images/asian_girl.jpg
     - assets/images/old_man.jpg
     - assets/images/african_child.jpg
     - assets/images/children.jpg
     - assets/images/wheelchair.jpg
     - assets/images/african2.jpg
+    - assets/images/screen1.png
+    - assets/images/screen2.png
     
   
   # An image asset can refer to one or more resolution-specific "variants", see

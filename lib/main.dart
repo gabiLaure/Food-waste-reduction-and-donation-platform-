@@ -1,7 +1,9 @@
 import 'package:caritas/home.dart';
 import 'package:caritas/pages/listing_creation_page.dart';
-import 'package:caritas/splash.dart';
+import 'package:caritas/intro/screens/splash.dart';
 import 'package:flutter/material.dart';
+
+import 'pages/register_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: HomePage(),
+      home: RegisterPage(),
     );
   }
 }

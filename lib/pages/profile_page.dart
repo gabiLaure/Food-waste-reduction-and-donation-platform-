@@ -1,4 +1,4 @@
-import 'package:caritas/pages/edit_page.dart';
+import 'package:caritas/pages/edit_profil.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {

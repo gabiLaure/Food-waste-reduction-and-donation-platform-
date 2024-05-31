@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:caritas/pages/edit_donation.dart';
+import 'package:caritas/pages/notification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -10,7 +13,16 @@ double w = size.width;
 double h = size.height;
 
 class DonationsFragment extends StatelessWidget {
-  const DonationsFragment({super.key});
+  DonationsFragment({super.key});
+
+  String listingType = 'Donation';
+  String communityType = 'CEPREJED';
+  List<File> selectedImages = []; // Replace with actual images
+  String title = 'Sample Listing Title';
+  String description = 'Sample description of the listing';
+  String availability = 'Week Days';
+  DateTime bestBeforeDate = DateTime.now();
+  bool isMerchant = false;
 
   // i think this is the page should not contain this code as it is just  screen which is holding the data , it cannot show donation details
   // as the donation detaliss are show by the DonationDetails.dart file
@@ -196,16 +208,36 @@ class DonationsFragment extends StatelessWidget {
                           children: [
                             Column(
                               children: [
-                                Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                      color: Colors.purple[200],
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.edit_note_rounded,
-                                      color: Colors.white,
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ListingEditPage(
+                                          listingType: listingType,
+                                          communityType: communityType,
+                                          selectedImages: selectedImages,
+                                          title: title,
+                                          description: description,
+                                          availability: availability,
+                                          bestBeforeDate: bestBeforeDate,
+                                          isMerchant: isMerchant,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                        color: Colors.purple[200],
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.edit_note_rounded,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -250,16 +282,27 @@ class DonationsFragment extends StatelessWidget {
                             const SizedBox(width: 10),
                             Column(
                               children: [
-                                Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                      color: Colors.purple[200],
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.message_rounded,
-                                      color: Colors.white,
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              NotificationPage()),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                        color: Colors.purple[200],
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.message_rounded,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),

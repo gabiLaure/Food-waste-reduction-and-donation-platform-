@@ -15,6 +15,7 @@ class LoginPage extends StatelessWidget {
 }*/
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'forgot_password_page.dart';
 import 'register_page.dart';
@@ -31,41 +32,98 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login Page'),
-      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset(
+              'assets/caritas_logo.png',
+              width: 200,
+              height: 200,
+            ),
             TextField(
               controller: _usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
+              decoration: InputDecoration(
+                focusColor: Colors.grey[100],
+                hintText: 'Username or phone',
+                hintStyle: GoogleFonts.poppins(),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 20.0,
+                  horizontal: 20.0,
+                ),
+                border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                    borderSide: BorderSide(
+                      width: 0.2,
+                    )),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 203, 152, 206),
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
+              decoration: InputDecoration(
+                focusColor: Colors.grey[100],
+                hintText: 'Password',
+                hintStyle: GoogleFonts.poppins(),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 20.0,
+                  horizontal: 20.0,
+                ),
+                border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                    borderSide: BorderSide(
+                      width: 0.2,
+                    )),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 203, 152, 206),
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                // Validate credentials and perform login logic here
-                // For simplicity, let's just print the entered values
-                //print('Username: ${_usernameController.text}');
-                //print('Password: ${_passwordController.text}');
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              },
-              child: const Text('Login'),
+            SizedBox(
+              width: double.infinity,
+              height: 70,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Validate credentials and perform login logic here
+                  // For simplicity, let's just print the entered values
+                  //print('Username: ${_usernameController.text}');
+                  //print('Password: ${_passwordController.text}');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                },
+                child: Text('Login',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Row(
