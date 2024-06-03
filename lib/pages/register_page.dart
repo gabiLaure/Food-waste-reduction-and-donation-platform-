@@ -6,6 +6,7 @@ import 'package:caritas/widgets/toast_messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:intl/intl.dart';
 import '../home.dart';
@@ -194,47 +195,154 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Registration Page'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                'assets/caritas_logo.png',
+                width: 200,
+                height: 200,
+              ),
               TextField(
                 controller: _firstNameController,
-                decoration: const InputDecoration(
-                  labelText: 'First Name',
+                decoration: InputDecoration(
+                  focusColor: Colors.grey[100],
+                  hintText: 'First Name',
+                  hintStyle: GoogleFonts.crimsonPro(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14.0,
+                    horizontal: 14.0,
+                  ),
+                  border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                      borderSide: BorderSide(
+                        width: 0.2,
+                      )),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 203, 152, 206),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _lastNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Last Name',
+                decoration: InputDecoration(
+                  focusColor: Colors.grey[100],
+                  hintText: 'Last Name',
+                  hintStyle: GoogleFonts.crimsonPro(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14.0,
+                    horizontal: 14.0,
+                  ),
+                  border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                      borderSide: BorderSide(
+                        width: 0.2,
+                      )),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 203, 152, 206),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
+                decoration: InputDecoration(
+                  focusColor: Colors.grey[100],
+                  hintText: 'Email',
+                  hintStyle: GoogleFonts.crimsonPro(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14.0,
+                    horizontal: 14.0,
+                  ),
+                  border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                      borderSide: BorderSide(
+                        width: 0.2,
+                      )),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 203, 152, 206),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _mobileController,
-                decoration: const InputDecoration(
-                  labelText: 'Mobile Number',
+                decoration: InputDecoration(
+                  focusColor: Colors.grey[100],
+                  hintText: 'Mobile Number',
+                  hintStyle: GoogleFonts.crimsonPro(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14.0,
+                    horizontal: 14.0,
+                  ),
+                  border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                      borderSide: BorderSide(
+                        width: 0.2,
+                      )),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 203, 152, 206),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _password,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
+                decoration: InputDecoration(
+                  focusColor: Colors.grey[100],
+                  hintText: 'Password',
+                  hintStyle: GoogleFonts.crimsonPro(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14.0,
+                    horizontal: 14.0,
+                  ),
+                  border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                      borderSide: BorderSide(
+                        width: 0.2,
+                      )),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 203, 152, 206),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -242,16 +350,39 @@ class _RegisterPageState extends State<RegisterPage> {
               DropdownButtonFormField(
                 decoration: const InputDecoration(
                   labelText: 'Account Type',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                      borderSide: BorderSide(
+                        width: 0.2,
+                      )),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 203, 152, 206),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                  ),
                 ),
-                value: 'Donor',
+                value: 'Orphanage',
                 items: [
                   DropdownMenuItem(
-                    child: Text('Donor'),
-                    value: 'Donor',
+                    child: Text('Orphanage'),
+                    value: 'Orphanage',
                   ),
                   DropdownMenuItem(
-                    child: Text('Beneficiary'),
-                    value: 'Beneficiary',
+                    child: Text('Restaurant'),
+                    value: 'Restaurant',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Superette'),
+                    value: 'Grocery',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Individual'),
+                    value: 'Individual',
                   ),
                 ],
                 onChanged: (value) {
@@ -263,25 +394,31 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
 
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  if (validateUser()) {
-                    authenticateUser();
-                  }
-                  // Validate input and perform registration logic here
-                  // For simplicity, let's just print the entered values
-                  //print('First Name: ${_firstNameController.text}');
-                  //print('Last Name: ${_lastNameController.text}');
-                  //print('Email: ${_emailController.text}');
-                  //print('Mobile Number: ${_mobileController.text}');
-                  //print('Password: ${_passwordController.text}');
-
-                  // Navigator.push(context,
-                  //     MaterialPageRoute(builder: (context) => HomePage()));
-                },
-                child: const Text('Register'),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (validateUser()) {
+                      authenticateUser();
+                    }
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomePage()));
+                  },
+                  child: const Text('Register',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400)),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      )),
+                ),
               ),
-              const SizedBox(height: 16),
+
+              const SizedBox(height: 24),
               TextButton(
                 onPressed: () {
                   // Navigate to the registration page when "Register" is pressed
