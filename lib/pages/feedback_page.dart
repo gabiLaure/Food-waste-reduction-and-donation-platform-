@@ -1,12 +1,13 @@
 // ignore_for_file: unnecessary_new, prefer_const_constructors
 
-import 'package:caritas/generators/uuid_generator.dart';
-import 'package:caritas/widgets/button_widgets.dart';
-import 'package:caritas/widgets/toast_messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../generators/uuid_generator.dart';
+import '../widgets/button_widgets.dart';
+import '../widgets/toast_messages.dart';
 
 class GiveFeedbackPage extends StatefulWidget {
   @override

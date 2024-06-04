@@ -1,9 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:caritas/pages/login_page.dart';
-import 'package:caritas/widgets/toast_messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../pages/login_page.dart';
+import 'toast_messages.dart';
 
 class SignOutAlertDialog {
   void showAlert(BuildContext context) {

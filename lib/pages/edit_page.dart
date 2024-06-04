@@ -2,10 +2,6 @@
 
 import 'dart:io';
 
-import 'package:caritas/models/user_model.dart';
-import 'package:caritas/widgets/button_widgets.dart';
-import 'package:caritas/widgets/image_frames_widgets.dart';
-import 'package:caritas/widgets/toast_messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_database/firebase_database.dart';
@@ -14,6 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 // import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../models/user_model.dart';
+import '../widgets/button_widgets.dart';
+import '../widgets/image_frames_widgets.dart';
+import '../widgets/toast_messages.dart';
 
 class EditDonorProfilePage extends StatefulWidget {
   @override

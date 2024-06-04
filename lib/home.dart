@@ -1,21 +1,18 @@
 //import 'package:caritas/pages/feeds_page.dart';
 // ignore_for_file: prefer_const_constructors
 
-import 'package:caritas/pages/all_donation.dart';
-import 'package:caritas/pages/all_request_page.dart';
-import 'package:caritas/pages/donation_page.dart';
-import 'package:caritas/pages/login_page.dart';
-import 'package:caritas/pages/profile_page.dart';
-import 'package:caritas/pages/feeds_page.dart';
-import 'package:caritas/pages/notification_page.dart';
-import 'package:caritas/widgets/alert_dialogs.dart';
-
 import 'package:flutter/material.dart';
 
-import 'pages/food_tips.dart';
+import 'pages/all_donation.dart';
+import 'pages/all_request_page.dart';
+import 'pages/donation_page.dart';
+import 'pages/feeds_page.dart';
 import 'pages/impact_page.dart';
+import 'pages/notification_page.dart';
 import 'pages/orphanage_page.dart';
+import 'pages/profile_page.dart';
 import 'pages/schedule.dart';
+import 'widgets/alert_dialogs.dart';
 
 //import 'pages/feeds_page.dart';
 // Import other necessary files if needed

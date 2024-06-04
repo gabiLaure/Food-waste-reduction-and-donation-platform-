@@ -1,6 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:caritas/intro/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'onboarding_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});

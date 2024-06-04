@@ -1,10 +1,12 @@
 // notification_details_page.dart
-import 'package:caritas/pages/chat_bubble.dart';
-import 'package:caritas/pages/notification_details_appbar.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/widgets.dart';
+
+import '../pages/chat_bubble.dart';
+import '../pages/notification_details_appbar.dart';
 
 enum MessageType {
   Sender,

@@ -1,9 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:caritas/home.dart';
-import 'package:caritas/widgets/button_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../home.dart';
+import 'button_widgets.dart';
 
 class CustomAlertDialog extends StatelessWidget {
   final bool isUserCreated;

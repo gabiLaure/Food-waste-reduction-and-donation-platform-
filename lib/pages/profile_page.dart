@@ -1,10 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:caritas/models/user_model.dart';
-import 'package:caritas/pages/edit_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../models/user_model.dart';
+import 'edit_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

@@ -1,6 +1,7 @@
-import 'package:caritas/pages/view_donation.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import 'view_donation.dart';
 
 class SchedulePage extends StatelessWidget {
   const SchedulePage({super.key});

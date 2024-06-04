@@ -1,13 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'package:caritas/pages/listing_creation_page.dart';
-import 'package:caritas/pages/view_donation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import '../widgets/food_category.dart';
+import 'listing_creation_page.dart';
+import 'view_donation.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -22,9 +22,11 @@ class _FeedPageState extends State<FeedPage> {
   final List<Map<String, String>> mediaItems = [
     {'type': 'image', 'path': 'assets/images/orphanage1.jpeg'},
     {'type': 'image', 'path': 'assets/images/orphanage2.jpeg'},
-    {'type': 'video', 'path': 'assets/videos/orphanage1.mp4'},
-    {'type': 'video', 'path': 'assets/videos/orphanage2.mp4'},
-    {'type': 'video', 'path': 'assets/videos/orphanage3.mp4'},
+    {'type': 'image', 'path': 'assets/images/orphanage3.jpeg'},
+    //{'type': 'image', 'path': 'assets/images/orphanage2.jpeg'},
+    // {'type': 'video', 'path': 'assets/videos/orphanage1.mp4'},
+    // {'type': 'video', 'path': 'assets/videos/orphanage2.mp4'},
+    // {'type': 'video', 'path': 'assets/videos/orphanage3.mp4'},
   ];
 
   List<VideoPlayerController> _videoControllers = [];

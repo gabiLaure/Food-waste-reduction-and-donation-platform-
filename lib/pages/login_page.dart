@@ -1,28 +1,12 @@
 // ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, avoid_print, use_build_context_synchronously
 
-/*import 'package:flutter/material.dart';
-
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return  Scaffold(
-      appBar: AppBar(title: const Text("App Title"),
-      backgroundColor: Colors.blue,),
-      backgroundColor: Colors.indigo,
-      body: const SafeArea(child: Text("Login Page", style: TextStyle(color: Colors.black),))
-    );
-  }
-}*/
-
-import 'package:caritas/home.dart';
-import 'package:caritas/widgets/button_widgets.dart';
-import 'package:caritas/widgets/toast_messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../home.dart';
+import '../widgets/button_widgets.dart';
+import '../widgets/toast_messages.dart';
 import 'forgot_password_page.dart';
 import 'register_page.dart';
 

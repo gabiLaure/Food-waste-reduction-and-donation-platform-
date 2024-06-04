@@ -2,13 +2,13 @@
 
 import 'dart:ui';
 
-import 'package:caritas/pages/edit_donation.dart';
-import 'package:caritas/pages/feedback_page.dart';
-import 'package:caritas/pages/listing_creation_page.dart';
-import 'package:caritas/pages/notification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
+
+import 'feedback_page.dart';
+import 'listing_creation_page.dart';
+import 'notification_page.dart';
 
 FlutterView view = WidgetsBinding.instance.platformDispatcher.views.first;
 // Dimensions in physical pixels (px)
