@@ -1,6 +1,9 @@
+import 'package:caritas/pages/feedback_page.dart';
 import 'package:caritas/pages/listing_creation_page.dart';
 import 'package:caritas/pages/view_donation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
 import 'package:caritas/pages/view_donation.dart';
@@ -177,14 +180,8 @@ class AllDonations extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      DonationsFragment();
-                      // Handle button 2 press
-                      // var article;
-                      // ArticleDetailsPage(
-                      //   image: article.imageUrl,
-                      //   articleName: article.name,
-                      //   articleDescription: article.description,
-                      // );
+                      Get.to(GiveFeedbackPage());
+                      print("clicked");
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green[100],

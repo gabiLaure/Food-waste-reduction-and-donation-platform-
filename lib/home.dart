@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 
 import 'pages/food_tips.dart';
 import 'pages/impact_page.dart';
+import 'pages/orphanage_page.dart';
 import 'pages/schedule.dart';
 
 //import 'pages/feeds_page.dart';
@@ -43,7 +44,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Caritas'),
+        title: Text('Caritas',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
         leading: Image.asset(
           'assets/caritas_logo.png', // Replace with your image asset path
           width: 32, // Set the desired width
@@ -58,11 +60,11 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.notifications_active_outlined),
                   onPressed: () {
                     // Handle notification button click here
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => NotificationsListPage()),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NotificationPage()),
+                    );
                   },
                 ),
                 IconButton(
@@ -99,7 +101,13 @@ class _HomePageState extends State<HomePage> {
               title: Text('Orphanage'),
               onTap: () {
                 // Handle navigation or other actions
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        OrphanageApp(), // Replace with your actual notification page
+                  ),
+                );
               },
             ),
             ListTile(
@@ -149,18 +157,18 @@ class _HomePageState extends State<HomePage> {
             //   },
             // ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: () {
-                SignOutAlertDialog().showAlert(context);
-              },
-            ),
-            ListTile(
               leading: Icon(Icons.settings),
               title: Text('Settings'),
               onTap: () {
                 // Handle navigation or other actions
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () {
+                SignOutAlertDialog().showAlert(context);
               },
             ),
             // logout button

@@ -21,6 +21,7 @@ import 'package:caritas/widgets/button_widgets.dart';
 import 'package:caritas/widgets/toast_messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'forgot_password_page.dart';
 import 'register_page.dart';
@@ -223,44 +224,93 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login Page'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset(
+              'assets/caritas_logo.png',
+              width: 200,
+              height: 200,
+            ),
             TextField(
               controller: _usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
+              decoration: InputDecoration(
+                focusColor: Colors.grey[100],
+                hintText: 'Username or phone',
+                hintStyle: GoogleFonts.crimsonPro(),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 14.0,
+                  horizontal: 14.0,
+                ),
+                border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                    borderSide: BorderSide(
+                      width: 0.2,
+                    )),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 203, 152, 206),
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
+              decoration: InputDecoration(
+                focusColor: Colors.grey[100],
+                hintText: 'Password',
+                hintStyle: GoogleFonts.crimsonPro(),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 14.0,
+                  horizontal: 14.0,
+                ),
+                border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                    borderSide: BorderSide(
+                      width: 0.2,
+                    )),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 203, 152, 206),
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                if (validateUser()) {
-                  _signInWithEmailAndPassword();
-                }
-                // Validate credentials and perform login logic here
-                // For simplicity, let's just print the entered values
-                //print('Username: ${_usernameController.text}');
-                //print('Password: ${_passwordController.text}');
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => LoginPage()),
-                // );
-              },
-              child: const Text('Login'),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (validateUser()) {
+                    _signInWithEmailAndPassword();
+                  }
+                },
+                child: Text('Login',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Row(

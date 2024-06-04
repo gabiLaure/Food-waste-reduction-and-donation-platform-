@@ -2,7 +2,10 @@
 
 import 'dart:ui';
 
+import 'package:caritas/pages/edit_donation.dart';
 import 'package:caritas/pages/feedback_page.dart';
+import 'package:caritas/pages/listing_creation_page.dart';
+import 'package:caritas/pages/notification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
@@ -196,22 +199,32 @@ class DonationsFragment extends StatelessWidget {
                         ),
                         const SizedBox(height: 30),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              children: [
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(children: [
                                 Container(
                                   height: 50,
                                   width: 50,
                                   decoration: BoxDecoration(
                                       color: Colors.purple[200],
                                       borderRadius: BorderRadius.circular(10)),
-                                  child: const Center(
+                                  child: Center(
+                                      child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ListingCreationPage()),
+                                        // ListingEditPage(listingType:'Listing', communityType :'Listing', selectedImages : 'Listing', title: 'Listing', description : 'Listing', availability: 'Listing', bestBeforeDate :'Listing', isMerchant: 'Listing')),
+                                      );
+                                      // Handle button press event
+                                    },
                                     child: Icon(
                                       Icons.edit_note_rounded,
                                       color: Colors.white,
                                     ),
-                                  ),
+                                  )),
                                 ),
                                 SizedBox(height: 10),
                                 Text(
@@ -222,70 +235,79 @@ class DonationsFragment extends StatelessWidget {
                                     fontWeight: FontWeight.w300,
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              children: [
-                                Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                      color: Colors.purple[200],
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.restore_from_trash,
-                                      color: Colors.white,
+                              ]),
+                              const SizedBox(width: 10),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                        color: Colors.purple[200],
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Center(
+                                        child: GestureDetector(
+                                      onTap: () {
+                                        Get.to(GiveFeedbackPage());
+                                        print("clicked");
+                                        // Handle button press event
+                                      },
+                                      child: Icon(
+                                        Icons.message_rounded,
+                                        color: Colors.white,
+                                      ),
+                                    )),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "Delete",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xff9ca5bb),
+                                      fontWeight: FontWeight.w300,
                                     ),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                        color: Colors.purple[200],
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Center(
+                                        child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  NotificationPage()),
+                                        );
+                                      },
+                                      child: Icon(
+                                        Icons.message_rounded,
+                                        color: Colors.white,
+                                      ),
+                                    )),
                                   ),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  "Delete",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0xff9ca5bb),
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              children: [
-                                Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                      color: Colors.purple[200],
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Center(
-                                      child: GestureDetector(
-                                    onTap: () {
-                                      Get.to(GiveFeedbackPage());
-                                      print("clicked");
-                                      // Handle button press event
-                                    },
-                                    child: Icon(
-                                      Icons.message_rounded,
-                                      color: Colors.white,
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "Message",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xff9ca5bb),
+                                      fontWeight: FontWeight.w300,
                                     ),
-                                  )),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  "Message",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0xff9ca5bb),
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                  )
+                                ],
+                              ),
+                            ]),
                         const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -317,7 +339,7 @@ class DonationsFragment extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
+                )
               ],
             ),
             //   Padding(
