@@ -14,15 +14,16 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
       splash: Scaffold(
-      body: _buildUI(),
-    ),
-     nextScreen: LoginPage(),
-     splashIconSize: 400,
+        body: _buildUI(),
+      ),
+      nextScreen: LoginPage(),
+      splashIconSize: 700,
     );
-
   }
 }
 
-Widget _buildUI(){
-  return Center(child: LottieBuilder.asset("assets/animation/foody.json"),);
+Widget _buildUI() {
+  return Center(
+    child: LottieBuilder.asset("assets/animation/foody.json"),
+  );
 }

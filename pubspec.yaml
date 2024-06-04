@@ -31,6 +31,10 @@ dependencies:
   mysql1: ^0.20.0
   flutter_chat_ui: ^1.6.13
   get: ^4.6.6
+  smooth_page_indicator: ^1.1.0
+  google_fonts: ^6.2.1
+  carousel_slider: ^4.0.0
+
   # firebase packages
   firebase_core: ^2.32.0
   firebase_database: ^10.5.7
@@ -68,13 +72,22 @@ flutter:
     - assets/herbes_spices.jpeg
     - assets/baked_goods.jpeg
     - assets/fat_oil.jpeg
+    - assets/malnutrition.jpeg
+    - assets/education.jpeg
+    - assets/emotion.jpeg
     - assets/images/asian_girl.jpg
+    - assets/images/orphanage1.jpeg
+    - assets/images/orphanage2.jpeg
+    - assets/images/orphanage3.jpeg
     - assets/images/old_man.jpg
     - assets/images/african_child.jpg
     - assets/images/children.jpg
     - assets/images/wheelchair.jpg
     - assets/images/african2.jpg
     - assets/images/welcome.png
+    - assets/videos/orphanage1.mp4
+    - assets/videos/orphanage2.mp4
+    - assets/videos/orphanage3.mp4
     - assets/images/
     
   
