@@ -67,4 +67,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'caritas-feee8.appspot.com',
     iosBundleId: 'com.example.caritas',
   );
+
 }
