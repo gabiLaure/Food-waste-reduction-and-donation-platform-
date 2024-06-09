@@ -1,6 +1,5 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors
 
-import 'dart:io';
 import 'package:caritas/generators/uuid_generator.dart';
 import 'package:caritas/home.dart';
 import 'package:caritas/widgets/toast_messages.dart';
@@ -8,10 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:flutter_cupernino_bottom_sheet/flutter_cupernino_bottom_sheet.dart';
 
 class RequestDonation extends StatefulWidget {
   @override
@@ -208,6 +204,7 @@ class _RequestDonationState extends State<RequestDonation> {
           'title': _controller.text,
           'description': _descriptionController.text,
           'requestdate': "$formattedDate, $formattedTime",
+          'status': 'Pending',
         })
         .then(
           (value) => sendSuccessCode(),

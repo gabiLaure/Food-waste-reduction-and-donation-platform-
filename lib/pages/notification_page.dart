@@ -36,6 +36,8 @@
 //   }
 // }
 
+// ignore_for_file: prefer_const_constructors
+
 import 'package:caritas/widgets/notification_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -54,52 +56,52 @@ class _NotificationPageState extends State<NotificationPage> {
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "13:15"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "09:30"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "yesterday"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "yesterday"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "yesterday"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "yesterday"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "yesterday"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "yesterday"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow"),
+        time: "yesterday"),
     ChatUsers(
         secondaryText: 'Hello! how are you doing?',
         text: "laury",
         image: "assets/pp.jpeg",
-        time: "tommorow")
+        time: "yesterday")
   ];
 
   @override
@@ -217,23 +219,34 @@ class _NotificationListState extends State<NotificationList> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.text),
+                          Text(
+                            widget.text.toUpperCase(),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Color.fromARGB(255, 6, 14, 29)),
+                          ),
                           SizedBox(
                             width: 16,
                           ),
                           Text(widget.secondaryText,
                               style: TextStyle(
-                                  fontSize: 14, color: Colors.purple[200])),
-                          Text(widget.text),
+                                fontSize: 14,
+                                // color: Colors.purple[200]
+                              )),
+                          widget.isMessageRead
+                              ? Icon(Icons.done)
+                              : Icon(Icons.done_all, color: Colors.blue)
+                          // Text(widget.text),
                         ],
                       ),
                     ),
                     Text(widget.time,
                         style: TextStyle(
-                            fontSize: 12,
-                            color: widget.isMessageRead
-                                ? Colors.grey[500]
-                                : Colors.amber))
+                          fontSize: 12,
+                          // color: widget.isMessageRead
+                          //     ? Colors.grey[500]
+                          //     : Colors.amber
+                        ))
                   ]),
                 )
               ]))),

@@ -62,8 +62,8 @@ class ImpactCard extends StatelessWidget {
           // Local image at the top
           Image.asset(
             imagePath,
-            height: 150,
-            width: double.infinity,
+            // width: double.infinity,
+            // height: double.infinity,
             fit: BoxFit.cover,
           ),
           ListTile(

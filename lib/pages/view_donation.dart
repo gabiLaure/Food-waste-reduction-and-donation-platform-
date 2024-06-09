@@ -6,6 +6,7 @@ import 'package:caritas/pages/edit_donation.dart';
 import 'package:caritas/pages/feedback_page.dart';
 import 'package:caritas/pages/listing_creation_page.dart';
 import 'package:caritas/pages/notification_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
@@ -31,6 +32,7 @@ class DonationsFragment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String currentUserID = FirebaseAuth.instance.currentUser!.uid.toString();
     return Scaffold(
       appBar: AppBar(
         title: const Text(
