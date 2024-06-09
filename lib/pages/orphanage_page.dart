@@ -7,12 +7,20 @@ class OrphanageApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.teal,
-        hintColor: Colors.tealAccent,
         textTheme: GoogleFonts.crimsonProTextTheme(
           Theme.of(context).textTheme,
         ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
+      // theme: ThemeData(
+      //   primaryColor: Colors.teal,
+      //   hintColor: Colors.tealAccent,
+      //   textTheme: GoogleFonts.crimsonProTextTheme(
+      //     Theme.of(context).textTheme,
+      //   ),
+      // ),
+
       home: OrphanageListPage(),
     );
   }
@@ -24,7 +32,7 @@ class OrphanageListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Orphanages'),
-        backgroundColor: Colors.teal,
+        // backgroundColor: Colors.teal,
       ),
       body: ListView.builder(
         itemCount: orphanages.length,
@@ -107,7 +115,7 @@ class OrphanageDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(orphanage.name),
-        backgroundColor: Colors.teal,
+        // backgroundColor: Colors.teal,
       ),
       body: SingleChildScrollView(
         child: Column(

@@ -83,7 +83,8 @@ class _FeedPageState extends State<FeedPage> {
             },
           );
         } else if (item['type'] == 'video') {
-          int index = mediaItems.indexOf(item) - 3; // Adjust index calculation
+          int index = mediaItems.indexOf(item) - 2;
+
           return Builder(
             builder: (BuildContext context) {
               return Container(
