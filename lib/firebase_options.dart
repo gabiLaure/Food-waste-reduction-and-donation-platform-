@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -66,6 +57,38 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://caritas-feee8-default-rtdb.firebaseio.com',
     storageBucket: 'caritas-feee8.appspot.com',
     iosBundleId: 'com.example.caritas',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDelS6Cgqz7Tgmn-7W-8kKF4kiT4DrvvSA',
+    appId: '1:848388148236:web:e1b6305a4e83a36429b229',
+    messagingSenderId: '848388148236',
+    projectId: 'caritas-feee8',
+    authDomain: 'caritas-feee8.firebaseapp.com',
+    databaseURL: 'https://caritas-feee8-default-rtdb.firebaseio.com',
+    storageBucket: 'caritas-feee8.appspot.com',
+    measurementId: 'G-7WERWRW3K9',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDmb1-aF9QbNwmpmhvZkrzfoOPs40wrmpg',
+    appId: '1:848388148236:ios:9e1ecfe6591fea8f29b229',
+    messagingSenderId: '848388148236',
+    projectId: 'caritas-feee8',
+    databaseURL: 'https://caritas-feee8-default-rtdb.firebaseio.com',
+    storageBucket: 'caritas-feee8.appspot.com',
+    iosBundleId: 'com.example.caritas',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDelS6Cgqz7Tgmn-7W-8kKF4kiT4DrvvSA',
+    appId: '1:848388148236:web:1437097905e3ea8a29b229',
+    messagingSenderId: '848388148236',
+    projectId: 'caritas-feee8',
+    authDomain: 'caritas-feee8.firebaseapp.com',
+    databaseURL: 'https://caritas-feee8-default-rtdb.firebaseio.com',
+    storageBucket: 'caritas-feee8.appspot.com',
+    measurementId: 'G-QDC6FZE51L',
   );
 
 }

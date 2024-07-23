@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Flutter Demo",
+
       theme: ThemeData(
         textTheme: GoogleFonts.crimsonProTextTheme(
           Theme.of(context).textTheme,

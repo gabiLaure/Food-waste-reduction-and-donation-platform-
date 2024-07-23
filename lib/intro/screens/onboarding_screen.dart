@@ -141,7 +141,7 @@ final List<OnBoard> demo_data = [
     ),
     title: "Let's Help\nEach Other",
     description:
-        "When we give cheerfully and accept\ngratefully, everyone is blessed",
+        "Let's come together to support the less fortunate\ngratefully, everyone is blessed",
   ),
   OnBoard(
     widget: Container(
@@ -154,9 +154,9 @@ final List<OnBoard> demo_data = [
   ),
   const OnBoard(
     widget: ImageSlider(),
-    title: "We Can Help\nPoor People",
+    title: "Food source of \n hope and comfort",
     description:
-        "When we give cheerfully and accept\ngratefully, everyone is blessed",
+        "For those in need \n a simple meal can make a world of difference",
   ),
 ];
 

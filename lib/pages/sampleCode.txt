@@ -1,9 +1,6 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'dart:io';
 import 'package:caritas/generators/uuid_generator.dart';
 import 'package:caritas/home.dart';
-import 'package:caritas/pages/map.dart';
 import 'package:caritas/widgets/button_widgets.dart';
 import 'package:caritas/widgets/toast_messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,11 +8,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
-import 'view_donation.dart';
 
 class ListingCreationPage extends StatefulWidget {
   @override
@@ -23,23 +20,17 @@ class ListingCreationPage extends StatefulWidget {
 }
 
 class _ListingCreationPageState extends State<ListingCreationPage> {
-  //String _output = '';
-  //late LatLng _selectedLocation;
+  String _listingType = 'Donation'; // Must match one of the dropdown items
+  String _communityType =
+      'DORCAS Foundation'; // Must match one of the dropdown items
 
-  String _communityType = 'DORCAS Foundation'; // Default value
   final String userProfileID =
       FirebaseAuth.instance.currentUser!.uid.toString();
 
-  // Uploading Process
   bool isStartToUpload = false;
   bool isUploadComplete = false;
   bool isAnError = false;
   double? circularProgressVal;
-
-  /* GoogleMapController? mapController;
-  LatLng? selectedPosition; */
-  String? selectedPlaceName;
-
   List<File> _selectedImages = [];
   String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
   String formattedTime = DateFormat('kk:mm:a').format(DateTime.now());
@@ -58,7 +49,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   }
 
   void sendSuccessCode() {
-    //print("Post Add Success!");
     Navigator.pop(context);
     setState(() {
       isStartToUpload = false;
@@ -69,8 +59,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
 
   void sendErrorCode(String error) {
     ToastMessages().showErrorToast(error);
-    //print("Post Add Error!");
-
     setState(() {
       isStartToUpload = false;
       isAnError = true;
@@ -80,7 +68,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   }
 
   showAlertDialog(BuildContext context) {
-    // show the dialog
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -89,7 +76,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           builder: (context, setState) {
             return AlertDialog(
               title: !isUploadComplete
-                  ? Center(child: Text("chargement du message"))
+                  ? Center(child: Text("Chargement du message"))
                   : Center(child: Text("Chargement réussi")),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -196,21 +183,18 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
       for (var image in _selectedImages) {
         final ref = firebase_storage.FirebaseStorage.instance
             .ref()
-            .child('donation_images/$userProfileID/$donationID');
+            .child('donation_images/$userProfileID/$donationID')
+            .child(DateTime.now().millisecondsSinceEpoch.toString());
         await ref.putFile(image);
         final imageUrl = await ref.getDownloadURL();
-        print("image URL: $imageUrl");
         imageList.add(imageUrl);
-        // addDonToFireStore(imageUrl);
       }
-      // add donnation to firestore with list of images
       addDonToFireStore(imageList);
     } catch (e) {
-      print(e);
+      sendErrorCode(e.toString());
     }
   }
 
-  // add donnation to firestore with multiple images
   Future<void> addDonToFireStore(List<String> imageList) async {
     FirebaseFirestore.instance
         .collection('Users')
@@ -220,6 +204,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
         .set({
           'donationID': donationID,
           'donorID': userProfileID,
+          'donationType': _listingType,
           'communityType': _communityType,
           'donationTitle': _controller.text,
           'donationDescription': _descriptionController.text,
@@ -256,18 +241,17 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     }
   }
 
-  final TextEditingController _descriptionController =
-      TextEditingController(); // Create the controller
-
+  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _controller = TextEditingController();
   final int maxTitleLength = 50;
   final int maxDescriptionLength = 500;
 
-  //bool _showCalendar = true;
-  // Holds the selected action
   String selectedAction = '';
   DateTime? selectedDate;
   bool isSwitched = false;
+
+  GoogleMapController? mapController;
+  LatLng? selectedLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -290,13 +274,15 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
             ),
           ),
           SizedBox(height: 16),
+          //_buildListingType(),
           SizedBox(height: 24),
-          _buildLocalCommunity(),
+          //_buildLocalCommunity(),
           SizedBox(height: 16),
           _buildLocation(),
           _buildPhotosContainer(),
           _buildTitle(),
           _buildDescription(),
+          _buildKilogramme(),
           _buildAvailabilities(),
           Divider(),
           _buildBestBefore(),
@@ -305,7 +291,9 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                validateDonation();
+              },
               child: Text('Validate Donation',
                   style: TextStyle(
                       fontSize: 20,
@@ -324,271 +312,213 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     );
   }
 
-  Widget _buildLocalCommunity() {
-    // Implement the widget for selecting the listing type
-    return DropdownButtonFormField<String>(
-      value: _communityType,
-      onChanged: (newValue) {
-        setState(() {
-          _communityType = newValue!;
-        });
-      },
-      items: <String>[
-        'CEPREJED',
-        'ONDAPA',
-        'DORCAS Foundation',
-        'MSDAC',
-        'Fondation des Enfants Orphelins'
-      ].map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      decoration: InputDecoration(
-        labelText: 'Local Community',
-        border: OutlineInputBorder(),
-      ),
-    );
-  }
+  // Widget _buildListingType() {
+  //   return DropdownButtonFormField<String>(
+  //     value: _listingType,
+  //     onChanged: (newValue) {
+  //       setState(() {
+  //         _listingType = newValue!;
+  //       });
+  //     },
+  //     items: _listingType.map<DropdownMenuItem<String>>((String value) {
+  //       print('ListingType Item: $value'); // Debugging line
+  //       return DropdownMenuItem<String>(
+  //         value: value,
+  //         child: Text(value),
+  //       );
+  //     }).toList(),
+  //     decoration: InputDecoration(
+  //       labelText: 'Listing Type',
+  //       border: OutlineInputBorder(),
+  //     ),
+  //   );
+  // }
+
+  // Widget _buildLocalCommunity() {
+  //   return DropdownButtonFormField<String>(
+  //     value: _communityType,
+  //     onChanged: (newValue) {
+  //       setState(() {
+  //         _communityType = newValue!;
+  //       });
+  //     },
+  //     items: _communityType.map<DropdownMenuItem<String>>((String value) {
+  //       print('CommunityType Item: $value'); // Debugging line
+  //       return DropdownMenuItem<String>(
+  //         value: value,
+  //         child: Text(value),
+  //       );
+  //     }).toList(),
+  //     decoration: InputDecoration(
+  //       labelText: 'Local Community',
+  //       border: OutlineInputBorder(),
+  //     ),
+  //   );
+  // }
 
   Widget _buildLocation() {
-    // Implement the food icon message widget
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          leading: Icon(Icons.check_circle_outline),
-          title: Text(
-            'Location : ',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+        Text('Location'),
+        SizedBox(height: 8),
+        Container(
+          height: 200,
+          child: GoogleMap(
+            onMapCreated: (controller) {
+              mapController = controller;
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(4.04827, 9.70428), // Example coordinates
+              zoom: 12,
             ),
+            markers: selectedLocation != null
+                ? {
+                    Marker(
+                      markerId: MarkerId('selected-location'),
+                      position: selectedLocation!,
+                    )
+                  }
+                : {},
+            onTap: (position) {
+              setState(() {
+                selectedLocation = position;
+              });
+            },
           ),
-          subtitle: Text(selectedPlaceName ?? 'Select location'),
-          trailing: Icon(Icons.location_on_sharp),
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DonationsFragment()));
-          },
         ),
-        Divider(),
       ],
     );
   }
 
   Widget _buildPhotosContainer() {
-    // Implement the widget for selecting/uploading photos
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 10,
-        ),
-        ListTile(
-            leading: Icon(Icons.check_circle_outline),
-            title: Row(children: [
-              Text(
-                'Food Image',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ])),
+        Text('Photos'),
         SizedBox(height: 8),
-        _buildSelectedImages(),
-        SizedBox(height: 8),
-        Visibility(
-          visible: _selectedImages.length < 4,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(150, 100), // Set the desired size
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ), // Rounded corners
-            onPressed: () {
-              _showImageSourceDialog();
-            },
-            icon: Icon(Icons.add), // Icon in the center
-            label: Text('Add food Image'),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
           ),
+          itemCount: _selectedImages.length + 1,
+          itemBuilder: (context, index) {
+            if (index == _selectedImages.length) {
+              return GestureDetector(
+                onTap: () => _getImage(ImageSource.gallery),
+                child: Container(
+                  color: Colors.grey[300],
+                  child: Icon(Icons.add_a_photo, size: 50),
+                ),
+              );
+            } else {
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.file(_selectedImages[index], fit: BoxFit.cover),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedImages.removeAt(index);
+                        });
+                      },
+                      child: Container(
+                        color: Colors.black54,
+                        child: Icon(Icons.close, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
-        Visibility(
-          visible: _selectedImages.length == 4,
-          child: Text(
-            'You can add a maximum of 4 photos.',
-            style: TextStyle(color: Colors.red),
+      ],
+    );
+  }
+
+  Widget _buildTitle() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Title'),
+        SizedBox(height: 8),
+        TextField(
+          controller: _controller,
+          maxLength: maxTitleLength,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSelectedImages() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: _selectedImages.map((image) {
-        return Stack(
+  Widget _buildDescription() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Description'),
+        SizedBox(height: 8),
+        TextField(
+          controller: _descriptionController,
+          maxLength: maxDescriptionLength,
+          maxLines: 3,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKilogramme() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Kilogramme'),
+        SizedBox(height: 8),
+        TextField(
+          controller: _descriptionController,
+          maxLength: maxDescriptionLength,
+          maxLines: 3,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+        ),
+        /* Row(
           children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: FileImage(image),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: GestureDetector(
-                onTap: () {
+            Expanded(
+              child: Slider(
+                value: _currentSliderValue,
+                min: 0,
+                max: 100,
+                divisions: 10,
+                label: _currentSliderValue.round().toString(),
+                onChanged: (value) {
                   setState(() {
-                    _selectedImages.remove(image);
+                    _currentSliderValue = value;
                   });
                 },
-                child: const CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Colors.red,
-                  child: Icon(
-                    Icons.close,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
               ),
             ),
-          ],
-        );
-      }).toList(),
-    );
-  }
-
-  void _showImageSourceDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(child: Text('Select Image Source')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(ImageSource.camera);
-                },
-                child: Text('Take Photo'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(ImageSource.gallery);
-                },
-                child: const Text('Choose from Gallery'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-//
-  Widget _buildTitle() {
-    // Implement the widget for entering the title
-    return Padding(
-        padding: const EdgeInsets.all(1.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 15.0),
-            const ListTile(
-                leading: Icon(Icons.check_circle_outline),
-                title: Row(children: [
-                  Text(
-                    'Enter Food Type',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ])),
             Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey), // Add a border
-                borderRadius: BorderRadius.circular(8.0), // Rounded corners
-              ),
-              child: TextField(
-                controller: _controller,
-                maxLength: maxTitleLength,
-                decoration: InputDecoration(
-                  contentPadding:
-                      EdgeInsets.all(12.0), // Add padding inside the box
-                  border: InputBorder.none,
-                  hintText: 'E.g. Vegetable, Cakes, Cereals',
-                  counterText: '${_controller.text.length}/$maxTitleLength',
-                ),
+              width: 50,
+              child: Text(
+                '${_currentSliderValue.round()} Kg',
+                textAlign: TextAlign.center,
               ),
             ),
           ],
-        ));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Widget _buildDescription() {
-    // Implement the widget for entering the description
-    return Padding(
-      padding: const EdgeInsets.all(1.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 8.0),
-          ListTile(
-              leading: Icon(Icons.check_circle_outline),
-              title: Row(children: [
-                Text(
-                  'Description',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ])),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey), // Add a border
-              borderRadius: BorderRadius.circular(8.0), // Rounded corners
-            ),
-            child: TextField(
-              minLines: null,
-              maxLines: null,
-              controller: _descriptionController,
-              maxLength: maxDescriptionLength,
-              decoration: InputDecoration(
-                contentPadding:
-                    EdgeInsets.all(12.0), // Add padding inside the box
-                border: InputBorder.none,
-                hintText:
-                    'E.g. Tomatoes from the garden,Give as many details as possible to increase your chances of giving',
-                counterText: '${_controller.text.length}/$maxDescriptionLength',
-              ),
-            ),
-          ),
-        ],
-      ),
+        ), */
+      ],
     );
   }
 
@@ -686,6 +616,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
             _showDatePicker(context);
           },
         ),
+        Divider(),
       ],
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class OrphanageApp extends StatelessWidget {
+class GroceryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,34 +21,34 @@ class OrphanageApp extends StatelessWidget {
       //   ),
       // ),
 
-      home: OrphanageListPage(),
+      home: GroceryListPage(),
     );
   }
 }
 
-class OrphanageListPage extends StatelessWidget {
+class GroceryListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Orphanages'),
+        title: Text('Grocerys'),
         // backgroundColor: Colors.teal,
       ),
       body: ListView.builder(
-        itemCount: orphanages.length,
+        itemCount: Grocerys.length,
         itemBuilder: (context, index) {
-          final orphanage = orphanages[index];
-          return OrphanageCard(orphanage: orphanage);
+          final grocery = Grocerys[index];
+          return GroceryCard(grocery: grocery);
         },
       ),
     );
   }
 }
 
-class OrphanageCard extends StatelessWidget {
-  final Orphanage orphanage;
+class GroceryCard extends StatelessWidget {
+  final Grocery grocery;
 
-  OrphanageCard({required this.orphanage});
+  GroceryCard({required this.grocery});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class OrphanageCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrphanageDetailPage(orphanage: orphanage),
+              builder: (context) => GroceryDetailPage(grocery: grocery),
             ),
           );
         },
@@ -75,7 +75,7 @@ class OrphanageCard extends StatelessWidget {
                 topRight: Radius.circular(15),
               ),
               child: Image.asset(
-                orphanage.image,
+                grocery.image,
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -87,12 +87,12 @@ class OrphanageCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    orphanage.name,
+                    grocery.name,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5),
                   Text(
-                    orphanage.description,
+                    grocery.description,
                     style: TextStyle(fontSize: 16),
                   ),
                 ],
@@ -105,25 +105,25 @@ class OrphanageCard extends StatelessWidget {
   }
 }
 
-class OrphanageDetailPage extends StatelessWidget {
-  final Orphanage orphanage;
+class GroceryDetailPage extends StatelessWidget {
+  final Grocery grocery;
 
-  OrphanageDetailPage({required this.orphanage});
+  GroceryDetailPage({required this.grocery});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(orphanage.name),
+        title: Text(grocery.name),
         // backgroundColor: Colors.teal,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HeaderImage(image: orphanage.image),
-            MissionStatement(mission: orphanage.mission),
-            ServicesSection(services: orphanage.services),
-            ContactInformation(contactInfo: orphanage.contactInfo),
+            HeaderImage(image: grocery.image),
+            DescriptionSection(description: grocery.description),
+            OpeningHoursSection(openingHours: grocery.openingHours),
+            ContactInformation(contactInfo: grocery.contactInfo),
           ],
         ),
       ),
@@ -152,7 +152,7 @@ class HeaderImage extends StatelessWidget {
           color: Colors.black54,
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Welcome to Our Orphanage',
+            'Welcome to Our Grocery',
             style: TextStyle(
               fontSize: 30,
               color: Colors.white,
@@ -165,17 +165,17 @@ class HeaderImage extends StatelessWidget {
   }
 }
 
-class MissionStatement extends StatelessWidget {
-  final String mission;
+class DescriptionSection extends StatelessWidget {
+  final String description;
 
-  MissionStatement({required this.mission});
+  DescriptionSection({required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
-        color: Colors.teal[50],
+        color: Colors.deepPurple[50],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
@@ -183,7 +183,7 @@ class MissionStatement extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            mission,
+            description,
             style: TextStyle(fontSize: 18),
             textAlign: TextAlign.center,
           ),
@@ -193,10 +193,10 @@ class MissionStatement extends StatelessWidget {
   }
 }
 
-class ServicesSection extends StatelessWidget {
-  final List<Service> services;
+class OpeningHoursSection extends StatelessWidget {
+  final String openingHours;
 
-  ServicesSection({required this.services});
+  OpeningHoursSection({required this.openingHours});
 
   @override
   Widget build(BuildContext context) {
@@ -206,42 +206,18 @@ class ServicesSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Our Mission',
+            'Opening Hours',
             style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple),
           ),
           SizedBox(height: 10),
-          ...services.map((service) => ServiceItem(service: service)).toList(),
+          Text(
+            openingHours,
+            style: TextStyle(fontSize: 16),
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class ServiceItem extends StatelessWidget {
-  final Service service;
-
-  ServiceItem({required this.service});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.teal[50],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      elevation: 5,
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: ListTile(
-        leading: Icon(service.icon, color: Colors.teal, size: 40),
-        title: Text(
-          service.title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(
-          service.description,
-          style: TextStyle(fontSize: 16),
-        ),
       ),
     );
   }
@@ -307,99 +283,55 @@ class ContactItem extends StatelessWidget {
   }
 }
 
-final List<Orphanage> orphanages = [
-  Orphanage(
-    name: 'Orphanage A',
-    description: 'A loving home for children in need.',
-    image: 'assets/images/orphanage1.jpeg',
-    mission:
-        'Our mission is to provide a loving and nurturing environment for all children.',
-    services: [
-      Service(
-        title: 'Education',
-        description:
-            'High-quality education to help children achieve their full potential.',
-        icon: Icons.school,
-      ),
-      Service(
-        title: 'Healthcare',
-        description: 'Healthcare services to ensure all children are healthy.',
-        icon: Icons.health_and_safety,
-      ),
-    ],
+final List<Grocery> Grocerys = [
+  Grocery(
+    name: 'Supermarket A',
+    description: 'A delightful place to enjoy exquisite cuisine.',
+    openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
+    image: 'assets/grocery/supermarket1.jpeg',
     contactInfo: ContactInfo(
       address: 'Biyem-Assi Street, Yaounde, Cameroun',
       phone: '+237 6789 456 789',
-      email: 'contact@orphanagea.org',
+      email: 'contact@Grocerya.org',
     ),
   ),
-  Orphanage(
-    name: 'Orphanage B',
+  Grocery(
+    name: 'Supermarket B',
     description: 'A loving home for children in need.',
-    image: 'assets/images/orphanage2.jpeg',
-    mission:
-        'Our mission is to provide a loving and nurturing environment for all children.',
-    services: [
-      Service(
-        title: 'Education',
-        description:
-            'High-quality education to help children achieve their full potential.',
-        icon: Icons.school,
-      ),
-      Service(
-        title: 'Healthcare',
-        description: 'Healthcare services to ensure all children are healthy.',
-        icon: Icons.health_and_safety,
-      ),
-    ],
+    image: 'assets/grocery/supermarket2.jpeg',
+    openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
     contactInfo: ContactInfo(
       address: 'TPO Street, Bafoussam, Cameroun',
       phone: '+237 6789 456 789',
-      email: 'contact@orphanagea.org',
+      email: 'contact@Grocerya.org',
     ),
   ),
-  Orphanage(
-    name: 'Orphanage C',
+  Grocery(
+    name: 'Supermarket C',
     description: 'A loving home for children in need.',
-    image: 'assets/images/orphanage3.jpeg',
-    mission:
-        'Our mission is to provide a loving and nurturing environment for all children.',
-    services: [
-      Service(
-        title: 'Education',
-        description:
-            'High-quality education to help children achieve their full potential.',
-        icon: Icons.school,
-      ),
-      Service(
-        title: 'Healthcare',
-        description: 'Healthcare services to ensure all children are healthy.',
-        icon: Icons.health_and_safety,
-      ),
-    ],
+    image: 'assets/grocery/supermarket3.jpeg',
+    openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
     contactInfo: ContactInfo(
       address: 'Chapelle Nsimeyong, Yaounde, Cameroun',
       phone: '+237 6789 456 789',
-      email: 'contact@orphanagea.org',
+      email: 'contact@Grocerya.org',
     ),
   ),
-  // Add more orphanages here
+  // Add more Grocerys here
 ];
 
-class Orphanage {
+class Grocery {
   final String name;
   final String description;
+  final String openingHours;
   final String image;
-  final String mission;
-  final List<Service> services;
   final ContactInfo contactInfo;
 
-  Orphanage({
+  Grocery({
     required this.name,
     required this.description,
+    required this.openingHours,
     required this.image,
-    required this.mission,
-    required this.services,
     required this.contactInfo,
   });
 }

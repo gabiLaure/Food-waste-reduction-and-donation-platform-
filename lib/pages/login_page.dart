@@ -59,8 +59,8 @@ class _LoginPageState extends State<LoginPage> {
           builder: (context, setState) {
             return AlertDialog(
               title: !isUserSigned
-                  ? Center(child: Text("Se connecter"))
-                  : Center(child: Text("Bienvenue à nouveau!")),
+                  ? Center(child: Text("Connect"))
+                  : Center(child: Text("Welcome back!")),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(
                                 height: 30.0,
                               ),
-                              Text("Connexion à votre compte...",
+                              Text("Connexion to your account...",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(fontSize: 16.0)
                                       .copyWith(color: Colors.grey.shade900)),
@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                           )
                         : Column(
                             children: [
-                              Text("Erreur!",
+                              Text("Error!",
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                                 height: 50.0,
                               ),
                               ButtonWidget(
-                                  text: "Réessayez",
+                                  text: "Try again",
                                   color: Colors.red,
                                   textColor: Colors.white,
                                   onClicked: () {
@@ -114,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                   else
                     Column(
                       children: [
-                        Text("Bienvenue!",
+                        Text("Welcome!",
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -131,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 50.0,
                         ),
                         ButtonWidget(
-                            text: "Continuer",
+                            text: "Continue",
                             textColor: Colors.white,
                             color: Colors.indigo,
                             onClicked: () {
@@ -225,126 +225,132 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/caritas_logo.png',
-              width: 200,
-              height: 200,
-            ),
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                focusColor: Colors.grey[100],
-                hintText: 'Username or phone',
-                hintStyle: GoogleFonts.crimsonPro(),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 14.0,
-                  horizontal: 14.0,
-                ),
-                border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20),
-                    ),
-                    borderSide: BorderSide(
-                      width: 0.2,
-                    )),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                focusColor: Colors.grey[100],
-                hintText: 'Password',
-                hintStyle: GoogleFonts.crimsonPro(),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 14.0,
-                  horizontal: 14.0,
-                ),
-                border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20),
-                    ),
-                    borderSide: BorderSide(
-                      width: 0.2,
-                    )),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (validateUser()) {
-                    _signInWithEmailAndPassword();
-                  }
-                },
-                child: Text('Login',
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 203, 152, 206),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: EdgeInsets.only(top: 50.0, left: 16, right: 16),
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      // Navigate to the registration page when "Register" is pressed
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegisterPage()),
-                      );
-                    },
-                    child: const Text("Don't have an account? Register"),
+                Image.asset(
+                  'assets/caritas_logo.png',
+                  width: 200,
+                  height: 200,
+                ),
+                TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(
+                    focusColor: Colors.grey[100],
+                    hintText: 'Username or phone',
+                    hintStyle: GoogleFonts.crimsonPro(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14.0,
+                      horizontal: 14.0,
+                    ),
+                    border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                        borderSide: BorderSide(
+                          width: 0.2,
+                        )),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 203, 152, 206),
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                    ),
                   ),
                 ),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      // Navigate to the forgot password page when "Forgot Password" is pressed
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ForgotPasswordPage()),
-                      );
-                    },
-                    child: const Text("Forgot Password?"),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    focusColor: Colors.grey[100],
+                    hintText: 'Password',
+                    hintStyle: GoogleFonts.crimsonPro(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14.0,
+                      horizontal: 14.0,
+                    ),
+                    border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                        borderSide: BorderSide(
+                          width: 0.2,
+                        )),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 203, 152, 206),
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(20),
+                      ),
+                    ),
                   ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (validateUser()) {
+                        _signInWithEmailAndPassword();
+                      }
+                    },
+                    child: Text('Login',
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          // Navigate to the registration page when "Register" is pressed
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const RegisterPage()),
+                          );
+                        },
+                        child: const Text("Don't have an account? Register"),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          // Navigate to the forgot password page when "Forgot Password" is pressed
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const ForgotPasswordPage()),
+                          );
+                        },
+                        child: const Text("Forgot Password?"),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

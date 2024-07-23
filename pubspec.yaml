@@ -36,6 +36,23 @@ dependencies:
   carousel_slider: ^4.0.0
   open_filex: ^4.4.0
   file_picker: ^8.0.3
+  #geolocator: ^12.0.0
+  #geocoding: ^3.0.0
+  #google_maps_flutter: ^2.7.0
+  #google_maps_place_picker_mb: ^3.1.2
+
+  #location: ^6.0.2
+  #url_launcher: ^6.0.9
+
+  google_maps_flutter: ^2.0.8
+
+  geolocator: ^12.0.0
+
+  flutter_google_places: ^0.3.0
+
+  awesome_snackbar_content: ^0.1.3
+
+
 
   # firebase packages
   firebase_core: ^2.32.0
@@ -46,6 +63,7 @@ dependencies:
   firebase_storage: ^11.7.7
   uuid: ^3.0.7
 
+
   
 
 dev_dependencies:
@@ -54,6 +72,7 @@ dev_dependencies:
 
   
   flutter_lints: ^4.0.0
+  
 
 
 flutter:
@@ -81,6 +100,15 @@ flutter:
     - assets/images/orphanage1.jpeg
     - assets/images/orphanage2.jpeg
     - assets/images/orphanage3.jpeg
+    - assets/restaurant/restaurantA.jpeg
+    - assets/restaurant/restaurantB.jpeg
+    - assets/restaurant/restaurantC.jpeg
+    - assets/grocery/supermarket1.jpeg
+    - assets/grocery/supermarket2.jpeg
+    - assets/grocery/supermarket3.jpeg
+    - assets/restaurant/menu1.jpeg
+    - assets/restaurant/menu2.jpeg
+    - assets/restaurant/menu3.jpeg
     - assets/images/old_man.jpg
     - assets/images/african_child.jpg
     - assets/images/children.jpg

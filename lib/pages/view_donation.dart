@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:caritas/pages/edit_donation.dart';
 import 'package:caritas/pages/feedback_page.dart';
-import 'package:caritas/pages/listing_creation_page.dart';
+//import 'package:caritas/pages/listing_creation_page.dart';
 import 'package:caritas/pages/notification_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -65,67 +65,49 @@ class DonationsFragment extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 30),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Container(
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              Container(
                                 height: 270,
                                 width: 180,
                                 decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage('assets/fruits.jpeg'),
-                                      fit: BoxFit.cover,
-                                      colorFilter: ColorFilter.mode(
-                                          Colors.black.withOpacity(0.5),
-                                          BlendMode.darken),
-                                    ),
-                                    borderRadius: BorderRadius.circular(30)),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: Container(
-                                height: 270,
-                                width: 180,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/sweets_snacks.jpeg'),
-                                      fit: BoxFit.cover,
-                                      colorFilter: ColorFilter.mode(
-                                          Colors.black.withOpacity(0.5),
-                                          BlendMode.darken),
-                                    ),
-                                    borderRadius: BorderRadius.circular(30)),
-                                child: const Center(
-                                  child: Text(
-                                    "2+ \nImage",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
+                                  image: DecorationImage(
+                                    image: AssetImage('assets/fruits.jpeg'),
+                                    fit: BoxFit.cover,
                                   ),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
-                            ),
-                            // const SizedBox(
-                            //   width: 10,
-                            // ),
-                            // Expanded(
-                            //   child: Container(
-                            //     height: 270,
-                            //     width: 180,
-                            //     decoration: BoxDecoration(
-                            //         borderRadius: BorderRadius.circular(30)),
-                            //     child: const VideoPlayerWidget(),
-                            //   ),
-                            // ),
-                          ],
+                              SizedBox(width: 10),
+                              Container(
+                                height: 270,
+                                width: 180,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image:
+                                        AssetImage('assets/sweets_snacks.jpeg'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Container(
+                                height: 270,
+                                width: 180,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image:
+                                        AssetImage('assets/sweets_snacks.jpeg'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 30),
                         Text(
@@ -213,13 +195,13 @@ class DonationsFragment extends StatelessWidget {
                                   child: Center(
                                       child: GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ListingCreationPage()),
-                                        // ListingEditPage(listingType:'Listing', communityType :'Listing', selectedImages : 'Listing', title: 'Listing', description : 'Listing', availability: 'Listing', bestBeforeDate :'Listing', isMerchant: 'Listing')),
-                                      );
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //           ListingCreationPage()),
+                                      //   // ListingEditPage(listingType:'Listing', communityType :'Listing', selectedImages : 'Listing', title: 'Listing', description : 'Listing', availability: 'Listing', bestBeforeDate :'Listing', isMerchant: 'Listing')),
+                                      // );
                                       // Handle button press event
                                     },
                                     child: Icon(

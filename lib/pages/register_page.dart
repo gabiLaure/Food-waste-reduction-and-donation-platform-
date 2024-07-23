@@ -10,6 +10,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:intl/intl.dart';
 import '../home.dart';
+import 'grocery_registration_page.dart';
+import 'orphanage_registration_page.dart';
+import 'restaurant_registration_page.dart';
 
 void main() {
   runApp(const RegisterApp());
@@ -366,8 +369,12 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                 ),
-                value: 'Orphanage',
+                value: 'None',
                 items: [
+                  DropdownMenuItem(
+                    child: Text('None'),
+                    value: 'None',
+                  ),
                   DropdownMenuItem(
                     child: Text('Orphanage'),
                     value: 'Orphanage',
@@ -390,6 +397,30 @@ class _RegisterPageState extends State<RegisterPage> {
                     accountTypeName = value.toString();
                     _typeDeCompte.text = value.toString();
                   });
+                  if (value == 'Orphanage') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => OrphanageRegistration()),
+                    );
+                  } else if (value == 'Restaurant') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RestaurantRegistration()),
+                    );
+                  } else if (value == 'Grocery') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GroceryRegistration()),
+                    );
+                  } else if (value == 'Individual') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  }
                 },
               ),
 

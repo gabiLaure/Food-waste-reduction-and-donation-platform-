@@ -21,10 +21,11 @@ class _FeedPageState extends State<FeedPage> {
 
   final List<Map<String, String>> mediaItems = [
     {'type': 'image', 'path': 'assets/images/orphanage1.jpeg'},
-    {'type': 'image', 'path': 'assets/images/orphanage2.jpeg'},
-    {'type': 'video', 'path': 'assets/videos/orphanage1.mp4'},
-    {'type': 'video', 'path': 'assets/videos/orphanage2.mp4'},
-    {'type': 'video', 'path': 'assets/videos/orphanage3.mp4'},
+    {'type': 'image', 'path': 'assets/restaurant/restaurantB.jpeg'},
+    {'type': 'image', 'path': 'assets/grocery/supermarket3.jpeg'},
+    // {'type': 'video', 'path': 'assets/videos/orphanage1.mp4'},
+    // {'type': 'video', 'path': 'assets/videos/orphanage2.mp4'},
+    // {'type': 'video', 'path': 'assets/videos/orphanage3.mp4'},
   ];
 
   List<VideoPlayerController> _videoControllers = [];

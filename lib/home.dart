@@ -13,8 +13,10 @@ import 'package:caritas/widgets/alert_dialogs.dart';
 import 'package:flutter/material.dart';
 
 import 'pages/food_tips.dart';
+import 'pages/grocery_page.dart';
 import 'pages/impact_page.dart';
 import 'pages/orphanage_page.dart';
+import 'pages/restaurant_page.dart';
 import 'pages/schedule.dart';
 
 //import 'pages/feeds_page.dart';
@@ -111,6 +113,34 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.restaurant_menu),
+              title: Text('Restaurant'),
+              onTap: () {
+                // Handle navigation or other actions
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        RestaurantApp(), // Replace with your actual notification page
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.local_grocery_store_outlined),
+              title: Text('Grocery'),
+              onTap: () {
+                // Handle navigation or other actions
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        GroceryApp(), // Replace with your actual notification page
+                  ),
+                );
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.volunteer_activism),
               title: Text('Donation'),
               onTap: () {
@@ -138,24 +168,6 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            // ListTile(
-            //   leading: Icon(Icons.fastfood_outlined),
-            //   title: Text('Food Tips'),
-            //   onTap: () {
-            //     // Handle navigation or other actions
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => FoodDetailsPage(
-            //           image: 'image',
-            //           foodName: 'foodName',
-            //           foodDescription: 'foodDescription',
-            //           foodTip: 'foodTip',
-            //         ), // Replace with your actual notification page
-            //       ),
-            //     );
-            //   },
-            // ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Settings'),
@@ -182,8 +194,8 @@ class _HomePageState extends State<HomePage> {
         data: NavigationBarThemeData(
           // backgroundColor: Colors.blue,
           //iconTheme: IconThemeData(color: Colors.white),
-          labelTextStyle: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               // Style for selected label
               return TextStyle(
                 fontSize: 16,

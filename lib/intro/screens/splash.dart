@@ -12,8 +12,8 @@ class SplashScreen extends StatelessWidget {
     return AnimatedSplashScreen(
         splash: Image.asset(
           'assets/caritas_logo.png',
-          width: 800,
-          height: 800,
+          width: 1000,
+          height: 1000,
         ),
         //backgroundColor: Color.fromARGB(255, 236, 183, 239),
 
