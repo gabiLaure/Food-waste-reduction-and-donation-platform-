@@ -2,6 +2,8 @@
 
 import 'package:caritas/pages/listing_creation_page.dart';
 import 'package:caritas/pages/view_donation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +20,7 @@ class FeedPage extends StatefulWidget {
 
 class _FeedPageState extends State<FeedPage> {
   DateTime selectedDate = DateTime.now();
-
+  final firestoreInstance = FirebaseFirestore.instance;
   final List<Map<String, String>> mediaItems = [
     {'type': 'image', 'path': 'assets/images/orphanage1.jpeg'},
     {'type': 'image', 'path': 'assets/restaurant/restaurantB.jpeg'},
@@ -195,68 +197,36 @@ class _FeedPageState extends State<FeedPage> {
                   textAlign: TextAlign.start,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Icon(Icons.fastfood_outlined),
-                          title: Text(
-                            'Thanks for Sharing!',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.shopping_bag_outlined),
-                                  SizedBox(width: 5),
-                                  Text('7 kg'),
-                                  SizedBox(width: 5),
-                                  Icon(Icons.location_on),
-                                  SizedBox(width: 3),
-                                  Text('100km'),
-                                ],
-                              ),
-                              SizedBox(height: 5),
-                              Row(
-                                children: [
-                                  Icon(Icons.watch_later_outlined),
-                                  SizedBox(width: 5),
-                                  Text('Collection (evening)'),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Handle button press
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        DonationsFragment()), // Correct the navigation destination
+                Container(
+                  // afficher les 5 derniers dons
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: firestoreInstance
+                          .collection('Users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection("donations")
+                          .orderBy('donationDate', descending: true)
+                          .limit(5)
+                          .snapshots(),
+                      builder: ((context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        return !snapshot.hasData
+                            ? Container()
+                            : ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  DocumentSnapshot donation =
+                                      snapshot.data!.docs[index];
+                                  return _scheduleDonationCard(
+                                      context, donation);
+                                },
                               );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[100],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            child: Text('View Donation'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                      })),
+                )
               ],
             ),
           ),
@@ -264,4 +234,68 @@ class _FeedPageState extends State<FeedPage> {
       ),
     );
   }
+}
+
+Widget _scheduleDonationCard(BuildContext context, DocumentSnapshot donation) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Card(
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(Icons.fastfood_outlined),
+            title: Text(
+              'Thanks for Sharing!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.shopping_bag_outlined),
+                    SizedBox(width: 5),
+                    Text('7 kg'),
+                    SizedBox(width: 5),
+                    Icon(Icons.location_on),
+                    SizedBox(width: 3),
+                    Text('100km'),
+                  ],
+                ),
+                SizedBox(height: 5),
+                Row(
+                  children: [
+                    Icon(Icons.watch_later_outlined),
+                    SizedBox(width: 5),
+                    Text(donation['donationAvailability']),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                // Handle button press
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DonationsFragment(
+                          donation)), // Correct the navigation destination
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[100],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              child: Text('View Donation'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

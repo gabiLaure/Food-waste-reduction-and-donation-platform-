@@ -11,9 +11,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:caritas/map/screens/current_location_screen.dart';
 
 import 'view_donation.dart';
 
@@ -45,6 +48,129 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   String formattedTime = DateFormat('kk:mm:a').format(DateTime.now());
 
   String donationID = UUIDGenerator().uuidV4();
+  // intialize _donLocationDetails
+  List _donLocationDetails = [
+    3.844119, // 00
+    11.501346, // 01
+    "No Address", // 02
+    "No Street", // 03
+    "No Postal Code", // 04
+    "No Administrative Area", // 05
+    "No Sub Administrative Area", // 06
+    "No Thoroughfare", // 07
+    "No Sub Thoroughfare", // 08
+    "No Locality", // 09
+    "No Sub Locality", // 10
+    "No Country", // 11
+    "No ISO Country Code", // 12
+  ];
+  double? donLocationLatitude, donLocationLongitude;
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled');
+    }
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        return Future.error("Location permission denied");
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied');
+    }
+
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        forceAndroidLocationManager: true);
+  }
+
+  Position? _currentPosition;
+
+  Position? position;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUserLocation();
+  }
+
+  String userCurrentAddress = "Aucun lieu n'est sélectionné !";
+  _getCurrentUserLocation() async {
+    try {
+      _determinePosition().then((Position position) {
+        setState(() {
+          _currentPosition = position;
+        });
+        print(_currentPosition);
+        _getCurrentUserAddressFromLatLng(
+            _currentPosition?.latitude, _currentPosition?.longitude);
+      }).catchError((e) {
+        print(e);
+      });
+    } catch (error) {
+      ToastMessages().showErrorToast(error.toString());
+    }
+  }
+
+  _getCurrentUserAddressFromLatLng(latitude, longitude) async {
+    try {
+      List<Placemark> p = await placemarkFromCoordinates(latitude, longitude);
+      Placemark place = p[0];
+      setState(() {
+        donLocationLatitude = latitude;
+        donLocationLongitude = longitude;
+
+        _donLocationDetails = [
+          latitude, // 00
+          longitude, // 01
+          "${place.name}", // 02
+          "${place.street}", // 03
+          "${place.postalCode}", // 04
+          "${place.administrativeArea}", // 05
+          "${place.subAdministrativeArea}", // 06
+          "${place.thoroughfare}", // 07
+          "${place.subThoroughfare}", // 08
+          "${place.locality}", // 09
+          "${place.subLocality}", // 10
+          "${place.country}", // 11
+          "${place.isoCountryCode}", // 12
+        ];
+
+        userCurrentAddress = ""
+            // "${_donLocationDetails[0].toString()}, "
+            // "${_donLocationDetails[1].toString()}, "
+            "${_donLocationDetails[2].toString()}, "
+            "${_donLocationDetails[3].toString()}, "
+            "${_donLocationDetails[4].toString()}, "
+            "${_donLocationDetails[5].toString()}, "
+            "${_donLocationDetails[6].toString()}, "
+            // "${_donLocationDetails[7].toString()}, "
+            // "${_donLocationDetails[8].toString()}, "
+            "${_donLocationDetails[9].toString()}, "
+            "${_donLocationDetails[10].toString()}, "
+            "${_donLocationDetails[11].toString()}, "
+            "${_donLocationDetails[12].toString()}";
+
+        /*ToastMessages().toastSuccess("Location Selected: \n"
+            "$_trashLocationAddress", context);*/
+      });
+      // retryCount--;
+      // await Future.delayed(Duration(seconds: 4));
+    } catch (error) {
+      ToastMessages().showErrorToast(error.toString());
+      print("ERROR=> _getTrashLocationAddressFromLatLng: $error");
+    }
+  }
 
   void _getImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -228,6 +354,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           'donationStatus': 'Pending',
           'donationBestBefore': selectedDate,
           'donationAvailability': selectedAction,
+          'donLocation': GeoPoint(donLocationLatitude!, donLocationLongitude!),
         })
         .then(
           (value) => sendSuccessCode(),
@@ -269,6 +396,12 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   DateTime? selectedDate;
   bool isSwitched = false;
 
+  // @override
+  // void initState() {
+  //   _getCurrentUserLocation();
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -305,7 +438,9 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                validateDonation();
+              },
               child: Text('Validate Donation',
                   style: TextStyle(
                       fontSize: 20,
@@ -365,11 +500,13 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          subtitle: Text(selectedPlaceName ?? 'Select location'),
+          subtitle: Text(userCurrentAddress),
           trailing: Icon(Icons.location_on_sharp),
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DonationsFragment()));
+            //_getCurrentUserLocation();
+            print("Location Selected: $userCurrentAddress");
+            // Navigator.push(context,
+            //     MaterialPageRoute(builder: (context) => DonationsFragment()));
           },
         ),
         Divider(),

@@ -1,7 +1,8 @@
 import 'dart:convert';
 
+import 'package:caritas/map/model/nearby_response.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter_tutorial/model/nearby_response.dart';
+// import 'package:google_maps_flutter_tutorial/model/nearby_response.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -13,7 +14,6 @@ class NearByPlacesScreen extends StatefulWidget {
 }
 
 class _NearByPlacesScreenState extends State<NearByPlacesScreen> {
-
   String apiKey = "";
   String radius = "30";
 
@@ -29,18 +29,16 @@ class _NearByPlacesScreenState extends State<NearByPlacesScreen> {
         title: const Text('Nearby Places'),
         centerTitle: true,
       ),
-
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ElevatedButton(onPressed: (){
-
-              getNearbyPlaces();
-
-            }, child: const Text("Get Nearby Places")),
-
-            if(nearbyPlacesResponse.results != null)
-              for(int i = 0 ; i < nearbyPlacesResponse.results!.length; i++)
+            ElevatedButton(
+                onPressed: () {
+                  getNearbyPlaces();
+                },
+                child: const Text("Get Nearby Places")),
+            if (nearbyPlacesResponse.results != null)
+              for (int i = 0; i < nearbyPlacesResponse.results!.length; i++)
                 nearbyPlacesWidget(nearbyPlacesResponse.results![i])
           ],
         ),
@@ -49,34 +47,33 @@ class _NearByPlacesScreenState extends State<NearByPlacesScreen> {
   }
 
   void getNearbyPlaces() async {
-
-    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latitude.toString() + ','
-    + longitude.toString() + '&radius=' + radius + '&key=' + apiKey
-    );
+    var url = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=$radius&key=$apiKey');
 
     var response = await http.post(url);
 
-    nearbyPlacesResponse = NearbyPlacesResponse.fromJson(jsonDecode(response.body));
+    nearbyPlacesResponse =
+        NearbyPlacesResponse.fromJson(jsonDecode(response.body));
 
     setState(() {});
-
   }
 
   Widget nearbyPlacesWidget(Results results) {
-
     return Container(
       width: MediaQuery.of(context).size.width,
-      margin: const EdgeInsets.only(top: 10,left: 10,right: 10),
+      margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
       padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(border: Border.all(color: Colors.black),borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(10)),
       child: Column(
         children: [
-          Text("Name: " + results.name!),
-          Text("Location: " + results.geometry!.location!.lat.toString() + " , " + results.geometry!.location!.lng.toString()),
+          Text("Name: ${results.name!}"),
+          Text(
+              "Location: ${results.geometry!.location!.lat} , ${results.geometry!.location!.lng}"),
           Text(results.openingHours != null ? "Open" : "Closed"),
         ],
       ),
     );
-
   }
 }

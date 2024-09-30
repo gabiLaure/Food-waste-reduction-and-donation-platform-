@@ -9,7 +9,6 @@ import 'package:caritas/pages/profile_page.dart';
 import 'package:caritas/pages/feeds_page.dart';
 import 'package:caritas/pages/notification_page.dart';
 import 'package:caritas/widgets/alert_dialogs.dart';
-
 import 'package:flutter/material.dart';
 
 import 'pages/food_tips.dart';
@@ -194,8 +193,8 @@ class _HomePageState extends State<HomePage> {
         data: NavigationBarThemeData(
           // backgroundColor: Colors.blue,
           //iconTheme: IconThemeData(color: Colors.white),
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
+          labelTextStyle: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
               // Style for selected label
               return TextStyle(
                 fontSize: 16,
