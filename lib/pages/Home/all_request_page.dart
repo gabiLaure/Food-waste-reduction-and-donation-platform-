@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable, prefer_interpolation_to_compose_strings
 
-import 'package:caritas/intro/screens/imageslider.dart';
 import 'package:caritas/models/donation.dart';
 import 'package:caritas/models/user_model.dart';
-import 'package:caritas/pages/feedback_page.dart';
-import 'package:caritas/pages/listing_creation_page.dart';
+import 'package:caritas/widgets/feedback_page.dart';
+import 'package:caritas/pages/Donation/listing_creation_page.dart';
+
+import 'package:caritas/pages/Donation/view_donation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class DonationCard extends StatelessWidget {
                   children: [
                     Icon(Icons.watch_later_outlined),
                     SizedBox(width: 5),
-                    Text("Collection($collectionTime)"),
+                    Text("Requested at " + collectionTime),
                   ],
                 ),
               ],
@@ -70,25 +71,26 @@ class DonationCard extends StatelessWidget {
   }
 }
 
-class AllDonations extends StatelessWidget {
-  AllDonations({super.key});
+class AllRequest extends StatelessWidget {
+  AllRequest({super.key});
   final firestoreInstance = FirebaseFirestore.instance;
   late Donation donation;
   late UserModelClass user;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Donations'),
+        title: Text('My Request'),
       ),
+      // Use a FutureBuilder to display a loading spinner while waiting for the
+      // VideoPlayerController to finish initializing.
       body: DefaultTabController(
         length: 2,
         child: Column(
           children: <Widget>[
             TabBar(
               tabs: [
-                Tab(text: 'Pending Offers'),
+                Tab(text: 'Pending Request'),
                 Tab(text: 'To be collected'),
               ],
             ),
@@ -100,7 +102,8 @@ class AllDonations extends StatelessWidget {
                           .collection('Users')
                           .doc(FirebaseAuth.instance.currentUser!.uid)
                           .collection("donations")
-                          .where('donationStatus', isEqualTo: 'Pending')
+                          .where('listingType', isEqualTo: 'Request')
+                          //.where('status', isEqualTo: 'Pending')
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
@@ -111,7 +114,7 @@ class AllDonations extends StatelessWidget {
                             ? Container()
                             : snapshot.data!.docs.length.toString() == '0'
                                 ? Center(
-                                    child: Text('No pending offers...'),
+                                    child: Text('No pending request...'),
                                   )
                                 : ListView.builder(
                                     itemCount: snapshot.data!.docs.length,
@@ -121,14 +124,14 @@ class AllDonations extends StatelessWidget {
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: DonationCard(
-                                          title:
-                                              "${"You've Accepted  " + donation['donationTitle']}!",
+                                          title: donation['title']!,
                                           //quantity: donation['quantity'],
                                           quantity: "7 kg",
                                           //distance: donation['distance'],
                                           distance: "100km",
+
                                           collectionTime:
-                                              donation['donationAvailability'],
+                                              donation['requestdate'],
                                           widget: Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Row(
@@ -191,7 +194,8 @@ class AllDonations extends StatelessWidget {
                           .collection('Users')
                           .doc(FirebaseAuth.instance.currentUser!.uid)
                           .collection("donations")
-                          .where('donationStatus', isEqualTo: 'Accepted')
+                          .where('listingType', isEqualTo: 'Request')
+                          // .where('donationStatus', isEqualTo: 'Accepted')
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
@@ -213,13 +217,14 @@ class AllDonations extends StatelessWidget {
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: DonationCard(
-                                          title: donation['donationTitle'],
+                                          title:
+                                              "${"You've Accepted  " + donation['title']}!",
                                           //quantity: donation['quantity'],
                                           quantity: "7 kg",
                                           //distance: donation['distance'],
                                           distance: "100km",
                                           collectionTime:
-                                              donation['donationAvailability'],
+                                              donation['requestdate'],
                                           widget: Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Row(

@@ -1,33 +1,95 @@
-import 'package:caritas/pages/request_page.dart';
-import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+// ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings
+
 import 'package:caritas/intro/screens/imageslider.dart';
 import 'package:caritas/models/donation.dart';
 import 'package:caritas/models/user_model.dart';
-import 'package:caritas/pages/feedback_page.dart';
-import 'package:caritas/pages/listing_creation_page.dart';
+import 'package:caritas/widgets/feedback_page.dart';
+import 'package:caritas/pages/Donation/listing_creation_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'all_donation.dart';
+class DonationCard extends StatelessWidget {
+  final String title;
+  final String quantity;
+  final String distance;
+  final String collectionTime;
+  final Widget widget;
 
-class DonationPage extends StatelessWidget {
-  DonationPage({super.key});
+  const DonationCard({
+    super.key,
+    required this.title,
+    required this.quantity,
+    required this.distance,
+    required this.collectionTime,
+    // widget
+    required this.widget,
+  });
 
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(Icons.fastfood_outlined),
+            title: Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.shopping_bag_outlined),
+                    SizedBox(width: 5),
+                    Text(quantity),
+                    SizedBox(width: 5),
+                    Icon(Icons.location_on),
+                    SizedBox(width: 3),
+                    Text(distance),
+                  ],
+                ),
+                SizedBox(height: 5),
+                Row(
+                  children: [
+                    Icon(Icons.watch_later_outlined),
+                    SizedBox(width: 5),
+                    Text("Collection($collectionTime)"),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          widget,
+        ],
+      ),
+    );
+  }
+}
+
+class AllDonations extends StatelessWidget {
+  AllDonations({super.key});
   final firestoreInstance = FirebaseFirestore.instance;
   late Donation donation;
   late UserModelClass user;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('My Donations'),
+      ),
       body: DefaultTabController(
-          length: 2,
-          child: Column(children: <Widget>[
+        length: 2,
+        child: Column(
+          children: <Widget>[
             TabBar(
               tabs: [
-                Tab(text: 'Pending Donation'),
-                Tab(text: 'Pending Request'),
+                Tab(text: 'Pending Offers'),
+                Tab(text: 'To be collected'),
               ],
             ),
             Expanded(
@@ -48,25 +110,8 @@ class DonationPage extends StatelessWidget {
                         return !snapshot.hasData
                             ? Container()
                             : snapshot.data!.docs.length.toString() == '0'
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Animated Logo (Replace with your logo widget)
-                                      _buildUI(),
-                                      //CircularProgressIndicator(), // Example of a loading animation
-                                      SizedBox(height: 20),
-                                      Text(
-                                        'There are no ads in this area',
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      SizedBox(height: 20),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          // Handle button press
-                                        },
-                                        child: Text('Expand my search area'),
-                                      ),
-                                    ],
+                                ? Center(
+                                    child: Text('No pending offers...'),
                                   )
                                 : ListView.builder(
                                     itemCount: snapshot.data!.docs.length,
@@ -156,25 +201,9 @@ class DonationPage extends StatelessWidget {
                         return !snapshot.hasData
                             ? Container()
                             : snapshot.data!.docs.length.toString() == '0'
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Animated Logo (Replace with your logo widget)
-                                      _buildUI(),
-                                      //CircularProgressIndicator(), // Example of a loading animation
-                                      SizedBox(height: 20),
-                                      Text(
-                                        'There are no ads in this area',
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      SizedBox(height: 20),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          // Handle button press
-                                        },
-                                        child: Text('Expand my search area'),
-                                      ),
-                                    ],
+                                ? Center(
+                                    child:
+                                        Text('No donations to be collected...'),
                                   )
                                 : ListView.builder(
                                     itemCount: snapshot.data!.docs.length,
@@ -226,60 +255,10 @@ class DonationPage extends StatelessWidget {
                       }),
                 ),
               ]),
-            ),
-          ])),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle floating action button press
-          _showDialog(context);
-        },
-        child: Icon(Icons.add),
+            )
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildUI() {
-    return Center(
-      child: LottieBuilder.asset("assets/animation/delivery.json"),
-    );
-  }
-
-  void _showDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(child: Text('Make a choice')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate to the listing creation page for donation
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ListingCreationPage()),
-                  );
-                },
-                child: Center(child: Text('Make a Donation')),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate to the listing creation page for request
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RequestDonation()),
-                  );
-                },
-                child: Center(child: Text('Make a Request')),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

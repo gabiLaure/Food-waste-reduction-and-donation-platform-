@@ -3,7 +3,7 @@
 import 'dart:io';
 import 'package:caritas/generators/uuid_generator.dart';
 import 'package:caritas/home.dart';
-import 'package:caritas/pages/map.dart';
+import 'package:caritas/pages/Geotargeting/map.dart';
 import 'package:caritas/widgets/button_widgets.dart';
 import 'package:caritas/widgets/toast_messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

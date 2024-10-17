@@ -3,10 +3,10 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:caritas/pages/edit_donation.dart';
-import 'package:caritas/pages/feedback_page.dart';
+import 'package:caritas/pages/Donation/edit_donation.dart';
+import 'package:caritas/widgets/feedback_page.dart';
 //import 'package:caritas/pages/listing_creation_page.dart';
-import 'package:caritas/pages/notification_page.dart';
+import 'package:caritas/pages/Home/notification_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -195,7 +195,7 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
                           // Handle button press event
                         },
                         child: Icon(
-                          Icons.message_rounded,
+                          Icons.delete,
                           color: Colors.white,
                         ),
                       )),

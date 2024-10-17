@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, library_private_types_in_public_api
 
-import 'package:caritas/pages/login_page.dart';
+import 'package:caritas/pages/Registration/login_page.dart';
 import 'package:caritas/widgets/custom_alert_dialog.dart';
 import 'package:caritas/widgets/toast_messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:intl/intl.dart';
-import '../home.dart';
-import 'grocery_registration_page.dart';
-import 'orphanage_registration_page.dart';
-import 'restaurant_registration_page.dart';
+import '../../home.dart';
+import '../Grocery/grocery_registration_page.dart';
+import '../Orphanage/orphanage_registration_page.dart';
+import '../Restaurant/restaurant_registration_page.dart';
 
 void main() {
   runApp(const RegisterApp());

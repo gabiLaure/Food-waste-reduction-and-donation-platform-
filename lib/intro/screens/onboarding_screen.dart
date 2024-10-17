@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:caritas/pages/register_page.dart';
+import 'package:caritas/pages/Registration/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 

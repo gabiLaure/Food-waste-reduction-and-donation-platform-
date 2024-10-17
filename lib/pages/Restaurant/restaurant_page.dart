@@ -1,54 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-class GroceryApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        textTheme: GoogleFonts.crimsonProTextTheme(
-          Theme.of(context).textTheme,
-        ),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      // theme: ThemeData(
-      //   primaryColor: Colors.teal,
-      //   hintColor: Colors.tealAccent,
-      //   textTheme: GoogleFonts.crimsonProTextTheme(
-      //     Theme.of(context).textTheme,
-      //   ),
-      // ),
-
-      home: GroceryListPage(),
-    );
-  }
-}
-
-class GroceryListPage extends StatelessWidget {
+class RestaurantListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grocerys'),
-        // backgroundColor: Colors.teal,
+        title: Text('Restaurants'),
       ),
       body: ListView.builder(
-        itemCount: Grocerys.length,
+        itemCount: restaurants.length,
         itemBuilder: (context, index) {
-          final grocery = Grocerys[index];
-          return GroceryCard(grocery: grocery);
+          final restaurant = restaurants[index];
+          return RestaurantCard(restaurant: restaurant);
         },
       ),
     );
   }
 }
 
-class GroceryCard extends StatelessWidget {
-  final Grocery grocery;
+class RestaurantCard extends StatelessWidget {
+  final Restaurant restaurant;
 
-  GroceryCard({required this.grocery});
+  RestaurantCard({required this.restaurant});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +36,8 @@ class GroceryCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => GroceryDetailPage(grocery: grocery),
+              builder: (context) =>
+                  RestaurantDetailPage(restaurant: restaurant),
             ),
           );
         },
@@ -75,7 +49,7 @@ class GroceryCard extends StatelessWidget {
                 topRight: Radius.circular(15),
               ),
               child: Image.asset(
-                grocery.image,
+                restaurant.image,
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -87,12 +61,12 @@ class GroceryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    grocery.name,
+                    restaurant.name,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5),
                   Text(
-                    grocery.description,
+                    restaurant.description,
                     style: TextStyle(fontSize: 16),
                   ),
                 ],
@@ -105,25 +79,25 @@ class GroceryCard extends StatelessWidget {
   }
 }
 
-class GroceryDetailPage extends StatelessWidget {
-  final Grocery grocery;
+class RestaurantDetailPage extends StatelessWidget {
+  final Restaurant restaurant;
 
-  GroceryDetailPage({required this.grocery});
+  RestaurantDetailPage({required this.restaurant});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(grocery.name),
-        // backgroundColor: Colors.teal,
+        title: Text(restaurant.name),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HeaderImage(image: grocery.image),
-            DescriptionSection(description: grocery.description),
-            OpeningHoursSection(openingHours: grocery.openingHours),
-            ContactInformation(contactInfo: grocery.contactInfo),
+            HeaderImage(image: restaurant.image),
+            DescriptionSection(description: restaurant.description),
+            OpeningHoursSection(openingHours: restaurant.openingHours),
+            MenuSection(menuItems: restaurant.menuItems),
+            ContactInformation(contactInfo: restaurant.contactInfo),
           ],
         ),
       ),
@@ -152,7 +126,7 @@ class HeaderImage extends StatelessWidget {
           color: Colors.black54,
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Welcome to Our Grocery',
+            'Welcome to Our Restaurant',
             style: TextStyle(
               fontSize: 30,
               color: Colors.white,
@@ -223,6 +197,77 @@ class OpeningHoursSection extends StatelessWidget {
   }
 }
 
+class MenuSection extends StatelessWidget {
+  final List<MenuItem> menuItems;
+
+  MenuSection({required this.menuItems});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Menu',
+            style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple),
+          ),
+          SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: menuItems.map((menuItem) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Container(
+                    height: 270,
+                    width: 180,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(menuItem.image),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MenuItemCard extends StatelessWidget {
+  final MenuItem menuItem;
+
+  MenuItemCard({required this.menuItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        height: 270,
+        width: 180,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/fruits.jpeg'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.5), BlendMode.darken),
+            ),
+            borderRadius: BorderRadius.circular(30)),
+      ),
+    );
+  }
+}
+
 class ContactInformation extends StatelessWidget {
   final ContactInfo contactInfo;
 
@@ -238,7 +283,9 @@ class ContactInformation extends StatelessWidget {
           Text(
             'Contact Us',
             style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple),
           ),
           SizedBox(height: 10),
           ContactItem(
@@ -271,7 +318,7 @@ class ContactItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.teal),
+          Icon(icon, color: Colors.deepPurple),
           SizedBox(width: 10),
           Text(
             text,
@@ -283,69 +330,81 @@ class ContactItem extends StatelessWidget {
   }
 }
 
-final List<Grocery> Grocerys = [
-  Grocery(
-    name: 'Supermarket A',
+final List<Restaurant> restaurants = [
+  Restaurant(
+    name: 'Restaurant A',
     description: 'A delightful place to enjoy exquisite cuisine.',
+    image: 'assets/restaurant/restaurantA.jpeg',
     openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
-    image: 'assets/grocery/supermarket1.jpeg',
+    menuItems: [
+      MenuItem(image: 'assets/restaurant/menu1.jpeg'),
+      MenuItem(image: 'assets/restaurant/menu1.jpeg'),
+      MenuItem(image: 'assets/restaurant/menu1.jpeg'),
+    ],
     contactInfo: ContactInfo(
-      address: 'Biyem-Assi Street, Yaounde, Cameroun',
+      address: '123 Main Street, Yaounde, Cameroun',
       phone: '+237 6789 456 789',
-      email: 'contact@Grocerya.org',
+      email: 'contact@restaurantA.com',
     ),
   ),
-  Grocery(
-    name: 'Supermarket B',
-    description: 'A loving home for children in need.',
-    image: 'assets/grocery/supermarket2.jpeg',
-    openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
+  Restaurant(
+    name: 'Restaurant B',
+    description:
+        'Welcome to Bistro Delights, a cozy corner where culinary passion meets a warm and inviting atmosphere.',
+    image: 'assets/restaurant/restaurantB.jpeg',
+    openingHours: 'Mon-Fri: 11am - 11pm\nSat-Sun: 9am - 12am',
+    menuItems: [
+      MenuItem(image: 'assets/restaurant/menu2.jpeg'),
+      MenuItem(image: 'assets/restaurant/menu2.jpeg'),
+      MenuItem(image: 'assets/restaurant/menu2.jpeg'),
+    ],
     contactInfo: ContactInfo(
-      address: 'TPO Street, Bafoussam, Cameroun',
-      phone: '+237 6789 456 789',
-      email: 'contact@Grocerya.org',
+      address: '456 Another St, Yaounde, Cameroun',
+      phone: '+237 6543 210 987',
+      email: 'contact@restaurantB.com',
     ),
   ),
-  Grocery(
-    name: 'Supermarket C',
-    description: 'A loving home for children in need.',
-    image: 'assets/grocery/supermarket3.jpeg',
-    openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
+  Restaurant(
+    name: 'Restaurant C',
+    description:
+        'Come enjoy the flavors and hospitality that make Bistro Delights a favorite spot for food lovers.',
+    image: 'assets/restaurant/restaurantC.jpeg',
+    openingHours: 'Mon-Fri: 11am - 11pm\nSat-Sun: 9am - 12am',
+    menuItems: [
+      MenuItem(image: 'assets/restaurant/menu3.jpeg'),
+      MenuItem(image: 'assets/restaurant/menu3.jpeg'),
+      MenuItem(image: 'assets/restaurant/menu3.jpeg'),
+    ],
     contactInfo: ContactInfo(
-      address: 'Chapelle Nsimeyong, Yaounde, Cameroun',
-      phone: '+237 6789 456 789',
-      email: 'contact@Grocerya.org',
+      address: '456 Another St, Yaounde, Cameroun',
+      phone: '+237 6543 210 987',
+      email: 'contact@restaurantC.com',
     ),
   ),
-  // Add more Grocerys here
 ];
 
-class Grocery {
+class Restaurant {
   final String name;
   final String description;
-  final String openingHours;
   final String image;
+  final String openingHours;
+  final List<MenuItem> menuItems;
   final ContactInfo contactInfo;
 
-  Grocery({
+  Restaurant({
     required this.name,
     required this.description,
-    required this.openingHours,
     required this.image,
+    required this.openingHours,
+    required this.menuItems,
     required this.contactInfo,
   });
 }
 
-class Service {
-  final String title;
-  final String description;
-  final IconData icon;
+class MenuItem {
+  final String image;
 
-  Service({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
+  MenuItem({required this.image});
 }
 
 class ContactInfo {
@@ -353,9 +412,6 @@ class ContactInfo {
   final String phone;
   final String email;
 
-  ContactInfo({
-    required this.address,
-    required this.phone,
-    required this.email,
-  });
+  ContactInfo(
+      {required this.address, required this.phone, required this.email});
 }

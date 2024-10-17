@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'package:caritas/pages/listing_creation_page.dart';
-import 'package:caritas/pages/view_donation.dart';
+import 'package:caritas/pages/Donation/listing_creation_page.dart';
+import 'package:caritas/pages/Donation/view_donation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,7 @@ import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-import '../widgets/food_category.dart';
+import '../Food Tips/food_category.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});

@@ -1,44 +1,41 @@
-//import 'package:caritas/pages/feeds_page.dart';
-// ignore_for_file: prefer_const_constructors
-
-import 'package:caritas/admin/admin_main.dart';
+import 'package:caritas/admin/widgets/admin_home.dart';
+import 'package:caritas/home.dart';
 import 'package:caritas/pages/Donation/all_donation.dart';
 import 'package:caritas/pages/Home/all_request_page.dart';
-import 'package:caritas/pages/Donation/donation_page.dart';
-import 'package:caritas/pages/Registration/login_page.dart';
-import 'package:caritas/pages/Home/profile_page.dart';
 import 'package:caritas/pages/Home/feeds_page.dart';
 import 'package:caritas/pages/Home/notification_page.dart';
 import 'package:caritas/widgets/alert_dialogs.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/Grocery/grocery_page.dart';
-import 'pages/Home/impact_page.dart';
-import 'pages/Orphanage/orphanage_page.dart';
-import 'pages/Restaurant/restaurant_page.dart';
-import 'pages/Home/schedule.dart';
+import '../pages/Grocery/grocery_page.dart';
+import '../pages/Orphanage/orphanage_page.dart';
+import '../pages/Restaurant/restaurant_page.dart';
+import 'widgets/admin_settings.dart';
+import 'widgets/donation_management.dart';
+import 'widgets/grocery_management.dart';
+import 'widgets/orphanage_management.dart';
+import 'widgets/reports.dart';
+import 'widgets/request_management.dart';
+import 'widgets/restaurant_management.dart';
+import 'widgets/user_management.dart';
 
 //import 'pages/feeds_page.dart';
 // Import other necessary files if needed
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class AdminPage extends StatefulWidget {
+  const AdminPage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _AdminPageState createState() => _AdminPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _AdminPageState extends State<AdminPage> {
   int index = 0;
 
   final screens = [
     // Replace these with your actual pages/screens
 
-    FeedPage(),
-    SchedulePage(),
-    DonationPage(),
-    ImpactPage(),
-    ProfilePage()
+    AdminHomePage(),
   ];
 
   @override
@@ -69,11 +66,11 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.settings),
+                  icon: const Icon(Icons.home),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AdminPage()),
+                      MaterialPageRoute(builder: (context) => HomePage()),
                     );
                   },
                 ),
@@ -92,7 +89,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Center(
                 child: Text(
-                  'My Dashboard',
+                  'Admin Dashboard',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -102,70 +99,90 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               leading: Icon(Icons.family_restroom),
-              title: Text('Orphanage'),
+              title: Text('Orphanage Management'),
               onTap: () {
-                // Handle navigation or other actions
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        OrphanageListPage(), // Replace with your actual notification page
+                        OrphanageManagementPage(), // Link to Orphanage management page
                   ),
                 );
               },
             ),
             ListTile(
               leading: Icon(Icons.restaurant_menu),
-              title: Text('Restaurant'),
+              title: Text('Restaurant Management'),
               onTap: () {
-                // Handle navigation or other actions
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        RestaurantListPage(), // Replace with your actual notification page
+                        RestaurantManagementPage(), // Link to Restaurant management page
                   ),
                 );
               },
             ),
             ListTile(
               leading: Icon(Icons.local_grocery_store_outlined),
-              title: Text('Grocery'),
+              title: Text('Grocery Management'),
               onTap: () {
-                // Handle navigation or other actions
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        GroceryListPage(), // Replace with your actual notification page
+                        GroceryManagementPage(), // Link to Grocery management page
                   ),
                 );
               },
             ),
             ListTile(
               leading: Icon(Icons.volunteer_activism),
-              title: Text('Donation'),
+              title: Text('Donation Management'),
               onTap: () {
-                // Handle navigation or other actions
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        AllDonations(), // Replace with your actual notification page
+                        DonationManagementPage(), // Link to Donation management page
                   ),
                 );
               },
             ),
             ListTile(
               leading: Icon(Icons.handshake),
-              title: Text('Request'),
+              title: Text('Request Management'),
               onTap: () {
-                // Handle navigation or other actions
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        AllRequest(), // Replace with your actual notification page
+                        RequestManagementPage(), // Link to Request management page
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.bar_chart),
+              title: Text('Reports'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReportsPage(), // Link to Reports page
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.people),
+              title: Text('User Management'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        UserManagementPage(), // Link to User management page
                   ),
                 );
               },
@@ -174,12 +191,11 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.settings),
               title: Text('Settings'),
               onTap: () {
-                // Handle navigation or other actions
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        AdminPage(), // Replace with your actual notification page
+                        SettingsPage(), // Link to Settings page
                   ),
                 );
               },
@@ -188,82 +204,14 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                SignOutAlertDialog().showAlert(context);
+                SignOutAlertDialog()
+                    .showAlert(context); // Show a logout confirmation dialog
               },
             ),
-            // logout button
-
-            // Add more list items as needed
           ],
         ),
       ),
       body: screens[index],
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          // backgroundColor: Colors.blue,
-          //iconTheme: IconThemeData(color: Colors.white),
-          labelTextStyle: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
-              // Style for selected label
-              return TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white, // Customize the color
-              );
-            } else {
-              // Style for unselected label
-              return TextStyle(
-                fontSize: 14,
-                color:
-                    Color.fromARGB(216, 104, 102, 102), // Customize the color
-              );
-            }
-          }),
-        ),
-        child: NavigationBar(
-          backgroundColor: Colors.purple[200],
-          indicatorColor: Colors.transparent,
-          surfaceTintColor: Colors.white,
-          selectedIndex: index,
-          onDestinationSelected: (index) => setState(() => this.index = index),
-          destinations: [
-            NavigationDestination(
-                icon: Icon(
-                  Icons.home,
-                  color: index == 0 ? Colors.white : null,
-                ),
-                label: 'Home'),
-            NavigationDestination(
-              icon: Icon(
-                Icons.schedule,
-                color: index == 1 ? Colors.white : null,
-              ),
-              label: 'Schedule',
-            ),
-            NavigationDestination(
-              icon: Icon(
-                Icons.volunteer_activism,
-                color: index == 2 ? Colors.white : null,
-              ),
-              label: 'Donate',
-            ),
-            NavigationDestination(
-              icon: Icon(
-                Icons.satellite_alt_outlined,
-                color: index == 3 ? Colors.white : null,
-              ),
-              label: 'Impact',
-            ),
-            NavigationDestination(
-              icon: Icon(
-                Icons.person_pin,
-                color: index == 4 ? Colors.white : null,
-              ),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

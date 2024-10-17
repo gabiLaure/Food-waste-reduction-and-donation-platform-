@@ -3,8 +3,8 @@
 
 import 'dart:io';
 
-import 'package:caritas/pages/chat_bubble.dart';
-import 'package:caritas/pages/notification_details_appbar.dart';
+import 'package:caritas/widgets/chat_bubble.dart';
+import 'package:caritas/widgets/notification_details_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';

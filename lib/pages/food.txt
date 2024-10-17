@@ -1,0 +1,301 @@
+import 'package:caritas/pages/Registration/login_page.dart';
+import 'package:flutter/material.dart';
+import 'food_tips.dart';
+
+class FoodCategoriesPage extends StatelessWidget {
+  final List<Map<String, String>> categories = [
+    {
+      'title': 'Fruits',
+      'image': 'assets/fruits.jpeg',
+      'description': 'Description',
+      'foodDescription':
+          'Fruits are not only delicious but also packed with essential vitamins, minerals, and antioxidants that contribute to a healthy diet.',
+      'tips': 'Food Tip',
+      'foodTips':
+          'Keep Fruits Cool, Store fruits like apples, pears, and berries in a cool place, ideally in the refrigerator to prolong freshness, Keep Fruits Cool: Store fruits like apples, pears, and berries in a cool place, ideally in the refrigerator to prolong freshness.'
+// - Separate Ethylene Producers: Keep ethylene-producing fruits (like bananas and avocados) away from other fruits to prevent premature ripening. '
+    },
+// - Keep Fruits Cool: Store fruits like apples, pears, and berries in a cool place, ideally in the refrigerator to prolong freshness.
+// - Separate Ethylene Producers: Keep ethylene-producing fruits (like bananas and avocados) away from other fruits to prevent premature ripening.
+// - Freezing: Freeze fruits like strawberries, blueberries, and mangoes. Wash, dry, and cut them into appropriate sizes, then spread them on a baking sheet before transferring to a freezer bag.
+// - Canning: Use sterilized jars and a water bath to can fruits like peaches, pears, or apples in syrup or juice for long-term storage.
+
+// 3. Drying
+// - Dehydrating: Remove moisture from fruits like apples, pears, and peaches using a dehydrator or an oven set to low heat. This method concentrates flavors and extends shelf life.
+
+// 4. Natural Preservatives
+// - Citrus Juice: Use lemon or lime juice to coat cut fruits like apples and bananas to prevent browning and preserve color.
+// - Honey or Sugar Syrup: Store fruits like berries in a mixture of honey or sugar syrup to extend freshness and enhance flavor.
+
+// 5. Use of Airtight Containers
+// - Avoid Moisture: Store cut fruits in airtight containers to prevent moisture buildup, which can lead to mold and spoilage.
+
+// 6. Regular Inspection
+// - Remove Spoiled Fruits: Check stored fruits regularly and remove any that show signs of spoilage to prevent them from affecting others.
+
+// 7. Ripening
+// - Paper Bag Method: Place unripe fruits like avocados and pears in a paper bag to trap ethylene gas and speed up ripening.
+
+    {'title': 'Vegetables', 'image': 'assets/vegetables.jpeg'},
+    {'title': 'Desserts', 'image': 'assets/desserts.jpeg'},
+    {'title': 'Grains', 'image': 'assets/grains.jpeg'},
+    {'title': 'Sweets and Snacks', 'image': 'assets/sweets_snacks.jpeg'},
+    {'title': 'Beverages', 'image': 'assets/beverages.jpeg'},
+    {'title': 'Herbs and Spices', 'image': 'assets/herbes_spices.jpeg'},
+    {'title': 'Baked Goods', 'image': 'assets/baked_goods.jpeg'},
+    {'title': 'Fat & Oil', 'image': 'assets/fat_oil.jpeg'},
+    // Add more categories here
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text('Food Tips',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: categories.map((category) {
+              return FoodCategoryCard(
+                title: category['title'] == null ? "" : category['title']!,
+                imageAsset: category['image'] == null ? "" : category['image']!,
+                foodName: category['title'] == null ? "" : category['title']!,
+                description: category['description'] == null
+                    ? ""
+                    : category['description']!,
+                foodDescription: category['foodDescription'] == null
+                    ? ""
+                    : category['foodDescription']!,
+                tip: '${category['tips'] == null ? "" : category['tips']!}',
+                foodTip:
+                    '${category['foodTip'] == null ? "" : category['foodTip']!}',
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class FoodCategoryCard extends StatelessWidget {
+  final String title;
+  final String imageAsset;
+  final String foodName;
+  final String description;
+  final String foodDescription;
+  final String tip;
+  final String foodTip;
+
+  FoodCategoryCard({
+    required this.title,
+    required this.imageAsset,
+    required this.foodName,
+    required this.description,
+    required this.foodDescription,
+    required this.tip,
+    required this.foodTip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FoodCategoryTips(
+                    title: title == null ? "" : title,
+                    imageAsset: imageAsset,
+                    image: imageAsset,
+                    foodName: foodName,
+                    foodDescription: foodDescription,
+                    description: description,
+                    tip: tip,
+                    foodTip: foodTip,
+                  )),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: AssetImage(imageAsset),
+            ),
+            SizedBox(height: 8),
+            Text(title),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FoodCategoryTips extends StatelessWidget {
+  final String title;
+  final String imageAsset;
+  final String image;
+  final String foodName;
+  final String description;
+  final String foodDescription;
+  final String tip;
+  final String foodTip;
+
+  FoodCategoryTips({
+    required this.title,
+    required this.imageAsset,
+    required this.image,
+    required this.foodName,
+    required this.description,
+    required this.foodDescription,
+    required this.tip,
+    required this.foodTip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Split the food tips by comma to display each tip as a bullet point
+    List<String> tipsList = foodTip.split(',');
+
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          // Add scroll to handle long content
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(image),
+              SizedBox(height: 8),
+              Text(description,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text(foodDescription),
+              SizedBox(height: 16),
+              Text(tip,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              SizedBox(height: 16),
+              // Display the tips as a bulleted list
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: tipsList.map((tip) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("• ",
+                            style: TextStyle(fontSize: 18)), // Bullet point
+                        Expanded(
+                            child: Text(tip.trim(),
+                                style: TextStyle(fontSize: 16))), // Display tip
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+final List<Map<String, String>> categories = [
+    {
+      'title': 'Fruits',
+      'image': 'assets/fruits.jpeg',
+      'description': 'Fruits Description',
+      'foodDescription':
+          'Fruits are packed with essential vitamins, minerals, and antioxidants that contribute to a healthy diet.',
+      'tips': 'Food Tip',
+      'foodTips':
+          'Keep Fruits Cool, Separate Ethylene Producers, Freezing, Canning, Dehydrating, Use Citrus Juice or Honey'
+    },
+    {
+      'title': 'Vegetables',
+      'image': 'assets/vegetables.jpeg',
+      'description': 'Vegetables Description',
+      'foodDescription':
+          'Vegetables are rich in vitamins, minerals, and fiber.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Keep Vegetables Dry, Store in Airtight Containers, Freeze for Long-Term Storage, Regularly Inspect Stored Vegetables for Spoilage, Use Ethylene Absorbers to Preserve Freshness'
+    },
+    {
+      'title': 'Desserts',
+      'image': 'assets/desserts.jpeg',
+      'description': 'Desserts Description',
+      'foodDescription':
+          'Desserts are sweet dishes, often served at the end of a meal.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Store Desserts in Cool Places, Avoid Direct Sunlight Exposure, Use Airtight Containers to Retain Freshness, Refrigerate Dairy-Based Desserts, Freeze for Long-Term Preservation'
+    },
+    {
+      'title': 'Grains',
+      'image': 'assets/grains.jpeg',
+      'description': 'Grains Description',
+      'foodDescription':
+          'Grains are a staple food rich in carbohydrates, providing energy.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Store Grains in Dry, Cool Places, Use Airtight Containers, Freeze Flour or Grains to Prevent Pests, Inspect for Signs of Mold or Insects'
+    },
+    {
+      'title': 'Sweets and Snacks',
+      'image': 'assets/sweets_snacks.jpeg',
+      'description': 'Sweets and Snacks Description',
+      'foodDescription':
+          'Sweets and snacks are often small, ready-to-eat treats enjoyed between meals.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Store Snacks in Airtight Containers, Keep Sweets in Cool, Dry Places, Freeze for Long-Term Storage, Keep Away from Moisture to Prevent Spoiling'
+    },
+    {
+      'title': 'Beverages',
+      'image': 'assets/beverages.jpeg',
+      'description': 'Beverages Description',
+      'foodDescription': 'Beverages are liquids intended for drinking.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Store Beverages in Cool Areas, Refrigerate After Opening, Shake Well Before Drinking, Avoid Exposure to Sunlight to Maintain Freshness'
+    },
+    {
+      'title': 'Herbs and Spices',
+      'image': 'assets/herbes_spices.jpeg',
+      'description': 'Herbs and Spices Description',
+      'foodDescription':
+          'Herbs and spices are used to add flavor and aroma to food.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Store in Airtight Containers, Keep Away from Moisture, Use Dry, Cool Areas, Avoid Direct Sunlight, Regularly Check for Freshness'
+    },
+    {
+      'title': 'Baked Goods',
+      'image': 'assets/baked_goods.jpeg',
+      'description': 'Baked Goods Description',
+      'foodDescription':
+          'Baked goods include bread, cakes, and pastries made by baking.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Store in Airtight Containers, Keep Away from Moisture, Freeze for Long-Term Storage, Avoid Direct Sunlight, Consume Quickly to Maintain Freshness'
+    },
+    {
+      'title': 'Fat & Oil',
+      'image': 'assets/fat_oil.jpeg',
+      'description': 'Fat & Oil Description',
+      'foodDescription':
+          'Fat and oil are used for cooking and enhancing flavor in food.',
+      'tips': 'Food Tips',
+      'foodTips':
+          'Store in Cool, Dark Places, Use Airtight Containers, Avoid Exposure to Heat or Sunlight, Check Expiry Dates Regularly, Use Clean Utensils to Prevent Contamination'
+    }
+  ];

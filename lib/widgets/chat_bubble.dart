@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/notification_details.dart';
+import 'notification_details.dart';
 
 class ChatBubble extends StatefulWidget {
   ChatMessage chatMessage;
