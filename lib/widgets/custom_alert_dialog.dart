@@ -24,8 +24,8 @@ class CustomAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: !isUserCreated
-          ? Center(child: Text("Creation du compte"))
-          : Center(child: Text("Compte créé avec succès!")),
+          ? Center(child: Text("Account creation"))
+          : Center(child: Text("Account created successfully!")),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -47,7 +47,7 @@ class CustomAlertDialog extends StatelessWidget {
                       SizedBox(
                         height: 30.0,
                       ),
-                      Text("Salut $firstName, Veuillez patienter...",
+                      Text("Hi $firstName, Please wait...",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                                   fontFamily: 'Montserrat', fontSize: 16.0)
@@ -65,7 +65,7 @@ class CustomAlertDialog extends StatelessWidget {
                         height: 50.0,
                       ),
                       ButtonWidget(
-                          text: "Réessayer",
+                          text: "Try again",
                           textColor: Colors.white,
                           color: Colors.red,
                           onClicked: () {
@@ -76,7 +76,7 @@ class CustomAlertDialog extends StatelessWidget {
           else
             Column(
               children: [
-                Text("Bienvenue!",
+                Text("Welcome!",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -93,7 +93,7 @@ class CustomAlertDialog extends StatelessWidget {
                   height: 50.0,
                 ),
                 ButtonWidget(
-                    text: "Continuer",
+                    text: "Continue",
                     textColor: Colors.white,
                     color: Colors.indigo,
                     onClicked: () {

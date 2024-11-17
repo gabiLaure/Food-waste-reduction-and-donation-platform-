@@ -70,7 +70,7 @@ class _RequestDonationState extends State<RequestDonation> {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: !isDonCreated
-                  ? Center(child: Text("Creation de la demande"))
+                  ? Center(child: Text("Creation of demande"))
                   : Center(child: Text("")),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -94,7 +94,7 @@ class _RequestDonationState extends State<RequestDonation> {
                                 height: 30.0,
                               ),
                               Text(
-                                "Veuillez patienter...",
+                                "Please wait...",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'Montserrat',
@@ -135,7 +135,7 @@ class _RequestDonationState extends State<RequestDonation> {
                               width: 50,
                             ),
                             SizedBox(height: 30),
-                            Text("Requête de don créé!",
+                            Text("Donation request created!",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                         fontFamily: 'Montserrat',
@@ -183,7 +183,7 @@ class _RequestDonationState extends State<RequestDonation> {
     if (_controller.text.isEmpty ||
         _descriptionController.text.isEmpty ||
         _listingType.isEmpty) {
-      ToastMessages().showInfoToast("Remplissez tous les champs");
+      ToastMessages().showInfoToast("Fill in all fields");
     } else {
       addReqDonToFireStore();
     }
@@ -243,8 +243,7 @@ class _RequestDonationState extends State<RequestDonation> {
           _buildListingType(),
           _buildTitle(),
           _buildDescription(),
-          //_buildAvailabilities(),
-          //Divider(),
+          _buildLocation(),
           SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
@@ -296,7 +295,7 @@ class _RequestDonationState extends State<RequestDonation> {
                 leading: Icon(Icons.check_circle_outline),
                 title: Row(children: [
                   Text(
-                    'Enter Ad Title',
+                    'Enter Food Title',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -374,139 +373,30 @@ class _RequestDonationState extends State<RequestDonation> {
     );
   }
 
-  Widget _buildAvailabilities() {
-    // Implement the widget for selecting availabilities
-    return ListTile(
-        leading: Icon(Icons.check_circle_outline),
-        title: Row(
-          children: [
-            Text(
-              'Avalaibility : ',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(selectedAction)
-          ],
-        ),
-        trailing: Icon(Icons.arrow_drop_down),
-        onTap: () {
-          // Navigate to the listing creation page for donation
-          setState(() {
-            _showModalBottomSheet();
-          });
-        });
-  }
-
-  void _showModalBottomSheet() {
-    final options = [
-      'Week Days',
-      'Week Evening',
-      'Weekend',
-      'I am available',
-      'Cancel',
-    ];
-
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Column(mainAxisSize: MainAxisSize.min, children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Select Availability',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Divider(), // Add a divider below the heading
-          ...options.map((option) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(option),
-                  onTap: () {
-                    if (option != 'Cancel') {
-                      setState(() {
-                        selectedAction = option;
-                      });
-                    }
-                    Navigator.pop(context);
-                  },
-                ),
-                Divider(),
-              ],
-            );
-          }).toList(),
-        ]);
-      },
-    );
-  }
-
-  Widget _buildBestBefore() {
+  Widget _buildLocation() {
     // Implement the food icon message widget
     return Column(
       children: [
         ListTile(
           leading: Icon(Icons.check_circle_outline),
           title: Text(
-            'Best Before : ',
+            'Location : ',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
-          subtitle: Text(
-              selectedDate != null ? selectedDate.toString() : 'Select a date'),
-          trailing: Icon(Icons.calendar_today),
+          subtitle: Text("location"),
+          trailing: Icon(Icons.location_on_sharp),
           onTap: () {
-            _showDatePicker(context);
+            //_getCurrentUserLocation();
+            print("Location Selected: ");
+            // Navigator.push(context,
+            //     MaterialPageRoute(builder: (context) => DonationsFragment()));
           },
         ),
         Divider(),
       ],
-    );
-  }
-
-  void _showDatePicker(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Column(mainAxisSize: MainAxisSize.min, children: [
-          const ListTile(
-              title: Center(
-                child: Text(
-                  'Select Expiration Date',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              trailing: Text(
-                'Done',
-                style: TextStyle(color: Colors.blue),
-              )),
-          Divider(),
-          Container(
-            height: 300,
-            child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.date,
-              initialDateTime: DateTime.now(),
-              onDateTimeChanged: (DateTime newDate) {
-                setState(() {
-                  selectedDate = newDate;
-                });
-              },
-            ),
-          )
-        ]);
-      },
     );
   }
 }

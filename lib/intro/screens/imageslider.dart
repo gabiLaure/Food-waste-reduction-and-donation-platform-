@@ -18,14 +18,14 @@ class ImageSlider extends StatefulWidget {
 class _ImageSliderState extends State<ImageSlider> {
   int currentIndex = 0;
   List<String> images = [
-    "asian_girl.jpg",
+    "kids in the farm.jpeg",
     "children.jpg",
-    "old_man.jpg",
+    "girl_dancing.jpg",
     "wheelchair.jpg",
     "african_child.jpg",
-    "african2.jpg",
+    "small_boy.jpeg",
   ];
-  Image _image = Image.asset("assets/images/asian_girl.jpg");
+  Image _image = Image.asset("assets/images/african_child.jpg");
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _ImageSliderState extends State<ImageSlider> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: h*0.5,
+      height: h * 0.5,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30.0),
         child: AnimatedSwitcher(

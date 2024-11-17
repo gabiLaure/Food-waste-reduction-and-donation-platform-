@@ -25,7 +25,7 @@ class AppProgressIndicator extends StatelessWidget {
               color: Colors.indigo,
             ),
              Text(
-               'loadding',
+               'loading...',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w300

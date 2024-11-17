@@ -50,7 +50,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
   }
 
   void sendSuccessCode() {
-    print("Commentaire envoyé avec succès!");
+    print("Comment sent successfully!");
     Navigator.pop(context);
     setState(() {
       isStartToUpload = false;
@@ -69,8 +69,8 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
           builder: (context, setState) {
             return AlertDialog(
               title: !isUploadComplete
-                  ? Center(child: Text("Envoi du Commentaire"))
-                  : Center(child: Text("Commentaire Envoyé avec Succès!")),
+                  ? Center(child: Text("Send a Comment"))
+                  : Center(child: Text("Comment sent successfully!")),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -92,8 +92,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
                               SizedBox(
                                 height: 30.0,
                               ),
-                              Text(
-                                  "Veuillez patienter jusqu'à l'envoi de vos commentaires.",
+                              Text("Please wait until your feedback is sent.",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                           fontFamily: 'Montserrat',
@@ -103,7 +102,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
                           )
                         : Column(
                             children: [
-                              Text("Erreur!",
+                              Text("Error!",
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -112,7 +111,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
                                 height: 50.0,
                               ),
                               ButtonWidget(
-                                  text: "Réessayez",
+                                  text: "Try Again",
                                   textColor: Colors.white,
                                   color: Colors.indigo,
                                   onClicked: () {
@@ -132,7 +131,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
                               width: 50,
                             ),
                             SizedBox(height: 30),
-                            Text("Commentaire envoyé avec succès",
+                            Text("Comment send Succesfully",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                         fontFamily: 'Montserrat',
@@ -182,7 +181,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
 
   void validateEdits() {
     if (_giveFeedbackController.text.isEmpty) {
-      ToastMessages().showWarningToast("Veuillez saisir votre commentaire");
+      ToastMessages().showWarningToast("Please enter your comment");
     } else {
       print(_giveFeedbackController.text);
       sendFeedback();
@@ -193,7 +192,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Faire un Commentaire"),
+        title: Text("Make a Comment"),
       ),
       body: ListView(
         children: [
@@ -212,9 +211,9 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
               style: TextStyle(fontWeight: FontWeight.normal),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 10.0),
-                helperText: "N° de lettres: $charLength",
-                hintText: "Dites quelque chose...",
-                labelText: 'Taper votre Commentaire',
+                helperText: "N° of letters: $charLength",
+                hintText: "Say something...",
+                labelText: 'Enter your Comment',
                 focusedBorder: OutlineInputBorder(
                   borderSide: const BorderSide(
                     color: Colors.black,
@@ -238,7 +237,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: ElevatedButton(
-              child: Text("Envoyer votre Commentaire"),
+              child: Text("Enter your Comment"),
               onPressed: () {
                 validateEdits();
               },

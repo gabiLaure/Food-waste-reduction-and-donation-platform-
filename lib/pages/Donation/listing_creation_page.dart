@@ -104,7 +104,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     _getCurrentUserLocation();
   }
 
-  String userCurrentAddress = "Aucun lieu n'est sélectionné !";
+  String userCurrentAddress = "No location has been selected!";
   _getCurrentUserLocation() async {
     try {
       _determinePosition().then((Position position) {
@@ -215,8 +215,8 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           builder: (context, setState) {
             return AlertDialog(
               title: !isUploadComplete
-                  ? Center(child: Text("chargement du message"))
-                  : Center(child: Text("Chargement réussi")),
+                  ? Center(child: Text("Donation Loading"))
+                  : Center(child: Text("Loading completed")),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -238,8 +238,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                               SizedBox(
                                 height: 30.0,
                               ),
-                              Text(
-                                  "Veuillez attendre que votre message soit téléchargé.",
+                              Text("Please your donation is charging...",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                           fontFamily: 'Montserrat',
@@ -249,7 +248,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                           )
                         : Column(
                             children: [
-                              Text("Erreur!",
+                              Text("Error!",
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -258,7 +257,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                                 height: 50.0,
                               ),
                               ButtonWidget(
-                                  text: "Réessayer",
+                                  text: "Try Again",
                                   textColor: Colors.white,
                                   color: Colors.red,
                                   onClicked: () {
@@ -278,7 +277,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                               width: 50,
                             ),
                             SizedBox(height: 30),
-                            Text("Le message a été chargé!",
+                            Text("The Donation has been charged!",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                         fontFamily: 'Montserrat',

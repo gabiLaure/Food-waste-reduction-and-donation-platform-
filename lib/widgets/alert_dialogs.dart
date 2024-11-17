@@ -11,12 +11,12 @@ class SignOutAlertDialog {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmer votre déconnexion'),
-          content: Text("Etes vous sûre de vouloir vous déconnecter?"),
+          title: Text('Confirm your logout'),
+          content: Text("Are you sure you want to log out?"),
           actions: <Widget>[
             TextButton(
               child: Text(
-                "NON",
+                "NO",
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               onPressed: () {
@@ -26,12 +26,12 @@ class SignOutAlertDialog {
             ),
             TextButton(
               child: Text(
-                "OUI",
+                "YES",
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
-                ToastMessages().showSuccessToast("Déconnexion réussie");
+                ToastMessages().showSuccessToast("Logout successful");
                 //print("Sign Out Success");
                 Navigator.pushAndRemoveUntil(
                   context,

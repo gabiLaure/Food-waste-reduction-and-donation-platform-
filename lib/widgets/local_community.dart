@@ -12,6 +12,7 @@ Widget _buildLocalCommunity() {
       });
     },
     items: <String>[
+      'None',
       'CEPREJED',
       'ONDAPA',
       'DORCAS Foundation',
