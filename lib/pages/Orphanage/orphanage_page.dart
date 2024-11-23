@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class OrphanageListPage extends StatelessWidget {
@@ -8,11 +9,36 @@ class OrphanageListPage extends StatelessWidget {
         title: Text('Orphanages'),
         // backgroundColor: Colors.teal,
       ),
-      body: ListView.builder(
-        itemCount: orphanages.length,
-        itemBuilder: (context, index) {
-          final orphanage = orphanages[index];
-          return OrphanageCard(orphanage: orphanage);
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('orphanages').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Affiche un indicateur de chargement pendant le fetching
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            // Affiche un message d'erreur si la récupération échoue
+            return Center(child: Text('An error occurred!'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            // Affiche un message si aucun orphelinat n'est trouvé
+            return Center(child: Text('No orphanages found.'));
+          }
+
+          // Convertir les documents en objets Orphanage
+          final orphanages = snapshot.data!.docs
+              .map((doc) => Orphanage.fromFirestore(doc))
+              .toList();
+
+          return ListView.builder(
+            itemCount: orphanages.length,
+            itemBuilder: (context, index) {
+              final orphanage = orphanages[index];
+              return OrphanageCard(orphanage: orphanage);
+            },
+          );
         },
       ),
     );
@@ -48,8 +74,8 @@ class OrphanageCard extends StatelessWidget {
                 topLeft: Radius.circular(15),
                 topRight: Radius.circular(15),
               ),
-              child: Image.asset(
-                orphanage.image,
+              child: Image.network(
+                orphanage.imageUrl,
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -94,10 +120,16 @@ class OrphanageDetailPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HeaderImage(image: orphanage.image),
-            MissionStatement(mission: orphanage.mission),
-            ServicesSection(services: orphanage.services),
-            ContactInformation(contactInfo: orphanage.contactInfo),
+            HeaderImage(image: orphanage.imageUrl),
+            MissionStatement(mission: orphanage.description),
+            ServicesSection(
+              healthcare: orphanage.healthcare,
+              education: orphanage.education,
+            ),
+            ContactInformation(
+                address: orphanage.address,
+                phone: orphanage.phone,
+                email: orphanage.email),
           ],
         ),
       ),
@@ -117,7 +149,8 @@ class HeaderImage extends StatelessWidget {
       height: 250,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(image),
+          image:
+              NetworkImage(image), // Utilisation de NetworkImage pour le lien
           fit: BoxFit.cover,
         ),
       ),
@@ -168,12 +201,26 @@ class MissionStatement extends StatelessWidget {
 }
 
 class ServicesSection extends StatelessWidget {
-  final List<Service> services;
+  final String healthcare;
+  final String education;
 
-  ServicesSection({required this.services});
+  ServicesSection({required this.healthcare, required this.education});
 
   @override
   Widget build(BuildContext context) {
+    final List<Service> services = [
+      Service(
+        title: 'Healthcare',
+        description: healthcare,
+        icon: Icons.health_and_safety,
+      ),
+      Service(
+        title: 'Education',
+        description: education,
+        icon: Icons.school,
+      ),
+    ];
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -185,7 +232,7 @@ class ServicesSection extends StatelessWidget {
                 fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
           ),
           SizedBox(height: 10),
-          ...services.map((service) => ServiceItem(service: service)).toList(),
+          ...services.map((service) => ServiceItem(service: service)),
         ],
       ),
     );
@@ -222,9 +269,12 @@ class ServiceItem extends StatelessWidget {
 }
 
 class ContactInformation extends StatelessWidget {
-  final ContactInfo contactInfo;
+  final String address;
+  final String phone;
+  final String email;
 
-  ContactInformation({required this.contactInfo});
+  ContactInformation(
+      {required this.address, required this.phone, required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -241,15 +291,15 @@ class ContactInformation extends StatelessWidget {
           SizedBox(height: 10),
           ContactItem(
             icon: Icons.location_on,
-            text: contactInfo.address,
+            text: address,
           ),
           ContactItem(
             icon: Icons.phone,
-            text: contactInfo.phone,
+            text: phone,
           ),
           ContactItem(
             icon: Icons.email,
-            text: contactInfo.email,
+            text: email,
           ),
         ],
       ),
@@ -281,101 +331,136 @@ class ContactItem extends StatelessWidget {
   }
 }
 
-final List<Orphanage> orphanages = [
-  Orphanage(
-    name: 'Orphanage A',
-    description: 'A loving home for children in need.',
-    image: 'assets/images/orphanage1.jpeg',
-    mission:
-        'Our mission is to provide a loving and nurturing environment for all children.',
-    services: [
-      Service(
-        title: 'Education',
-        description:
-            'High-quality education to help children achieve their full potential.',
-        icon: Icons.school,
-      ),
-      Service(
-        title: 'Healthcare',
-        description: 'Healthcare services to ensure all children are healthy.',
-        icon: Icons.health_and_safety,
-      ),
-    ],
-    contactInfo: ContactInfo(
-      address: 'Biyem-Assi Street, Yaounde, Cameroun',
-      phone: '+237 6789 456 789',
-      email: 'contact@orphanagea.org',
-    ),
-  ),
-  Orphanage(
-    name: 'Orphanage B',
-    description: 'A loving home for children in need.',
-    image: 'assets/images/orphanage2.jpeg',
-    mission:
-        'Our mission is to provide a loving and nurturing environment for all children.',
-    services: [
-      Service(
-        title: 'Education',
-        description:
-            'High-quality education to help children achieve their full potential.',
-        icon: Icons.school,
-      ),
-      Service(
-        title: 'Healthcare',
-        description: 'Healthcare services to ensure all children are healthy.',
-        icon: Icons.health_and_safety,
-      ),
-    ],
-    contactInfo: ContactInfo(
-      address: 'TPO Street, Bafoussam, Cameroun',
-      phone: '+237 6789 456 789',
-      email: 'contact@orphanagea.org',
-    ),
-  ),
-  Orphanage(
-    name: 'Orphanage C',
-    description: 'A loving home for children in need.',
-    image: 'assets/images/orphanage3.jpeg',
-    mission:
-        'Our mission is to provide a loving and nurturing environment for all children.',
-    services: [
-      Service(
-        title: 'Education',
-        description:
-            'High-quality education to help children achieve their full potential.',
-        icon: Icons.school,
-      ),
-      Service(
-        title: 'Healthcare',
-        description: 'Healthcare services to ensure all children are healthy.',
-        icon: Icons.health_and_safety,
-      ),
-    ],
-    contactInfo: ContactInfo(
-      address: 'Chapelle Nsimeyong, Yaounde, Cameroun',
-      phone: '+237 6789 456 789',
-      email: 'contact@orphanagea.org',
-    ),
-  ),
-  // Add more orphanages here
-];
+// final List<Orphanage> orphanages = [
+//   Orphanage(
+//     name: 'Orphanage A',
+//     description: 'A loving home for children in need.',
+//     image: 'assets/images/orphanage1.jpeg',
+//     mission:
+//         'Our mission is to provide a loving and nurturing environment for all children.',
+//     services: [
+//       Service(
+//         title: 'Education',
+//         description:
+//             'High-quality education to help children achieve their full potential.',
+//         icon: Icons.school,
+//       ),
+//       Service(
+//         title: 'Healthcare',
+//         description: 'Healthcare services to ensure all children are healthy.',
+//         icon: Icons.health_and_safety,
+//       ),
+//     ],
+//     contactInfo: ContactInfo(
+//       address: 'Biyem-Assi Street, Yaounde, Cameroun',
+//       phone: '+237 6789 456 789',
+//       email: 'contact@orphanagea.org',
+//     ),
+//   ),
+//   Orphanage(
+//     name: 'Orphanage B',
+//     description: 'A loving home for children in need.',
+//     image: 'assets/images/orphanage2.jpeg',
+//     mission:
+//         'Our mission is to provide a loving and nurturing environment for all children.',
+//     services: [
+//       Service(
+//         title: 'Education',
+//         description:
+//             'High-quality education to help children achieve their full potential.',
+//         icon: Icons.school,
+//       ),
+//       Service(
+//         title: 'Healthcare',
+//         description: 'Healthcare services to ensure all children are healthy.',
+//         icon: Icons.health_and_safety,
+//       ),
+//     ],
+//     contactInfo: ContactInfo(
+//       address: 'TPO Street, Bafoussam, Cameroun',
+//       phone: '+237 6789 456 789',
+//       email: 'contact@orphanagea.org',
+//     ),
+//   ),
+//   Orphanage(
+//     name: 'Orphanage C',
+//     description: 'A loving home for children in need.',
+//     image: 'assets/images/orphanage3.jpeg',
+//     mission:
+//         'Our mission is to provide a loving and nurturing environment for all children.',
+//     services: [
+//       Service(
+//         title: 'Education',
+//         description:
+//             'High-quality education to help children achieve their full potential.',
+//         icon: Icons.school,
+//       ),
+//       Service(
+//         title: 'Healthcare',
+//         description: 'Healthcare services to ensure all children are healthy.',
+//         icon: Icons.health_and_safety,
+//       ),
+//     ],
+//     contactInfo: ContactInfo(
+//       address: 'Chapelle Nsimeyong, Yaounde, Cameroun',
+//       phone: '+237 6789 456 789',
+//       email: 'contact@orphanagea.org',
+//     ),
+//   ),
+//   // Add more orphanages here
+// ];
 
 class Orphanage {
+  final String id;
   final String name;
+  final String address;
+  final double latitude;
+  final double longitude;
   final String description;
-  final String image;
-  final String mission;
-  final List<Service> services;
-  final ContactInfo contactInfo;
+  final String imageUrl;
+  final String phone;
+  final String healthcare;
+  final String education;
+  final String email;
+  // final String mission;
+  // final List<String> services;
+  // final ContactInfo contactInfo;
 
   Orphanage({
+    required this.id,
     required this.name,
+    required this.address,
+    required this.latitude,
+    required this.longitude,
     required this.description,
-    required this.image,
-    required this.mission,
-    required this.services,
-    required this.contactInfo,
+    required this.imageUrl,
+    required this.phone,
+    required this.healthcare,
+    required this.education,
+    required this.email,
+    // required this.mission,
+    // required this.services,
+    // required this.contactInfo,
   });
+
+  // Méthode pour convertir un document Firestore en Orphanage
+  factory Orphanage.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Orphanage(
+      id: doc.id,
+      name: data['orphanageName'] ?? '',
+      address: data['address'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
+      latitude: data['latitude'] ?? '',
+      longitude: data['longitude'] ?? '',
+      description: data['description'] ?? '',
+      email: data['email'] ?? '',
+      phone: data['phone'] ?? '',
+      healthcare: data['healthcare'] ?? '',
+      education: data['education'] ?? '',
+      // contactInfo: data['contactInfo'] ?? '',
+    );
+  }
 }
 
 class Service {

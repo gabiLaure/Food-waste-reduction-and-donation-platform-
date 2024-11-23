@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -20,6 +21,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String accountTypeName = ''; // This should come from a dropdown or selection
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  double? circularProgressVal;
   // Validation function to check if inputs are valid
   bool validateUser() {
     if (_formKey.currentState?.validate() ?? false) {
@@ -29,22 +31,112 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   // Authenticate user with Firebase Auth
-  void authenticateUser() async {
+  void authenticateUser(BuildContext context) async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Email and password cannot be empty')),
+      );
+      return;
+    }
+
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
       );
-      // Handle successful registration
-      print("User registered: ${userCredential.user?.email}");
-      // You can store user info in Firebase Firestore or navigate to another page
+
+      // add user to firestore with multiple images
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userCredential.user!.uid.toString())
+          .set({
+            'userUid': userCredential.user!.uid.toString(),
+            'fullname': fullNameController.text.trim(),
+            'phone': phoneController.text.trim(),
+            'accountType': accountTypeName,
+            'email': emailController.text.trim()
+          })
+          .then(
+            (value) => redirectUser(context),
+          )
+          .catchError((error) => sendErrorCode(error.toString()));
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'Email already in use.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = 'The password is too weak.';
+      } else {
+        errorMessage = 'Registration failed. Please try again.';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     } catch (e) {
-      // Handle error
-      print("Registration error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration failed: $e')),
       );
+    }
+  }
+
+  void sendErrorCode(error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(error)),
+    );
+  }
+
+  void redirectUser(context) {
+    // Navigate based on account type
+    switch (accountTypeName) {
+      case 'Individual':
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Your User Account has been created')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+        break;
+      case 'Orphanage':
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Your User account has been created please fill the Ophanage Registration form')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => OrphanageRegistration()),
+        );
+        break;
+      case 'Restaurant':
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Your User account has been created please fill the Restaurant Registration form')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => RestaurantRegistration()),
+        );
+        break;
+      case 'Supermarket':
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Your User account has been created please fill the Supermarket Registration form')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => GroceryRegistration()),
+        );
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invalid account type')),
+        );
+        return;
     }
   }
 
@@ -165,37 +257,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           child: ElevatedButton(
                             onPressed: () {
                               if (validateUser()) {
-                                authenticateUser();
-
-                                // Navigate based on account type
-                                if (accountTypeName == 'Individual') {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => HomePage()),
-                                  );
-                                } else if (accountTypeName == 'Orphanage') {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            OrphanageRegistration()),
-                                  );
-                                } else if (accountTypeName == 'Restaurant') {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            RestaurantRegistration()),
-                                  );
-                                } else if (accountTypeName == 'Supermarket') {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            GroceryRegistration()),
-                                  );
-                                }
+                                authenticateUser(context);
                               }
                             },
                             child: const Text(
@@ -221,3 +283,47 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ]))));
   }
 }
+// showAlertDialog(BuildContext context) {
+//     // show the dialog
+//     showDialog(
+//       context: context,
+//       barrierDismissible: false,
+//       builder: (context) {
+//         return StatefulBuilder(
+//           builder: (context, setState) {
+//             return AlertDialog(
+//               title:  Center(child: Text("Loading")),
+//               content: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 children: [
+//                  Column(
+//                             mainAxisSize: MainAxisSize.min,
+//                             mainAxisAlignment: MainAxisAlignment.center,
+//                             children: [
+//                               SizedBox(
+//                                 height: 30.0,
+//                               ),
+//                               CircularProgressIndicator(
+//                                 value: circularProgressVal,
+//                                 strokeWidth: 6,
+//                                 valueColor: AlwaysStoppedAnimation<Color>(
+//                                     Colors.indigo),
+//                               ),
+//                               SizedBox(
+//                                 height: 30.0,
+//                               ),
+//                               Text("Account Creation...",
+//                                   textAlign: TextAlign.center,
+//                                   style: TextStyle(fontSize: 16.0)
+//                                       .copyWith(color: Colors.grey.shade900)),
+//                             ],
+//                           )],
+//               ),
+//               shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.all(Radius.circular(20.0))),
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }

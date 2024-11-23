@@ -4,8 +4,10 @@ import 'package:caritas/widgets/toast_messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../widgets/forgot_password_page.dart';
+import '../Orphanage/orphanage_registration_page.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,18 +20,10 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _isHidden = true;
   bool isUserSigned = false;
   bool isInValidaAccount = false;
   double? circularProgressVal;
-  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   late String accountType;
-
-  void _togglePasswordView() {
-    setState(() {
-      _isHidden = !_isHidden;
-    });
-  }
 
   showAlertDialog(BuildContext context) {
     // show the dialog
@@ -162,8 +156,8 @@ class _LoginPageState extends State<LoginPage> {
     return false;
   }
 
-  void _signInWithEmailAndPassword() async {
-    showAlertDialog(context);
+  void _signInWithEmailAndPassword(context) async {
+    // showAlertDialog(context);
 
     setState(() {
       isUserSigned = false;
@@ -175,31 +169,107 @@ class _LoginPageState extends State<LoginPage> {
           .signInWithEmailAndPassword(
               email: _usernameController.text,
               password: _passwordController.text);
-      print(userCredential.user!.uid.toString());
-      // await geAccountType(userCredential.user!.uid.toString());
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => HomePage(),
-        ),
-        (route) => false,
-      );
-      //Navigator.pop(context);
-      print('User is signed in!');
+      // Récupération du document basé sur l'UID
+      String userUid = userCredential.user!.uid.toString();
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userUid) // Utilisation de l'UID
+          .get();
+      if (userDoc.exists) {
+        // Affichage des données du document
+        Map<String, dynamic>? userData =
+            userDoc.data() as Map<String, dynamic>?;
+        getUserSupInfo(userData);
+      } else {
+        _toastMessages.showErrorToast("An error occured.");
+      }
+
+      // Navigator.pushAndRemoveUntil(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (BuildContext context) => HomePage(),
+      //   ),
+      //   (route) => false,
+      // );
+      // Navigator.pop(context);
+      // print('User is signed in!');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         ifAnError();
-        print('No user found for that email.');
-        _toastMessages.showErrorToast("Pas d'utilisateur trouvé");
+        _toastMessages.showErrorToast("No user found");
       } else if (e.code == 'wrong-password') {
         ifAnError();
-        print('Wrong password provided for that user.');
-        _toastMessages.showErrorToast("Mot de passe incorrect!");
+        _toastMessages.showErrorToast("Incorrect password!");
       } else {
-        _toastMessages.showErrorToast("Une erreur est survenue.");
+        _toastMessages.showErrorToast("An error has occured.");
         _toastMessages.showErrorToast(e.toString());
-        print(e.toString());
       }
+    }
+  }
+
+  void getUserSupInfo(userData) {
+    // Navigate based on account type
+    switch (userData['accountType']) {
+      case 'Orphanage':
+        fetchOrphanageByUserProfileID(userData);
+        break;
+
+      default:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+        return;
+    }
+  }
+
+  void fetchOrphanageByUserProfileID(userProfile) async {
+    try {
+      // Query Firestore to find the orphanage with the given userProfileID
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('orphanages')
+          .where('userProfileID', isEqualTo: userProfileID)
+          .get();
+      // Check if any documents are returned
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the first document (assuming userProfileID is unique)
+        DocumentSnapshot document = querySnapshot.docs.first;
+
+        // Convert document data into a map
+        Map<String, dynamic> orphanageData =
+            document.data() as Map<String, dynamic>;
+
+        // Use the orphanage data as needed
+        print('Orphanage data: $orphanageData');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('No Orphanage found'),
+            content: Text(
+                "We can't get an Orphanage related to this account though it has an account type Orphanage. Please register ophanage on this account!"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => OrphanageRegistration()),
+                    );
+                  },
+                  child: const Text('OK'))
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error fetching orphanage: $e');
     }
   }
 
@@ -281,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (validateUser()) {
-                        _signInWithEmailAndPassword();
+                        _signInWithEmailAndPassword(context);
                       }
                     },
                     child: Text('Login',

@@ -29,7 +29,9 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   //String _output = '';
   //late LatLng _selectedLocation;
 
-  String _communityType = 'DORCAS Foundation'; // Default value
+  String? _communityType; // Default value
+  List<Map<String, dynamic>> orphanages = [];
+
   final String userProfileID =
       FirebaseAuth.instance.currentUser!.uid.toString();
 
@@ -102,6 +104,31 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   void initState() {
     super.initState();
     _getCurrentUserLocation();
+    fetchOrphanages();
+  }
+
+  Future<void> fetchOrphanages() async {
+    try {
+      // Requête Firestore pour récupérer les orphelinats
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('orphanages') // Nom de la collection des orphelinats
+          .get();
+
+      // Extraire les noms des orphelinats et leurs ID depuis le document
+      List<Map<String, dynamic>> fetchedOrphanages = querySnapshot.docs
+          .map((doc) => {
+                'name': doc['orphanageName'] as String, // Nom de l'orphelinat
+                'id': doc.id, // ID du document
+              })
+          .toList();
+
+      // Mettre à jour l'état avec les orphelinats récupérés
+      setState(() {
+        orphanages = fetchedOrphanages;
+      });
+    } catch (e) {
+      print("Error fetching orphanages: $e");
+    }
   }
 
   String userCurrentAddress = "No location has been selected!";
@@ -423,7 +450,11 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           ),
           SizedBox(height: 16),
           SizedBox(height: 24),
-          _buildLocalCommunity(),
+          orphanages.isNotEmpty
+              ? _buildLocalCommunity(orphanages)
+              : Center(
+                  child:
+                      CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés),
           SizedBox(height: 16),
           _buildLocation(),
           _buildPhotosContainer(),
@@ -458,8 +489,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     );
   }
 
-  Widget _buildLocalCommunity() {
-    // Implement the widget for selecting the listing type
+  Widget _buildLocalCommunity(List<Map<String, dynamic>> orphanages) {
     return DropdownButtonFormField<String>(
       value: _communityType,
       onChanged: (newValue) {
@@ -467,16 +497,10 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           _communityType = newValue!;
         });
       },
-      items: <String>[
-        'CEPREJED',
-        'ONDAPA',
-        'DORCAS Foundation',
-        'MSDAC',
-        'Fondation des Enfants Orphelins'
-      ].map((String value) {
+      items: orphanages.map((Map<String, dynamic> orphanage) {
         return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
+          value: orphanage['name'],
+          child: Text(orphanage['name']),
         );
       }).toList(),
       decoration: InputDecoration(

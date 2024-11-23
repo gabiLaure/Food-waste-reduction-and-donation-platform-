@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:caritas/pages/Orphanage/map_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../../generators/uuid_generator.dart';
 import '../../home.dart'; // Import geocoding
 
 class OrphanageRegistration extends StatefulWidget {
@@ -19,7 +21,12 @@ class OrphanageRegistration extends StatefulWidget {
 LatLng? _orphanageLocation;
 String? _address = ''; // To store the address name
 double? _latitude; // To store latitude
-double? _longitude; // To store longitude
+double? _longitude;
+
+final String userProfileID = FirebaseAuth.instance.currentUser!.uid.toString();
+// final UserCredential userCredential;
+// To store longitude
+String donationID = UUIDGenerator().uuidV4();
 
 class _OrphanageRegistrationState extends State<OrphanageRegistration> {
   final _formKey = GlobalKey<FormState>();
@@ -75,6 +82,8 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
       // Save data to Firestore
       await FirebaseFirestore.instance.collection('orphanages').add({
         'orphanageName': orphanageName,
+        'latitude': _latitude,
+        'longitude': _longitude,
         'description': description,
         'education': education,
         'healthcare': healthcare,
@@ -83,6 +92,7 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
         'email': email,
         'imageUrl': imageUrl,
         'documentUrl': documentUrl,
+        'userProfileID': userProfileID
       });
 
       showDialog(
