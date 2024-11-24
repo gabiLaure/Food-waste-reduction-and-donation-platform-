@@ -87,11 +87,14 @@ Widget _scheduleDonationCard(DocumentSnapshot donation, BuildContext context) {
                   children: [
                     Icon(Icons.shopping_bag_outlined),
                     SizedBox(width: 5),
-                    Text('7 kg'),
+                    Text(
+                      '${donation['quantity']!.toString()} kg ',
+                    ),
                     SizedBox(width: 5),
                     Icon(Icons.location_on),
                     SizedBox(width: 3),
-                    Text('100km'),
+                    Text(
+                        '${donation['distanceBetweenUs']!.toStringAsFixed(2)} km'),
                   ],
                 ),
                 SizedBox(height: 5),

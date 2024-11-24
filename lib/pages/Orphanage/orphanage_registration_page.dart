@@ -29,6 +29,9 @@ final String userProfileID = FirebaseAuth.instance.currentUser!.uid.toString();
 String donationID = UUIDGenerator().uuidV4();
 
 class _OrphanageRegistrationState extends State<OrphanageRegistration> {
+  TextEditingController orphanageController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
   String orphanageName = '',
       description = '',
@@ -81,10 +84,10 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
 
       // Save data to Firestore
       await FirebaseFirestore.instance.collection('orphanages').add({
-        'orphanageName': orphanageName,
+        'orphanageName': orphanageController.text.trim(),
         'latitude': _latitude,
         'longitude': _longitude,
-        'description': description,
+        'description': descriptionController.text.trim(),
         'education': education,
         'healthcare': healthcare,
         'address': address,
@@ -166,20 +169,38 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
             children: [
               SizedBox(height: 16),
               TextFormField(
-                decoration: fieldDecoration('Orphanage Name'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Please enter the orphanage name'
-                    : null,
-                onSaved: (value) => orphanageName = value!,
+                controller: orphanageController,
+                decoration: InputDecoration(labelText: 'Orphanage'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your full name';
+                  }
+                  return null;
+                },
+
+                //   decoration: fieldDecoration('Orphanage Name'),
+                //   validator: (value) => value == null || value.isEmpty
+                //       ? 'Please enter the orphanage name'
+                //       : null,
+                //   onSaved: (value) => orphanageName = value!,
               ),
               SizedBox(height: 16),
               TextFormField(
-                decoration: fieldDecoration('Description'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Please enter a description'
-                    : null,
-                onSaved: (value) => description = value!,
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your description';
+                  }
+                  return null;
+                },
               ),
+              //   decoration: fieldDecoration('Description'),
+              //   validator: (value) => value == null || value.isEmpty
+              //       ? 'Please enter a description'
+              //       : null,
+              //   onSaved: (value) => description = value!,
+              // ),
               SizedBox(height: 16),
               TextFormField(
                 decoration: fieldDecoration('Education Level'),

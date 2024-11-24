@@ -98,7 +98,8 @@ class AllDonations extends StatelessWidget {
                   child: StreamBuilder<QuerySnapshot>(
                       stream: firestoreInstance
                           .collection('Users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .doc(
+                              FirebaseAuth.instance.currentUser!.uid.toString())
                           .collection("donations")
                           .where('donationStatus', isEqualTo: 'Pending')
                           .snapshots(),
@@ -124,9 +125,12 @@ class AllDonations extends StatelessWidget {
                                           title:
                                               "${"You've Accepted  " + donation['donationTitle']}!",
                                           //quantity: donation['quantity'],
-                                          quantity: "7 kg",
+                                          quantity:
+                                              '${donation['quantity']!.toString()} kg',
                                           //distance: donation['distance'],
-                                          distance: "100km",
+                                          distance:
+                                              '${donation['distanceBetweenUs']!.toStringAsFixed(2)} km',
+
                                           collectionTime:
                                               donation['donationAvailability'],
                                           widget: Padding(

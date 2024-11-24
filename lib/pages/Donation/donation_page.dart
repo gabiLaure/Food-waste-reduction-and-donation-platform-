@@ -79,9 +79,11 @@ class DonationPage extends StatelessWidget {
                                           title:
                                               "${"You've Accepted  " + donation['donationTitle']}!",
                                           //quantity: donation['quantity'],
-                                          quantity: "7 kg",
+                                          quantity:
+                                              '${donation['quantity']!.toString()} kg',
                                           //distance: donation['distance'],
-                                          distance: "100km",
+                                          distance:
+                                              '${donation['distanceBetweenUs']!.toStringAsFixed(2)} km',
                                           collectionTime:
                                               donation['donationAvailability'],
                                           widget: Padding(
@@ -186,9 +188,10 @@ class DonationPage extends StatelessWidget {
                                         child: DonationCard(
                                           title: donation['donationTitle'],
                                           //quantity: donation['quantity'],
-                                          quantity: "7 kg",
+                                          quantity: donation['quantity'],
                                           //distance: donation['distance'],
-                                          distance: "100km",
+                                          distance:
+                                              donation['distanceBetweenUs'],
                                           collectionTime:
                                               donation['donationAvailability'],
                                           widget: Padding(

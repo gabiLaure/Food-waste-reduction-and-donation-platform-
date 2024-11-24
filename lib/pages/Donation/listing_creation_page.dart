@@ -18,6 +18,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:caritas/map/screens/current_location_screen.dart';
 
+import '../Orphanage/map_picker.dart';
 import 'view_donation.dart';
 
 class ListingCreationPage extends StatefulWidget {
@@ -29,7 +30,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   //String _output = '';
   //late LatLng _selectedLocation;
 
-  String? _communityType; // Default value
   List<Map<String, dynamic>> orphanages = [];
 
   final String userProfileID =
@@ -51,21 +51,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
 
   String donationID = UUIDGenerator().uuidV4();
   // intialize _donLocationDetails
-  List _donLocationDetails = [
-    3.844119, // 00
-    11.501346, // 01
-    "No Address", // 02
-    "No Street", // 03
-    "No Postal Code", // 04
-    "No Administrative Area", // 05
-    "No Sub Administrative Area", // 06
-    "No Thoroughfare", // 07
-    "No Sub Thoroughfare", // 08
-    "No Locality", // 09
-    "No Sub Locality", // 10
-    "No Country", // 11
-    "No ISO Country Code", // 12
-  ];
+
   double? donLocationLatitude, donLocationLongitude;
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -96,15 +82,53 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
         forceAndroidLocationManager: true);
   }
 
-  Position? _currentPosition;
+  String _address = ''; // To store the address name
+  double? _latitude; // To store latitude
+  double? _longitude;
+  double? _distanceBetweenUs;
+  Map<String, dynamic>? userInfos;
 
+  Map<String, dynamic>? selectedOrphanage; // Stocke l'orphelinat sélectionné
   Position? position;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentUserLocation();
+    // _getCurrentUserLocation();
     fetchOrphanages();
+    getCurrentUserInfo();
+  }
+
+  void getCurrentUserInfo() async {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userProfileID) // Utilisation de l'UID
+        .get();
+    if (userDoc.exists) {
+      Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+      setState(() {
+        userInfos = userData;
+      });
+    } else {
+      print("An error occured.");
+    }
+  }
+
+  // Fetch the address from latitude and longitude
+  Future<void> _getAddressFromCoordinates(latitude, longitude) async {
+    if (latitude != null && longitude != null) {
+      try {
+        List<Placemark> placemarks =
+            await placemarkFromCoordinates(latitude!, longitude!);
+        Placemark place = placemarks[0];
+        setState(() {
+          _address =
+              "${place.name}, ${place.locality}, ${place.country}"; // Formatted address
+        });
+      } catch (e) {
+        print("Error fetching address: $e");
+      }
+    }
   }
 
   Future<void> fetchOrphanages() async {
@@ -119,6 +143,8 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           .map((doc) => {
                 'name': doc['orphanageName'] as String, // Nom de l'orphelinat
                 'id': doc.id, // ID du document
+                'latitude': doc['latitude'],
+                'longitude': doc['longitude']
               })
           .toList();
 
@@ -136,66 +162,15 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     try {
       _determinePosition().then((Position position) {
         setState(() {
-          _currentPosition = position;
+          _latitude = position.latitude;
+          _longitude = position.longitude;
         });
-        print(_currentPosition);
-        _getCurrentUserAddressFromLatLng(
-            _currentPosition?.latitude, _currentPosition?.longitude);
+        _getAddressFromCoordinates(position.latitude, position.longitude);
       }).catchError((e) {
         print(e);
       });
     } catch (error) {
       ToastMessages().showErrorToast(error.toString());
-    }
-  }
-
-  _getCurrentUserAddressFromLatLng(latitude, longitude) async {
-    try {
-      List<Placemark> p = await placemarkFromCoordinates(latitude, longitude);
-      Placemark place = p[0];
-      setState(() {
-        donLocationLatitude = latitude;
-        donLocationLongitude = longitude;
-
-        _donLocationDetails = [
-          latitude, // 00
-          longitude, // 01
-          "${place.name}", // 02
-          "${place.street}", // 03
-          "${place.postalCode}", // 04
-          "${place.administrativeArea}", // 05
-          "${place.subAdministrativeArea}", // 06
-          "${place.thoroughfare}", // 07
-          "${place.subThoroughfare}", // 08
-          "${place.locality}", // 09
-          "${place.subLocality}", // 10
-          "${place.country}", // 11
-          "${place.isoCountryCode}", // 12
-        ];
-
-        userCurrentAddress = ""
-            // "${_donLocationDetails[0].toString()}, "
-            // "${_donLocationDetails[1].toString()}, "
-            "${_donLocationDetails[2].toString()}, "
-            "${_donLocationDetails[3].toString()}, "
-            "${_donLocationDetails[4].toString()}, "
-            "${_donLocationDetails[5].toString()}, "
-            "${_donLocationDetails[6].toString()}, "
-            // "${_donLocationDetails[7].toString()}, "
-            // "${_donLocationDetails[8].toString()}, "
-            "${_donLocationDetails[9].toString()}, "
-            "${_donLocationDetails[10].toString()}, "
-            "${_donLocationDetails[11].toString()}, "
-            "${_donLocationDetails[12].toString()}";
-
-        /*ToastMessages().toastSuccess("Location Selected: \n"
-            "$_trashLocationAddress", context);*/
-      });
-      // retryCount--;
-      // await Future.delayed(Duration(seconds: 4));
-    } catch (error) {
-      ToastMessages().showErrorToast(error.toString());
-      print("ERROR=> _getTrashLocationAddressFromLatLng: $error");
     }
   }
 
@@ -345,20 +320,32 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   Future<void> uploadImageToStorage() async {
     List<String> imageList = [];
     try {
+      // Ensure no duplicate images in the list
+      _selectedImages = _selectedImages.toSet().toList();
+
       for (var image in _selectedImages) {
-        final ref = firebase_storage.FirebaseStorage.instance
-            .ref()
-            .child('donation_images/$userProfileID/$donationID');
+        // Generate a unique path for each image
+        final ref = firebase_storage.FirebaseStorage.instance.ref().child(
+            'donation_images/$userProfileID/$donationID/${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}');
+
+        // Upload the image to Firebase Storage
         await ref.putFile(image);
+
+        // Get the download URL
         final imageUrl = await ref.getDownloadURL();
         print("image URL: $imageUrl");
+
+        // Add the URL to the list
         imageList.add(imageUrl);
-        // addDonToFireStore(imageUrl);
       }
-      // add donnation to firestore with list of images
+
+      // Save the image list to Firestore
       addDonToFireStore(imageList);
+
+      // Clear the selected images after uploading
+      _selectedImages.clear();
     } catch (e) {
-      print(e);
+      print("Error uploading images: $e");
     }
   }
 
@@ -371,16 +358,19 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
         .doc(donationID)
         .set({
           'donationID': donationID,
-          'donorID': userProfileID,
-          'communityType': _communityType,
+          'userInfos': userInfos,
+          'orphanage': selectedOrphanage,
           'donationTitle': _controller.text,
+          'quantity': _controllerQuantity.text,
           'donationDescription': _descriptionController.text,
           'donationDate': "$formattedDate, $formattedTime",
           'donationImages': imageList,
           'donationStatus': 'Pending',
           'donationBestBefore': selectedDate,
           'donationAvailability': selectedAction,
-          'donLocation': GeoPoint(donLocationLatitude!, donLocationLongitude!),
+          'latitude': _latitude,
+          'longitude': _longitude,
+          'distanceBetweenUs': _distanceBetweenUs
         })
         .then(
           (value) => sendSuccessCode(),
@@ -412,7 +402,24 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   final TextEditingController _descriptionController =
       TextEditingController(); // Create the controller
 
+  // Méthode pour calculer la distance entre deux points géographiques en mètres
+  double calculateDistance(double currentLatitude, double currentLongitude,
+      double communityLatitude, double communityLongitude) {
+    if (_latitude != null &&
+        _longitude != null &&
+        selectedOrphanage != null &&
+        selectedOrphanage!['latitude'] != null &&
+        selectedOrphanage!['longitude'] != null) {
+      final distanceInMeters = Geolocator.distanceBetween(currentLatitude,
+          currentLongitude, communityLatitude, communityLongitude);
+
+      return distanceInMeters / 1000;
+    }
+    return 0.0;
+  }
+
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controllerQuantity = TextEditingController();
   final int maxTitleLength = 50;
   final int maxDescriptionLength = 500;
 
@@ -428,8 +435,158 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   //   super.initState();
   // }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   // Vérifie que _distanceBetweenUs n'est pas nul et est inférieur à 20 km
+  //   if (_distanceBetweenUs != null) {
+  //     if (_distanceBetweenUs! < 20) {
+  //       return Scaffold(
+  //         appBar: AppBar(
+  //           title: Text('Create Donation'),
+  //         ),
+  //         body: ListView(
+  //           padding: EdgeInsets.all(16),
+  //           children: [
+  //             GestureDetector(
+  //               onTap: () {
+  //                 // Navigate to the page with information about allowed food types
+  //               },
+  //               child: const Center(
+  //                 child: Text(
+  //                   'What type of food are allowed on Caritas?',
+  //                   style: TextStyle(color: Colors.blue),
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(height: 16),
+  //             SizedBox(height: 24),
+  //             orphanages.isNotEmpty
+  //                 ? _buildLocalCommunity(orphanages)
+  //                 : Center(
+  //                     child:
+  //                         CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés
+  //             SizedBox(height: 16),
+  //             _buildLocation(),
+  //             _displayDistance(),
+  //             _buildPhotosContainer(),
+  //             _buildTitle(),
+  //             _buildDescription(),
+  //             _buildAvailabilities(),
+  //             Divider(),
+  //             _buildBestBefore(),
+  //             SizedBox(height: 24),
+  //             SizedBox(
+  //               width: double.infinity,
+  //               height: 50,
+  //               child: ElevatedButton(
+  //                 onPressed: () {
+  //                   validateDonation();
+  //                 },
+  //                 child: Text('Validate Donation',
+  //                     style: TextStyle(
+  //                         fontSize: 20,
+  //                         color: Colors.white,
+  //                         fontWeight: FontWeight.w400)),
+  //                 style: ElevatedButton.styleFrom(
+  //                   backgroundColor: Color.fromARGB(255, 203, 152, 206),
+  //                   shape: const RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.all(Radius.circular(20)),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     } else {
+  //       // Si la distance est supérieure à 20 km
+
+  //       return Scaffold(
+  //         appBar: AppBar(
+  //           title: Text('Create Donation'),
+  //         ),
+  //         body: ListView(
+  //           padding: EdgeInsets.all(16),
+  //           children: [
+  //             GestureDetector(
+  //               onTap: () {
+  //                 // Navigate to the page with information about allowed food types
+  //               },
+  //               child: const Center(
+  //                 child: Text(
+  //                   'What type of food are allowed on Caritas?',
+  //                   style: TextStyle(color: Colors.blue),
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(height: 16),
+  //             SizedBox(height: 24),
+  //             orphanages.isNotEmpty
+  //                 ? _buildLocalCommunity(orphanages)
+  //                 : Center(
+  //                     child:
+  //                         CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés
+  //             SizedBox(height: 16),
+  //             _buildLocation(),
+  //             _displayDistance(),
+  //           ],
+  //         ),
+  //       );
+  //     }
+  //   } else {
+  //     // Si _distanceBetweenUs est null, afficher un message pour indiquer que la distance n'est pas encore calculée
+  //     return Scaffold(
+  //       appBar: AppBar(
+  //         title: Text('Create Donation'),
+  //       ),
+  //       body: ListView(
+  //         padding: EdgeInsets.all(16),
+  //         children: [
+  //           GestureDetector(
+  //             onTap: () {
+  //               // Navigate to the page with information about allowed food types
+  //             },
+  //             child: const Center(
+  //               child: Text(
+  //                 'What type of food are allowed on Caritas?',
+  //                 style: TextStyle(color: Colors.blue),
+  //               ),
+  //             ),
+  //           ),
+  //           SizedBox(height: 16),
+  //           SizedBox(height: 24),
+  //           orphanages.isNotEmpty
+  //               ? _buildLocalCommunity(orphanages)
+  //               : Center(
+  //                   child:
+  //                       CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés
+  //           SizedBox(height: 16),
+  //           _buildLocation(),
+  //           _displayDistance(),
+  //         ],
+  //       ),
+  //     );
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
+    // Vérifie si _distanceBetweenUs est null, si c'est le cas, on montre un message
+    if (_distanceBetweenUs == null) {
+      return _buildScaffoldWithMessage('');
+    }
+
+    // Si _distanceBetweenUs est inférieur à 20 km, affiche les informations détaillées
+    if (_distanceBetweenUs! < 20) {
+      return _buildScaffoldWithDetails();
+    } else {
+      // Si la distance est supérieure à 20 km, affiche un message
+      return _buildScaffoldWithMessage(
+          'Distance is too far donations are permitted within a distance of less than 20km');
+    }
+  }
+
+  Widget _buildScaffoldWithDetails() {
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Donation'),
@@ -452,14 +609,14 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           SizedBox(height: 24),
           orphanages.isNotEmpty
               ? _buildLocalCommunity(orphanages)
-              : Center(
-                  child:
-                      CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés),
+              : Center(child: CircularProgressIndicator()),
           SizedBox(height: 16),
           _buildLocation(),
+          _displayDistance(),
           _buildPhotosContainer(),
           _buildTitle(),
           _buildDescription(),
+          _buildQuantity(),
           _buildAvailabilities(),
           Divider(),
           _buildBestBefore(),
@@ -489,17 +646,58 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     );
   }
 
+  Widget _buildScaffoldWithMessage(String message) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create Donation'),
+      ),
+      body: ListView(
+        padding: EdgeInsets.all(16),
+        children: [
+          GestureDetector(
+            onTap: () {
+              // Navigate to the page with information about allowed food types
+            },
+            child: const Center(
+              child: Text(
+                'What type of food are allowed on Caritas?',
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          SizedBox(height: 24),
+          orphanages.isNotEmpty
+              ? _buildLocalCommunity(orphanages)
+              : Center(child: CircularProgressIndicator()),
+          SizedBox(height: 16),
+          _buildLocation(),
+          _displayDistance(),
+          Center(
+            child: Text(
+              message,
+              style: TextStyle(
+                  fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLocalCommunity(List<Map<String, dynamic>> orphanages) {
-    return DropdownButtonFormField<String>(
-      value: _communityType,
+    return DropdownButtonFormField<Map<String, dynamic>>(
+      value: selectedOrphanage,
       onChanged: (newValue) {
         setState(() {
-          _communityType = newValue!;
+          selectedOrphanage = newValue!;
+          _distanceBetweenUs = calculateDistance(_latitude!, _longitude!,
+              newValue['latitude'], newValue['longitude']);
         });
       },
       items: orphanages.map((Map<String, dynamic> orphanage) {
-        return DropdownMenuItem<String>(
-          value: orphanage['name'],
+        return DropdownMenuItem<Map<String, dynamic>>(
+          value: orphanage,
           child: Text(orphanage['name']),
         );
       }).toList(),
@@ -523,13 +721,29 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          subtitle: Text(userCurrentAddress),
+          subtitle: Text(_address),
           trailing: Icon(Icons.location_on_sharp),
-          onTap: () {
-            //_getCurrentUserLocation();
-            print("Location Selected: $userCurrentAddress");
-            // Navigator.push(context,
-            //     MaterialPageRoute(builder: (context) => DonationsFragment()));
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LocationPicker(
+                  onLocationPicked: (position) {
+                    setState(() {
+                      _latitude = position.latitude; // Store latitude
+                      _longitude = position.longitude; // Store longitude
+                      _distanceBetweenUs = calculateDistance(
+                          position.latitude,
+                          position.longitude,
+                          selectedOrphanage!['latitude'],
+                          selectedOrphanage!['longitude']);
+                    });
+                    _getAddressFromCoordinates(position.latitude,
+                        position.longitude); // Get address from coordinates
+                  },
+                ),
+              ),
+            );
           },
         ),
         Divider(),
@@ -661,7 +875,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     );
   }
 
-//
   Widget _buildTitle() {
     // Implement the widget for entering the title
     return Padding(
@@ -694,6 +907,46 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                       EdgeInsets.all(12.0), // Add padding inside the box
                   border: InputBorder.none,
                   hintText: 'E.g. Vegetable, Cakes, Cereals',
+                  counterText: '${_controller.text.length}/$maxTitleLength',
+                ),
+              ),
+            ),
+          ],
+        ));
+  }
+
+  Widget _buildQuantity() {
+    // Implement the widget for entering the title
+    return Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 15.0),
+            const ListTile(
+                leading: Icon(Icons.check_circle_outline),
+                title: Row(children: [
+                  Text(
+                    'Enter Food Quantity(in Kg)',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ])),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey), // Add a border
+                borderRadius: BorderRadius.circular(8.0), // Rounded corners
+              ),
+              child: TextField(
+                controller: _controllerQuantity,
+                maxLength: maxTitleLength,
+                decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.all(12.0), // Add padding inside the box
+                  border: InputBorder.none,
+                  hintText: 'E.g. 5kg, 15kg, 20kg',
                   counterText: '${_controller.text.length}/$maxTitleLength',
                 ),
               ),
@@ -884,6 +1137,46 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           )
         ]);
       },
+    );
+  }
+
+  Widget _displayDistance() {
+    // Vérifie si les coordonnées et l'orphelinat sélectionné sont disponibles
+    if (_distanceBetweenUs == null || _distanceBetweenUs == 0.0) {
+      return SizedBox
+          .shrink(); // Retourne un widget vide si les conditions ne sont pas remplies
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            leading: Icon(Icons.map),
+            title: Text(
+              'Distance to Selected Orphanage',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Text(
+                '${_distanceBetweenUs!.toStringAsFixed(2)} kilometers',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -104,7 +104,10 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
               Text(
                 donation['donationTitle'],
                 //"Fruits and Snacks",
-                style: TextStyle(fontSize: 16, color: Colors.purple[200]),
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple[200]),
               ),
               const SizedBox(
                 height: 15,
@@ -113,25 +116,13 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          donation['donationDescription'],
-                          //"Nutrients for Poor Child",
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                          softWrap: true,
-                        ),
-                        Text(
-                          getTimeElapsed(donation['donationDate']),
-                          //"20 days left",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xff9ca5bb),
-                              fontWeight: FontWeight.w300),
-                        )
-                      ],
+                    child: Text(
+                      getTimeElapsed(donation['donationDate']),
+                      //"20 days left",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xff9ca5bb),
+                          fontWeight: FontWeight.w300),
                     ),
                   ),
                   const SizedBox(
@@ -257,21 +248,21 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
                     backgroundImage: AssetImage('assets/pp.jpeg'),
                   ),
                   Text(
-                    " by ",
-                    style: TextStyle(fontSize: 24),
+                    " By ",
+                    style: TextStyle(fontSize: 20),
                   ),
                   Text(
-                    "Laury",
+                    donation['userInfos']['fullname'],
                     style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 20,
                         color: Colors.purple[200],
                         fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              const Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+              Text(
+                donation['donationDescription'],
                 style: TextStyle(fontSize: 16),
                 softWrap: true,
               ),
