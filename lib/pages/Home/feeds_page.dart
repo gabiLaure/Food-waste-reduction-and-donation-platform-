@@ -29,6 +29,8 @@ class _FeedPageState extends State<FeedPage> {
     // {'type': 'video', 'path': 'assets/videos/orphanage2.mp4'},
     // {'type': 'video', 'path': 'assets/videos/orphanage3.mp4'},
   ];
+  final String userProfileID =
+      FirebaseAuth.instance.currentUser!.uid.toString();
 
   List<VideoPlayerController> _videoControllers = [];
 
@@ -201,11 +203,12 @@ class _FeedPageState extends State<FeedPage> {
                   // afficher les 5 derniers dons
                   child: StreamBuilder<QuerySnapshot>(
                       stream: firestoreInstance
-                          .collection('Users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
                           .collection("donations")
-                          .orderBy('donationDate', descending: true)
-                          .limit(5)
+                          .where('userInfos.userUid',
+                              isEqualTo:
+                                  userProfileID) // Filtrer par UID de l'utilisateur actuel
+
+                          .limit(5) // Limiter à 5 résultats
                           .snapshots(),
                       builder: ((context, snapshot) {
                         if (snapshot.connectionState ==

@@ -1,50 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModelClass {
-  final String uuid;
+  final String userUid;
   final String accountType;
-  final String firstName;
-  final String lastName;
+  final String fullname;
   final String email;
-  final String contactNumber;
+  final String phone;
   // final String homeAddress;
-  final String accountCreated;
-  final String profileImage;
+  String accountCreated = '';
+  String profileImage = '';
 
   UserModelClass({
-    required this.uuid,
+    required this.userUid,
     required this.accountType,
-    required this.firstName,
-    required this.lastName,
+    required this.fullname,
     required this.email,
-    required this.contactNumber,
-    // required this.homeAddress,
-    required this.accountCreated,
-    required this.profileImage,
+    required this.phone,
   });
 
   factory UserModelClass.fromDocument(DocumentSnapshot doc) {
     return UserModelClass(
-      uuid: doc['uuid'],
+      userUid: doc['userUid'],
       accountType: doc['accountType'],
-      firstName: doc['firstName'],
-      lastName: doc['lastName'],
+      fullname: doc['fullname'],
       email: doc['email'],
-      contactNumber: doc['contactNumber'],
-      // homeAddress: doc['homeAddress'],
-      accountCreated: doc['accountCreated'],
-      profileImage: doc['profileImage'],
+      phone: doc['phone'],
     );
   }
   // model to document
   Map<String, dynamic> toDocument() {
     return {
-      "uuid": uuid,
+      "userUid": userUid,
       "accountType": accountType,
-      "firstName": firstName,
-      "lastName": lastName,
+      "fullname": fullname,
       "email": email,
-      "contactNumber": contactNumber,
+      "phone": phone,
       "accountCreated": accountCreated,
       "profileImage": profileImage
     };

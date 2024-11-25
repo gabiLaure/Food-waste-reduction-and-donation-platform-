@@ -16,7 +16,7 @@ class ProfilePage extends StatelessWidget {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection("Users")
-              .where('uuid', isEqualTo: currentUserID)
+              .where('userUid', isEqualTo: currentUserID)
               .snapshots(),
           builder: (context, dataSnapshot) {
             if (!dataSnapshot.hasData) {
@@ -64,7 +64,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      '${userModelClass.firstName} ${userModelClass.lastName}',
+                      '${userModelClass.fullname}',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

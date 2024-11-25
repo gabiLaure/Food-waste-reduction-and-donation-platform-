@@ -1,7 +1,7 @@
+import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/pages/Request/request_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:caritas/intro/screens/imageslider.dart';
 import 'package:caritas/models/donation.dart';
 import 'package:caritas/models/user_model.dart';
 import 'package:caritas/widgets/feedback_page.dart';
@@ -9,6 +9,7 @@ import 'package:caritas/pages/Donation/listing_creation_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:caritas/widgets/toast_messages.dart';
 
 import 'all_donation.dart';
 
@@ -18,235 +19,190 @@ class DonationPage extends StatelessWidget {
   final firestoreInstance = FirebaseFirestore.instance;
   late Donation donation;
   late UserModelClass user;
+  void acceptDonation(DocumentSnapshot<Object?> donation) async {
+    try {
+      // Met à jour le statut de la donation dans Firestore
+      await FirebaseFirestore.instance
+          .collection(
+              'donations') // Remplacez par le nom correct de la collection
+          .doc(donation['donationID']) // L'ID du document de la donation
+          .update({
+        'donationStatus': 'Accepted', // Nouveau statut
+        'orphanAccept': GlobalData.orphanageData,
+        'updatedAt':
+            FieldValue.serverTimestamp(), // Met à jour la date si nécessaire
+      });
+      ToastMessages().showSuccessToast('Donation accepted successfully..');
+    } catch (e) {
+      ToastMessages().showErrorToast("Error while accepting donation: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: DefaultTabController(
-          length: 2,
-          child: Column(children: <Widget>[
-            TabBar(
-              tabs: [
-                Tab(text: 'Pending Donation'),
-                Tab(text: 'Pending Request'),
-              ],
-            ),
+        length: 2,
+        child: Column(
+          children: <Widget>[
+            _buildTabBar(),
             Expanded(
-              child: TabBarView(children: [
-                Container(
-                  child: StreamBuilder<QuerySnapshot>(
-                      stream: firestoreInstance
-                          .collection('Users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .collection("donations")
-                          .where('donationStatus', isEqualTo: 'Pending')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        return !snapshot.hasData
-                            ? Container()
-                            : snapshot.data!.docs.length.toString() == '0'
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Animated Logo (Replace with your logo widget)
-                                      _buildUI(),
-                                      //CircularProgressIndicator(), // Example of a loading animation
-                                      SizedBox(height: 20),
-                                      Text(
-                                        'There are no ads in this area',
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      SizedBox(height: 20),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          // Handle button press
-                                        },
-                                        child: Text('Expand my search area'),
-                                      ),
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: snapshot.data!.docs.length,
-                                    itemBuilder: (context, index) {
-                                      DocumentSnapshot donation =
-                                          snapshot.data!.docs[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: DonationCard(
-                                          title:
-                                              "${"You've Accepted  " + donation['donationTitle']}!",
-                                          //quantity: donation['quantity'],
-                                          quantity:
-                                              '${donation['quantity']!.toString()} kg',
-                                          //distance: donation['distance'],
-                                          distance:
-                                              '${donation['distanceBetweenUs']!.toStringAsFixed(2)} km',
-                                          collectionTime:
-                                              donation['donationAvailability'],
-                                          widget: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    // Handle button 2 press
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey[200],
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                  ),
-                                                  child: Text('Decline'),
-                                                ),
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    // Handle button 2 press
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ListingCreationPage(),
-                                                      ),
-                                                    );
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.green[100],
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                  ),
-                                                  child: Text('Accept'),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                      }),
-                ),
-                Container(
-                  child: StreamBuilder<QuerySnapshot>(
-                      stream: firestoreInstance
-                          .collection('Users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .collection("donations")
-                          .where('donationStatus', isEqualTo: 'Accepted')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        return !snapshot.hasData
-                            ? Container()
-                            : snapshot.data!.docs.length.toString() == '0'
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Animated Logo (Replace with your logo widget)
-                                      _buildUI(),
-                                      //CircularProgressIndicator(), // Example of a loading animation
-                                      SizedBox(height: 20),
-                                      Text(
-                                        'There are no ads in this area',
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      SizedBox(height: 20),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          // Handle button press
-                                        },
-                                        child: Text('Expand my search area'),
-                                      ),
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: snapshot.data!.docs.length,
-                                    itemBuilder: (context, index) {
-                                      DocumentSnapshot donation =
-                                          snapshot.data!.docs[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: DonationCard(
-                                          title: donation['donationTitle'],
-                                          //quantity: donation['quantity'],
-                                          quantity: donation['quantity'],
-                                          //distance: donation['distance'],
-                                          distance:
-                                              donation['distanceBetweenUs'],
-                                          collectionTime:
-                                              donation['donationAvailability'],
-                                          widget: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    Get.to(() =>
-                                                        GiveFeedbackPage());
-                                                    print("clicked");
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.green[100],
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                  ),
-                                                  child: Text('Feedback'),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                      }),
-                ),
-              ]),
+              child: TabBarView(
+                children: [
+                  _buildPendingDonationTab(),
+                  _buildPendingRequestTab(),
+                ],
+              ),
             ),
-          ])),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle floating action button press
-          _showDialog(context);
-        },
-        child: Icon(Icons.add),
+          ],
+        ),
+      ),
+      floatingActionButton: _buildFloatingActionButton(context),
+    );
+  }
+
+  // Builds the TabBar widget
+  Widget _buildTabBar() {
+    return TabBar(
+      tabs: [
+        Tab(text: 'Pending Donation'),
+        Tab(text: 'Pending Request'),
+      ],
+    );
+  }
+
+  // Builds the Pending Donation tab content
+  Widget _buildPendingDonationTab() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestoreInstance
+          .collection('donations')
+          .where('orphanage.id', isEqualTo: 'all-community')
+          .where('donationStatus', isEqualTo: 'Pending')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return _buildEmptyState('There are no donations in this area');
+        }
+
+        return _buildDonationList(snapshot.data!);
+      },
+    );
+  }
+
+  // Builds the Pending Request tab content
+  Widget _buildPendingRequestTab() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestoreInstance
+          .collection('request')
+          .where('donationStatus', isEqualTo: 'Pending')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return _buildEmptyState('There are no requests in this area');
+        }
+
+        return _buildDonationList(snapshot.data!);
+      },
+    );
+  }
+
+  // Builds a list of donations
+  Widget _buildDonationList(QuerySnapshot snapshot) {
+    return ListView.builder(
+      itemCount: snapshot.docs.length,
+      itemBuilder: (context, index) {
+        DocumentSnapshot donation = snapshot.docs[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DonationCard(
+            title: donation['donationTitle'],
+            quantity: '${donation['quantity']} kg',
+            distance: '${donation['distanceBetweenUs'].toStringAsFixed(2)} km',
+            collectionTime: donation['donationAvailability'],
+            widget: _buildActionButtons(donation),
+          ),
+        );
+      },
+    );
+  }
+
+  // Builds buttons for the action (Accept, Decline, etc.)
+  Widget _buildActionButtons(DocumentSnapshot donation) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildAcceptButton(donation),
+        ],
       ),
     );
   }
 
+  // Builds the Accept button
+  Widget _buildAcceptButton(DocumentSnapshot donation) {
+    return ElevatedButton(
+      onPressed: () {
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ListingCreationPage(),
+        //   ),
+        // );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green[100],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+      child: Text('Accept'),
+    );
+  }
+
+  // Builds the empty state UI when there are no donations or requests
+  Widget _buildEmptyState(String message) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildUI(),
+        SizedBox(height: 20),
+        Text(message, style: TextStyle(fontSize: 18)),
+        SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {
+            // Handle expand search area button press
+          },
+          child: Text('Expand my search area'),
+        ),
+      ],
+    );
+  }
+
+  // Builds the UI for loading state (Lottie animation)
   Widget _buildUI() {
     return Center(
       child: LottieBuilder.asset("assets/animation/delivery.json"),
     );
   }
 
+  // Builds the Floating Action Button
+  Widget _buildFloatingActionButton(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () => _showDialog(context),
+      child: Icon(Icons.add),
+    );
+  }
+
+  // Shows the dialog for making a choice
   void _showDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -256,33 +212,34 @@ class DonationPage extends StatelessWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate to the listing creation page for donation
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ListingCreationPage()),
-                  );
-                },
-                child: Center(child: Text('Make a Donation')),
+              _buildDialogButton(
+                context,
+                'Make a Donation',
+                ListingCreationPage(),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate to the listing creation page for request
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RequestDonation()),
-                  );
-                },
-                child: Center(child: Text('Make a Request')),
+              _buildDialogButton(
+                context,
+                'Make a Request',
+                RequestDonation(),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  // Helper method to build dialog buttons
+  Widget _buildDialogButton(BuildContext context, String label, Widget page) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      },
+      child: Center(child: Text(label)),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../admin/models/global_data.dart';
 import '../../widgets/forgot_password_page.dart';
 import '../Orphanage/orphanage_registration_page.dart';
 import 'register_page.dart';
@@ -210,6 +211,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void getUserSupInfo(userData) {
     // Navigate based on account type
+    GlobalData.userData = userData;
     switch (userData['accountType']) {
       case 'Orphanage':
         fetchOrphanageByUserProfileID(userData);
@@ -236,12 +238,13 @@ class _LoginPageState extends State<LoginPage> {
         // Get the first document (assuming userProfileID is unique)
         DocumentSnapshot document = querySnapshot.docs.first;
 
-        // Convert document data into a map
-        Map<String, dynamic> orphanageData =
-            document.data() as Map<String, dynamic>;
+        Map<String, dynamic> orphanageData = {
+          ...document.data() as Map<String, dynamic>,
+          'id': document.id, // Add the document ID
+        };
 
         // Use the orphanage data as needed
-        print('Orphanage data: $orphanageData');
+        GlobalData.orphanageData = orphanageData;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),

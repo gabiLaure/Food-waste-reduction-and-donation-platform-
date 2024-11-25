@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_new, prefer_const_constructors
 
+import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/generators/uuid_generator.dart';
 import 'package:caritas/widgets/button_widgets.dart';
 import 'package:caritas/widgets/toast_messages.dart';
@@ -7,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
 class GiveFeedbackPage extends StatefulWidget {
   @override
@@ -14,6 +16,7 @@ class GiveFeedbackPage extends StatefulWidget {
 }
 
 class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
+  final donation = Get.arguments;
   TextEditingController _giveFeedbackController = new TextEditingController();
   int charLength = 0;
   String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
@@ -50,7 +53,6 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
   }
 
   void sendSuccessCode() {
-    print("Comment sent successfully!");
     Navigator.pop(context);
     setState(() {
       isStartToUpload = false;
@@ -166,12 +168,12 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
   sendFeedback() {
     FirebaseFirestore.instance
         .collection('Feedbacks')
-        .doc("User Feedbacks")
-        .collection(FirebaseAuth.instance.currentUser!.uid)
         .doc(UUIDGenerator().uuidV1())
         .set({
           'feedback': _giveFeedbackController.text,
           'postedDate': "$formattedDate, $formattedTime",
+          'donation': donation,
+          'userInfos': GlobalData.userData
         })
         .then(
           (value) => sendSuccessCode(),
@@ -183,7 +185,6 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
     if (_giveFeedbackController.text.isEmpty) {
       ToastMessages().showWarningToast("Please enter your comment");
     } else {
-      print(_giveFeedbackController.text);
       sendFeedback();
     }
   }

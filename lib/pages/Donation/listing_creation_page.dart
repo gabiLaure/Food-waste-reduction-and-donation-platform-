@@ -132,6 +132,12 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   }
 
   Future<void> fetchOrphanages() async {
+    Map<String, dynamic> allCommunity = {
+      'id': 'all-community',
+      'name': 'All Community',
+      'latitude': 0.0, // Pas de latitude pour "All Community"
+      'longitude': 0.0, // Pas de longitude pour "All Community"
+    };
     try {
       // Requête Firestore pour récupérer les orphelinats
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -150,7 +156,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
 
       // Mettre à jour l'état avec les orphelinats récupérés
       setState(() {
-        orphanages = fetchedOrphanages;
+        orphanages = [allCommunity, ...fetchedOrphanages];
       });
     } catch (e) {
       print("Error fetching orphanages: $e");
@@ -333,8 +339,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
 
         // Get the download URL
         final imageUrl = await ref.getDownloadURL();
-        print("image URL: $imageUrl");
-
         // Add the URL to the list
         imageList.add(imageUrl);
       }
@@ -352,8 +356,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   // add donnation to firestore with multiple images
   Future<void> addDonToFireStore(List<String> imageList) async {
     FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userProfileID)
         .collection('donations')
         .doc(donationID)
         .set({
@@ -407,9 +409,8 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
       double communityLatitude, double communityLongitude) {
     if (_latitude != null &&
         _longitude != null &&
-        selectedOrphanage != null &&
-        selectedOrphanage!['latitude'] != null &&
-        selectedOrphanage!['longitude'] != null) {
+        communityLatitude != 0.0 &&
+        communityLongitude != 0.0) {
       final distanceInMeters = Geolocator.distanceBetween(currentLatitude,
           currentLongitude, communityLatitude, communityLongitude);
 
@@ -435,140 +436,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   //   super.initState();
   // }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   // Vérifie que _distanceBetweenUs n'est pas nul et est inférieur à 20 km
-  //   if (_distanceBetweenUs != null) {
-  //     if (_distanceBetweenUs! < 20) {
-  //       return Scaffold(
-  //         appBar: AppBar(
-  //           title: Text('Create Donation'),
-  //         ),
-  //         body: ListView(
-  //           padding: EdgeInsets.all(16),
-  //           children: [
-  //             GestureDetector(
-  //               onTap: () {
-  //                 // Navigate to the page with information about allowed food types
-  //               },
-  //               child: const Center(
-  //                 child: Text(
-  //                   'What type of food are allowed on Caritas?',
-  //                   style: TextStyle(color: Colors.blue),
-  //                 ),
-  //               ),
-  //             ),
-  //             SizedBox(height: 16),
-  //             SizedBox(height: 24),
-  //             orphanages.isNotEmpty
-  //                 ? _buildLocalCommunity(orphanages)
-  //                 : Center(
-  //                     child:
-  //                         CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés
-  //             SizedBox(height: 16),
-  //             _buildLocation(),
-  //             _displayDistance(),
-  //             _buildPhotosContainer(),
-  //             _buildTitle(),
-  //             _buildDescription(),
-  //             _buildAvailabilities(),
-  //             Divider(),
-  //             _buildBestBefore(),
-  //             SizedBox(height: 24),
-  //             SizedBox(
-  //               width: double.infinity,
-  //               height: 50,
-  //               child: ElevatedButton(
-  //                 onPressed: () {
-  //                   validateDonation();
-  //                 },
-  //                 child: Text('Validate Donation',
-  //                     style: TextStyle(
-  //                         fontSize: 20,
-  //                         color: Colors.white,
-  //                         fontWeight: FontWeight.w400)),
-  //                 style: ElevatedButton.styleFrom(
-  //                   backgroundColor: Color.fromARGB(255, 203, 152, 206),
-  //                   shape: const RoundedRectangleBorder(
-  //                     borderRadius: BorderRadius.all(Radius.circular(20)),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     } else {
-  //       // Si la distance est supérieure à 20 km
-
-  //       return Scaffold(
-  //         appBar: AppBar(
-  //           title: Text('Create Donation'),
-  //         ),
-  //         body: ListView(
-  //           padding: EdgeInsets.all(16),
-  //           children: [
-  //             GestureDetector(
-  //               onTap: () {
-  //                 // Navigate to the page with information about allowed food types
-  //               },
-  //               child: const Center(
-  //                 child: Text(
-  //                   'What type of food are allowed on Caritas?',
-  //                   style: TextStyle(color: Colors.blue),
-  //                 ),
-  //               ),
-  //             ),
-  //             SizedBox(height: 16),
-  //             SizedBox(height: 24),
-  //             orphanages.isNotEmpty
-  //                 ? _buildLocalCommunity(orphanages)
-  //                 : Center(
-  //                     child:
-  //                         CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés
-  //             SizedBox(height: 16),
-  //             _buildLocation(),
-  //             _displayDistance(),
-  //           ],
-  //         ),
-  //       );
-  //     }
-  //   } else {
-  //     // Si _distanceBetweenUs est null, afficher un message pour indiquer que la distance n'est pas encore calculée
-  //     return Scaffold(
-  //       appBar: AppBar(
-  //         title: Text('Create Donation'),
-  //       ),
-  //       body: ListView(
-  //         padding: EdgeInsets.all(16),
-  //         children: [
-  //           GestureDetector(
-  //             onTap: () {
-  //               // Navigate to the page with information about allowed food types
-  //             },
-  //             child: const Center(
-  //               child: Text(
-  //                 'What type of food are allowed on Caritas?',
-  //                 style: TextStyle(color: Colors.blue),
-  //               ),
-  //             ),
-  //           ),
-  //           SizedBox(height: 16),
-  //           SizedBox(height: 24),
-  //           orphanages.isNotEmpty
-  //               ? _buildLocalCommunity(orphanages)
-  //               : Center(
-  //                   child:
-  //                       CircularProgressIndicator()), // Afficher un chargement si les orphelinats ne sont pas encore chargés
-  //           SizedBox(height: 16),
-  //           _buildLocation(),
-  //           _displayDistance(),
-  //         ],
-  //       ),
-  //     );
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     // Vérifie si _distanceBetweenUs est null, si c'est le cas, on montre un message
@@ -576,14 +443,77 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
       return _buildScaffoldWithMessage('');
     }
 
-    // Si _distanceBetweenUs est inférieur à 20 km, affiche les informations détaillées
-    if (_distanceBetweenUs! < 20) {
-      return _buildScaffoldWithDetails();
+    if (selectedOrphanage!['name'] == 'All Community') {
+      return _buildScaffoldWithDetailsForAll();
     } else {
-      // Si la distance est supérieure à 20 km, affiche un message
-      return _buildScaffoldWithMessage(
-          'Distance is too far donations are permitted within a distance of less than 20km');
+      // Si _distanceBetweenUs est inférieur à 20 km, affiche les informations détaillées
+      if (_distanceBetweenUs! < 20) {
+        return _buildScaffoldWithDetails();
+      } else {
+        // Si la distance est supérieure à 20 km, affiche un message
+        return _buildScaffoldWithMessage(
+            'Distance is too far donations are permitted within a distance of less than 20km');
+      }
     }
+  }
+
+  Widget _buildScaffoldWithDetailsForAll() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create Donation'),
+      ),
+      body: ListView(
+        padding: EdgeInsets.all(16),
+        children: [
+          GestureDetector(
+            onTap: () {
+              // Navigate to the page with information about allowed food types
+            },
+            child: const Center(
+              child: Text(
+                'What type of food are allowed on Caritas?',
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          SizedBox(height: 24),
+          orphanages.isNotEmpty
+              ? _buildLocalCommunity(orphanages)
+              : Center(child: CircularProgressIndicator()),
+          SizedBox(height: 16),
+          _buildLocation(),
+          _buildPhotosContainer(),
+          _buildTitle(),
+          _buildDescription(),
+          _buildQuantity(),
+          _buildAvailabilities(),
+          Divider(),
+          _buildBestBefore(),
+          SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {
+                validateDonation();
+              },
+              child: Text('Validate Donation',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildScaffoldWithDetails() {
@@ -691,8 +621,20 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
       onChanged: (newValue) {
         setState(() {
           selectedOrphanage = newValue!;
-          _distanceBetweenUs = calculateDistance(_latitude!, _longitude!,
-              newValue['latitude'], newValue['longitude']);
+
+          // Logique pour "All Community"
+          if (newValue['name'] == 'All Community') {
+            _distanceBetweenUs =
+                0.0; // Pas de calcul de distance pour "All Community"
+          } else {
+            // Calculer la distance pour les autres communautés
+            _distanceBetweenUs = calculateDistance(
+              _latitude!,
+              _longitude!,
+              newValue['latitude'],
+              newValue['longitude'],
+            );
+          }
         });
       },
       items: orphanages.map((Map<String, dynamic> orphanage) {

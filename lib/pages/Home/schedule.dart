@@ -9,6 +9,9 @@ import 'package:table_calendar/table_calendar.dart';
 class SchedulePage extends StatelessWidget {
   SchedulePage({super.key});
 
+  final String userProfileID =
+      FirebaseAuth.instance.currentUser!.uid.toString();
+
   final firestoreInstance = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
@@ -36,11 +39,12 @@ class SchedulePage extends StatelessWidget {
                 // afficher les 3 derniers dons
                 child: StreamBuilder<QuerySnapshot>(
                     stream: firestoreInstance
-                        .collection('Users')
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
                         .collection("donations")
-                        .orderBy('donationDate', descending: true)
-                        .limit(5)
+                        .where('userInfos.userUid',
+                            isEqualTo:
+                                userProfileID) // Filtrer par UID de l'utilisateur actuel
+
+                        .limit(5) // Limiter à 5 résultats
                         .snapshots(),
                     builder: ((context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {

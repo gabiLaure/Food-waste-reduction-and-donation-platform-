@@ -355,18 +355,12 @@ class _EditDonorProfilePageState extends State<EditDonorProfilePage> {
                           TextFormField(
                             readOnly: true,
                             controller: firstNameController
-                              ..text = userModelClass.firstName,
+                              ..text = userModelClass.fullname,
                             decoration:
                                 InputDecoration(labelText: 'First Name'),
                           ),
                           SizedBox(height: 16),
-                          TextFormField(
-                            readOnly: true,
-                            controller: lastNameController
-                              ..text = userModelClass.lastName,
-                            decoration: InputDecoration(labelText: 'Last Name'),
-                          ),
-                          SizedBox(height: 16),
+
                           TextFormField(
                             readOnly: true,
                             controller: emailController
@@ -377,7 +371,7 @@ class _EditDonorProfilePageState extends State<EditDonorProfilePage> {
                           TextFormField(
                             readOnly: true,
                             controller: phoneNumberController
-                              ..text = userModelClass.contactNumber,
+                              ..text = userModelClass.phone,
                             decoration:
                                 InputDecoration(labelText: 'Phone Number'),
                           ),
