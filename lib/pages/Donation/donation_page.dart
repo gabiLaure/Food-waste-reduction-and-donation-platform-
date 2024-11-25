@@ -1,6 +1,7 @@
 import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/pages/Request/request_page.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:caritas/models/donation.dart';
 import 'package:caritas/models/user_model.dart';
@@ -19,7 +20,8 @@ class DonationPage extends StatelessWidget {
   final firestoreInstance = FirebaseFirestore.instance;
   late Donation donation;
   late UserModelClass user;
-  void acceptDonation(DocumentSnapshot<Object?> donation) async {
+
+  void acceptDonation(donation) async {
     try {
       // Met à jour le statut de la donation dans Firestore
       await FirebaseFirestore.instance
@@ -28,7 +30,8 @@ class DonationPage extends StatelessWidget {
           .doc(donation['donationID']) // L'ID du document de la donation
           .update({
         'donationStatus': 'Accepted', // Nouveau statut
-        'orphanAccept': GlobalData.orphanageData,
+        'distanceBetweenUs': donation['distanceBetweenUs'],
+        'orphanage': GlobalData.orphanageData,
         'updatedAt':
             FieldValue.serverTimestamp(), // Met à jour la date si nécessaire
       });
@@ -84,32 +87,62 @@ class DonationPage extends StatelessWidget {
           return Center(child: CircularProgressIndicator());
         }
 
+        // Retrieve orphanage location
+        final double? currentLatitude = GlobalData.orphanageData?['latitude'];
+        final double? currentLongitude = GlobalData.orphanageData?['longitude'];
+
+        if (currentLatitude == null || currentLongitude == null) {
+          return _buildEmptyState('Location data is missing.');
+        }
+
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return _buildEmptyState('There are no donations in this area');
         }
 
-        return _buildDonationList(snapshot.data!);
-      },
-    );
-  }
+        // Filter and calculate distance
+        final nearbyDonations = snapshot.data!.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final donationLatitude = data['latitude'] ?? 0.0;
+          final donationLongitude = data['longitude'] ?? 0.0;
 
-  // Builds the Pending Request tab content
-  Widget _buildPendingRequestTab() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: firestoreInstance
-          .collection('request')
-          .where('donationStatus', isEqualTo: 'Pending')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          // Calculate distance
+          final distanceInMeters = Geolocator.distanceBetween(
+            currentLatitude,
+            currentLongitude,
+            donationLatitude,
+            donationLongitude,
+          );
+          // Store calculated distance
+          data['distanceBetweenUs'] = distanceInMeters / 1000; // Convert to km
+          return data;
+        }).where((data) {
+          // Filter by 20km radius
+
+          return data['distanceBetweenUs'] <= 20.0;
+        }).toList();
+
+        if (nearbyDonations.isEmpty) {
+          return _buildEmptyState('No donations within 20km.');
         }
-
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return _buildEmptyState('There are no requests in this area');
-        }
-
-        return _buildDonationList(snapshot.data!);
+        // Build the list
+        // Build the list with nearby donations
+        return ListView.builder(
+          itemCount: nearbyDonations.length,
+          itemBuilder: (context, index) {
+            final donation = nearbyDonations[index];
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DonationCard(
+                title: donation['donationTitle'],
+                quantity: '${donation['quantity']} kg',
+                distance:
+                    '${donation['distanceBetweenUs'].toStringAsFixed(2)} km',
+                collectionTime: donation['donationAvailability'],
+                widget: _buildActionButtons(donation),
+              ),
+            );
+          },
+        );
       },
     );
   }
@@ -134,8 +167,75 @@ class DonationPage extends StatelessWidget {
     );
   }
 
+  // Builds the Pending Request tab content
+  Widget _buildPendingRequestTab() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestoreInstance
+          .collection('request')
+          .where('donationStatus', isEqualTo: 'Pending')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        // Retrieve orphanage location
+        final double? currentLatitude = GlobalData.orphanageData?['latitude'];
+        final double? currentLongitude = GlobalData.orphanageData?['longitude'];
+
+        if (currentLatitude == null || currentLongitude == null) {
+          return _buildEmptyState('Location data is missing.');
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return _buildEmptyState('There are no requests in this area');
+        }
+
+        // Filter and calculate distance
+        final nearbyRequests = snapshot.data!.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final requestLatitude = data['latitude'] ?? 0.0;
+          final requestLongitude = data['longitude'] ?? 0.0;
+
+          // Calculate distance
+          final distanceInMeters = Geolocator.distanceBetween(
+            currentLatitude,
+            currentLongitude,
+            requestLatitude,
+            requestLongitude,
+          );
+
+          // Store calculated distance
+          data['distanceBetweenUs'] = distanceInMeters / 1000; // Convert to km
+          return data;
+        }).where((data) {
+          // Filter by 20km radius
+          return data['distanceBetweenUs'] <= 20.0;
+        }).toList();
+
+        if (nearbyRequests.isEmpty) {
+          return _buildEmptyState('No requests within 20km.');
+        }
+
+        // Build the list
+        return ListView.builder(
+          itemCount: nearbyRequests.length,
+          itemBuilder: (context, index) {
+            final data = nearbyRequests[index];
+            final distanceBetweenUs = data['distanceBetweenUs'];
+
+            return ListTile(
+              title: Text(data['requestTitle'] ?? "Unknown Request"),
+              subtitle: Text("${distanceBetweenUs.toStringAsFixed(2)} km away"),
+            );
+          },
+        );
+      },
+    );
+  }
+
   // Builds buttons for the action (Accept, Decline, etc.)
-  Widget _buildActionButtons(DocumentSnapshot donation) {
+  Widget _buildActionButtons(donation) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -148,15 +248,10 @@ class DonationPage extends StatelessWidget {
   }
 
   // Builds the Accept button
-  Widget _buildAcceptButton(DocumentSnapshot donation) {
+  Widget _buildAcceptButton(donation) {
     return ElevatedButton(
       onPressed: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => ListingCreationPage(),
-        //   ),
-        // );
+        acceptDonation(donation);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.green[100],

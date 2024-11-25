@@ -124,7 +124,6 @@ class AllDonations extends StatelessWidget {
       stream: firestoreInstance
           .collection("donations")
           .where('orphanage.id', isEqualTo: GlobalData.orphanageData!['id'])
-          .where('orphanAccept', isEqualTo: GlobalData.orphanageData!['id'])
           .where('donationStatus', isEqualTo: status)
           .snapshots(),
       builder: (context, snapshot) {
