@@ -137,20 +137,32 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
                     height: 50,
                     width: 50,
                     decoration: BoxDecoration(
-                        color: Colors.purple[200],
+                        color: Color.fromARGB(255, 135, 170, 230),
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                         child: GestureDetector(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) =>
-                        //           ListingCreationPage()),
-                        //   // ListingEditPage(listingType:'Listing', communityType :'Listing', selectedImages : 'Listing', title: 'Listing', description : 'Listing', availability: 'Listing', bestBeforeDate :'Listing', isMerchant: 'Listing')),
-                        // );
-                        // Handle button press event
+                        // Assuming you have a variable 'donation' which holds the current donation data
+                        var donation = {
+                          'foodType': 'Vegetable',
+                          'description': 'Fresh organic vegetables',
+                          'quantity': 20,
+                          'community': 'Local Community',
+                          'location': 'Downtown',
+                          'foodImage':
+                              'https://example.com/food_image.jpg', // Sample URL for food image
+                        };
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditDonationPage(
+                              donationData: donation,
+                            ),
+                          ),
+                        );
                       },
+                      // Handle button press event
                       child: Icon(
                         Icons.edit_note_rounded,
                         color: Colors.white,
@@ -162,7 +174,7 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
                     "Edit",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xff9ca5bb),
+                      color: const Color.fromARGB(255, 164, 167, 170),
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -174,7 +186,7 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
                       height: 50,
                       width: 50,
                       decoration: BoxDecoration(
-                          color: Colors.purple[200],
+                          color: Colors.red[200],
                           borderRadius: BorderRadius.circular(10)),
                       child: Center(
                           child: GestureDetector(

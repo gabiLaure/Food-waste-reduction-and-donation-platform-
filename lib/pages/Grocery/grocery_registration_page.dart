@@ -1,8 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
+import '../../home.dart';
 
 class GroceryRegistration extends StatelessWidget {
   @override
@@ -31,10 +35,17 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
   String address = '';
   String phone = '';
   String email = '';
-  File? _image;
   String openingHours = ''; // State variable to hold opening hours input
+  File? _image;
+  List<String> documentPaths = [];
+  List<String> imagePaths = [];
 
   final picker = ImagePicker();
+
+  // Firebase instances
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -46,6 +57,69 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
         print('No image selected.');
       }
     });
+  }
+
+  Future<void> _uploadImage(File imageFile) async {
+    try {
+      String filePath =
+          'groceries_images/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      UploadTask uploadTask = _storage.ref().child(filePath).putFile(imageFile);
+
+      TaskSnapshot snapshot = await uploadTask;
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
+  }
+
+  Future<void> _registerGrocery() async {
+    if (_image == null) {
+      // Handle image not selected
+      print('Image is required');
+      return;
+    }
+
+    String? userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      // Handle user not authenticated
+      print('User is not authenticated');
+      return;
+    }
+
+    // Add grocery details to Firestore
+    await _firestore.collection('groceries').add({
+      'userId': userId,
+      'name': name,
+      'storeName': storeName,
+      'description': description,
+      'address': address,
+      'phone': phone,
+      'email': email,
+      'openingHours': openingHours,
+      'image': _image?.path,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    // Show success message
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Registration Successful'),
+        content: Text('Grocery $storeName has been registered!'),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomePage()), // Go to home page
+                );
+              },
+              child: const Text('OK'))
+        ],
+      ),
+    );
   }
 
   @override
@@ -65,20 +139,13 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                   horizontal: 14.0,
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                  borderSide: BorderSide(
-                    width: 0.2,
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(width: 0.2),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
+                  borderSide:
+                      BorderSide(color: Color.fromARGB(255, 203, 152, 206)),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
               ),
               validator: (value) {
@@ -101,20 +168,13 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                   horizontal: 14.0,
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                  borderSide: BorderSide(
-                    width: 0.2,
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(width: 0.2),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
+                  borderSide:
+                      BorderSide(color: Color.fromARGB(255, 203, 152, 206)),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
               ),
               validator: (value) {
@@ -137,7 +197,7 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: _image == null
-                    ? Center(child: Text('Tap to select Superette image'))
+                    ? Center(child: Text('Tap to select grocery image'))
                     : Image.file(_image!, fit: BoxFit.cover),
               ),
             ),
@@ -151,20 +211,13 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                   horizontal: 14.0,
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                  borderSide: BorderSide(
-                    width: 0.2,
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(width: 0.2),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
+                  borderSide:
+                      BorderSide(color: Color.fromARGB(255, 203, 152, 206)),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
               ),
               validator: (value) {
@@ -187,20 +240,13 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                   horizontal: 14.0,
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                  borderSide: BorderSide(
-                    width: 0.2,
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(width: 0.2),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
+                  borderSide:
+                      BorderSide(color: Color.fromARGB(255, 203, 152, 206)),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
               ),
               validator: (value) {
@@ -223,20 +269,13 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                   horizontal: 14.0,
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                  borderSide: BorderSide(
-                    width: 0.2,
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(width: 0.2),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
+                  borderSide:
+                      BorderSide(color: Color.fromARGB(255, 203, 152, 206)),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
               ),
               validator: (value) {
@@ -259,20 +298,13 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                   horizontal: 14.0,
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                  borderSide: BorderSide(
-                    width: 0.2,
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(width: 0.2),
                 ),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 203, 152, 206),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
+                  borderSide:
+                      BorderSide(color: Color.fromARGB(255, 203, 152, 206)),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
               ),
               validator: (value) {
@@ -293,34 +325,19 @@ class _GroceryRegistrationFormState extends State<GroceryRegistrationForm> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    // Here you can handle the form data as needed
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text('Registration Successful'),
-                        content: Text('Grocery $name has been registered!'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
+                    _registerGrocery();
                   }
                 },
                 child: Text('Register Grocery',
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400)),
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 203, 152, 206),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    )),
+                  backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),

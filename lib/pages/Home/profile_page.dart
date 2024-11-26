@@ -4,6 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../Orphanage/edit_orphanage_registration.dart';
+import 'edit_profil_page.dart';
+
+String orphanageId = 'id';
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -88,7 +93,23 @@ class ProfilePage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EditDonorProfilePage(),
+                                builder: (context) => EditProfilePage(),
+                              ),
+                            );
+                          },
+                        ),
+                        // Retrieve orphanageId dynamically
+                        _buildSettingsTile(
+                          'Edit Orphanage',
+                          Icons.house,
+                          () {
+                            // Navigate to Edit orphanage registration, passing the orphanageId
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => OrphanageEdit(
+                                    orphanageId:
+                                        orphanageId), // Pass orphanageId
                               ),
                             );
                           },

@@ -1,11 +1,9 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings
 
 import 'package:caritas/admin/models/global_data.dart';
-import 'package:caritas/intro/screens/imageslider.dart';
 import 'package:caritas/models/donation.dart';
 import 'package:caritas/models/user_model.dart';
 import 'package:caritas/widgets/feedback_page.dart';
-import 'package:caritas/pages/Donation/listing_creation_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -117,14 +115,113 @@ class AllDonations extends StatelessWidget {
     }
   }
 
-  // Widget pour afficher la liste des donations d'un certain statut
-  Widget donationListStream(
+  // Widget pour afficher
+  Widget donationListStreamOrphanage(
       {required String status, required String emptyMessage}) {
+    print(GlobalData.orphanageData);
+    print(GlobalData.userData);
     return StreamBuilder<QuerySnapshot>(
       stream: firestoreInstance
           .collection("donations")
           .where('orphanage.id', isEqualTo: GlobalData.orphanageData!['id'])
           .where('donationStatus', isEqualTo: status)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        return !snapshot.hasData
+            ? Container()
+            : snapshot.data!.docs.isEmpty
+                ? Center(child: Text(emptyMessage))
+                : ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot donation = snapshot.data!.docs[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DonationCard(
+                          title: donation['donationTitle'],
+                          quantity: '${donation['quantity']!.toString()} kg',
+                          distance:
+                              '${donation['distanceBetweenUs']!.toStringAsFixed(2)} km',
+                          collectionTime: donation['donationAvailability'],
+                          widget: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                if (status == 'Pending')
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (status == 'Pending') {
+                                        declineDonation(donation);
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[200],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: Text('Decline'),
+                                  ),
+                                if (status == 'Pending')
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      acceptDonation(donation);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green[100],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: Text('Accept'),
+                                  ),
+                                if (status == 'Accepted')
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Get.to(() => GiveFeedbackPage(),
+                                          arguments: {
+                                            'donationID':
+                                                donation['donationID'],
+                                            'donationTitle':
+                                                donation['donationTitle']
+                                          });
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green[100],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: Text('Feedback'),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+      },
+    );
+  }
+
+  Widget donationListStreamIndividual(
+      {required String status, required String emptyMessage}) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestoreInstance
+          .collection("donations")
+          .where('userUid',
+              isEqualTo: FirebaseAuth.instance.currentUser
+                  ?.uid) // Filter by the current user's UID
+          .where('donationStatus',
+              isEqualTo: status) // Filter by donation status
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -233,17 +330,17 @@ class AllDonations extends StatelessWidget {
               child: TabBarView(
                 children: [
                   // Onglet des offres en attente
-                  donationListStream(
+                  donationListStreamOrphanage(
                     status: 'Pending',
                     emptyMessage: 'No pending offers...',
                   ),
                   // Onglet des dons à collecter
-                  donationListStream(
+                  donationListStreamOrphanage(
                     status: 'Accepted',
                     emptyMessage: 'No donations to be collected...',
                   ),
                   // Onglet des offres refusées
-                  donationListStream(
+                  donationListStreamOrphanage(
                     status: 'Declined',
                     emptyMessage: 'No denied offers...',
                   ),
@@ -254,162 +351,5 @@ class AllDonations extends StatelessWidget {
         ),
       ),
     );
-    // Expanded(
-    //   child: TabBarView(children: [
-    //     Container(
-    //       child: StreamBuilder<QuerySnapshot>(
-    //           stream: firestoreInstance
-    //               .collection("donations")
-    //               .where('orphanage.id',
-    //                   isEqualTo: GlobalData.orphanageData!['id'])
-    //               .where('donationStatus', isEqualTo: 'Pending')
-    //               .snapshots(),
-    //           builder: (context, snapshot) {
-    //             if (snapshot.connectionState ==
-    //                 ConnectionState.waiting) {
-    //               return Center(child: CircularProgressIndicator());
-    //             }
-    //             return !snapshot.hasData
-    //                 ? Container()
-    //                 : snapshot.data!.docs.length.toString() == '0'
-    //                     ? Center(
-    //                         child: Text('No pending offers...'),
-    //                       )
-    //                     : ListView.builder(
-    //                         itemCount: snapshot.data!.docs.length,
-    //                         itemBuilder: (context, index) {
-    //                           DocumentSnapshot donation =
-    //                               snapshot.data!.docs[index];
-    //                           return Padding(
-    //                             padding: const EdgeInsets.all(8.0),
-    //                             child: DonationCard(
-    //                               title:
-    //                                   "${"You've Accepted  " + donation['donationTitle']}!",
-    //                               quantity:
-    //                                   '${donation['quantity']!.toString()} kg',
-    //                               distance:
-    //                                   '${donation['distanceBetweenUs']!.toStringAsFixed(2)} km',
-    //                               collectionTime:
-    //                                   donation['donationAvailability'],
-    //                               widget: Padding(
-    //                                 padding: const EdgeInsets.all(8.0),
-    //                                 child: Row(
-    //                                   mainAxisAlignment:
-    //                                       MainAxisAlignment.spaceEvenly,
-    //                                   children: [
-    //                                     ElevatedButton(
-    //                                       onPressed: () {
-    //                                         declineDonation(donation);
-    //                                       },
-    //                                       style:
-    //                                           ElevatedButton.styleFrom(
-    //                                         backgroundColor:
-    //                                             Colors.grey[200],
-    //                                         shape:
-    //                                             RoundedRectangleBorder(
-    //                                           borderRadius:
-    //                                               BorderRadius.circular(
-    //                                                   8.0),
-    //                                         ),
-    //                                       ),
-    //                                       child: Text('Decline'),
-    //                                     ),
-    //                                     ElevatedButton(
-    //                                       onPressed: () {
-    //                                         // Handle button 2 press
-    //                                         acceptDonation(donation);
-    //                                       },
-    //                                       style:
-    //                                           ElevatedButton.styleFrom(
-    //                                         backgroundColor:
-    //                                             Colors.green[100],
-    //                                         shape:
-    //                                             RoundedRectangleBorder(
-    //                                           borderRadius:
-    //                                               BorderRadius.circular(
-    //                                                   8.0),
-    //                                         ),
-    //                                       ),
-    //                                       child: Text('Accept'),
-    //                                     ),
-    //                                   ],
-    //                                 ),
-    //                               ),
-    //                             ),
-    //                           );
-    //                         },
-    //                       );
-    //           }),
-    //     ),
-    //     Container(
-    //       child: StreamBuilder<QuerySnapshot>(
-    //           stream: firestoreInstance
-    //               .collection("donations")
-    //               .where('orphanage.id',
-    //                   isEqualTo: GlobalData.orphanageData!['id'])
-    //               .where('donationStatus', isEqualTo: 'Accepted')
-    //               .snapshots(),
-    //           builder: (context, snapshot) {
-    //             if (snapshot.connectionState ==
-    //                 ConnectionState.waiting) {
-    //               return Center(child: CircularProgressIndicator());
-    //             }
-    //             return !snapshot.hasData
-    //                 ? Container()
-    //                 : snapshot.data!.docs.length.toString() == '0'
-    //                     ? Center(
-    //                         child:
-    //                             Text('No donations to be collected...'),
-    //                       )
-    //                     : ListView.builder(
-    //                         itemCount: snapshot.data!.docs.length,
-    //                         itemBuilder: (context, index) {
-    //                           DocumentSnapshot donation =
-    //                               snapshot.data!.docs[index];
-    //                           return Padding(
-    //                             padding: const EdgeInsets.all(8.0),
-    //                             child: DonationCard(
-    //                               title: donation['donationTitle'],
-    //                               quantity:
-    //                                   '${donation['quantity']!.toString()} kg',
-    //                               distance:
-    //                                   '${donation['distanceBetweenUs']!.toStringAsFixed(2)} km',
-    //                               collectionTime:
-    //                                   donation['donationAvailability'],
-    //                               widget: Padding(
-    //                                 padding: const EdgeInsets.all(8.0),
-    //                                 child: Row(
-    //                                   mainAxisAlignment:
-    //                                       MainAxisAlignment.spaceEvenly,
-    //                                   children: [
-    //                                     ElevatedButton(
-    //                                       onPressed: () {
-    //                                         Get.to(() =>
-    //                                             GiveFeedbackPage());
-    //                                       },
-    //                                       style:
-    //                                           ElevatedButton.styleFrom(
-    //                                         backgroundColor:
-    //                                             Colors.green[100],
-    //                                         shape:
-    //                                             RoundedRectangleBorder(
-    //                                           borderRadius:
-    //                                               BorderRadius.circular(
-    //                                                   8.0),
-    //                                         ),
-    //                                       ),
-    //                                       child: Text('Feedback'),
-    //                                     ),
-    //                                   ],
-    //                                 ),
-    //                               ),
-    //                             ),
-    //                           );
-    //                         },
-    //                       );
-    //           }),
-    //     ),
-    //   ]),
-    // )
   }
 }
