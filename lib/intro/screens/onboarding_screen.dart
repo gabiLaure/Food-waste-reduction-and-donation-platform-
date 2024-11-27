@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:caritas/pages/Registration/register_page.dart';
+import 'package:caritas/pages/Registration/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -98,7 +98,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             : Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RegistrationPage(),
+                                  builder: (context) => LoginPage(),
                                 ),
                               );
                       },

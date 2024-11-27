@@ -115,11 +115,28 @@ class AllDonations extends StatelessWidget {
     }
   }
 
+  void cancelDonation(DocumentSnapshot<Object?> donation) async {
+    try {
+      // Met à jour le statut de la donation dans Firestore
+      await FirebaseFirestore.instance
+          .collection(
+              'donations') // Remplacez par le nom correct de la collection
+          .doc(donation['donationID']) // L'ID du document de la donation
+          .update({
+        'donationStatus': 'Cancel', // Nouveau statut
+        'updatedAt':
+            FieldValue.serverTimestamp(), // Met à jour la date si nécessaire
+      });
+
+      ToastMessages().showSuccessToast('Donation declined successfully.');
+    } catch (e) {
+      ToastMessages().showErrorToast("Error while declined donation: $e");
+    }
+  }
+
   // Widget pour afficher
   Widget donationListStreamOrphanage(
       {required String status, required String emptyMessage}) {
-    print(GlobalData.orphanageData);
-    print(GlobalData.userData);
     return StreamBuilder<QuerySnapshot>(
       stream: firestoreInstance
           .collection("donations")
@@ -210,6 +227,152 @@ class AllDonations extends StatelessWidget {
                   );
       },
     );
+  }
+
+  Widget donationListStreamRestaurant(
+      {required String status, required String emptyMessage}) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestoreInstance
+          .collection("donations")
+          .where('userInfos.userUid',
+              isEqualTo: GlobalData.userData!['userUid'])
+          .where('donationStatus', isEqualTo: status)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        return !snapshot.hasData
+            ? Container()
+            : snapshot.data!.docs.isEmpty
+                ? Center(child: Text(emptyMessage))
+                : ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot donation = snapshot.data!.docs[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DonationCard(
+                          title: donation['donationTitle'],
+                          quantity: '${donation['quantity']!.toString()} kg',
+                          distance: '-',
+                          collectionTime: donation['donationAvailability'],
+                          widget: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                if (status == 'Pending')
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (status == 'Pending') {
+                                        cancelDonation(donation);
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[200],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: Text('Cancel'),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+      },
+    );
+  }
+
+  List<Tab> displayTabs() {
+    String accountType = GlobalData.userData?['accountType'] ?? '';
+
+    switch (accountType) {
+      case 'Orphanage':
+        return [
+          Tab(text: 'Pending Offers'),
+          Tab(text: 'To be collected'),
+          Tab(text: 'Denied Offers'),
+        ];
+      case 'Restaurant':
+        return [
+          Tab(text: 'Pending Offers'),
+          Tab(text: 'Collected Offers'),
+          Tab(text: 'Cancel Offers'),
+        ];
+      default:
+        return [
+          Tab(text: 'Pending Offers'),
+          Tab(text: 'To be collected'),
+          Tab(text: 'Denied Offers'),
+        ];
+    }
+  }
+
+  List<Widget> displayTabsContent() {
+    String accountType = GlobalData.userData?['accountType'] ?? '';
+
+    switch (accountType) {
+      case 'Orphanage':
+        return [
+          // Onglet des offres en attente
+          donationListStreamOrphanage(
+            status: 'Pending',
+            emptyMessage: 'No pending offers...',
+          ),
+          // Onglet des dons à collecter
+          donationListStreamOrphanage(
+            status: 'Accepted',
+            emptyMessage: 'No donations to be collected...',
+          ),
+          // Onglet des offres refusées
+          donationListStreamOrphanage(
+            status: 'Declined',
+            emptyMessage: 'No denied offers...',
+          ),
+        ];
+      case 'Restaurant':
+        return [
+          // Onglet des offres en attente
+          donationListStreamRestaurant(
+            status: 'Pending',
+            emptyMessage: 'No pending offers...',
+          ),
+          // Onglet des dons à collecter
+          donationListStreamRestaurant(
+            status: 'Accepted',
+            emptyMessage: 'No donations to be collected...',
+          ),
+          // Onglet des dons à collecter
+          donationListStreamRestaurant(
+            status: 'Cancel',
+            emptyMessage: 'No donations to be collected...',
+          ),
+        ];
+      default:
+        return [
+          // Onglet des offres en attente
+          donationListStreamOrphanage(
+            status: 'Pending',
+            emptyMessage: 'No pending offers...',
+          ),
+          // Onglet des dons à collecter
+          donationListStreamOrphanage(
+            status: 'Accepted',
+            emptyMessage: 'No donations to be collected...',
+          ),
+          // Onglet des offres refusées
+          donationListStreamOrphanage(
+            status: 'Declined',
+            emptyMessage: 'No denied offers...',
+          ),
+        ];
+    }
   }
 
   Widget donationListStreamIndividual(
@@ -311,41 +474,21 @@ class AllDonations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Tab> tabHeader = displayTabs();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('My Donations'),
       ),
       body: DefaultTabController(
-        length: 3,
+        length: tabHeader.length,
         child: Column(
           children: <Widget>[
             TabBar(
-              tabs: [
-                Tab(text: 'Pending Offers'),
-                Tab(text: 'To be collected'),
-                Tab(text: 'Denied Offers'),
-              ],
+              tabs: tabHeader,
             ),
             Expanded(
-              child: TabBarView(
-                children: [
-                  // Onglet des offres en attente
-                  donationListStreamOrphanage(
-                    status: 'Pending',
-                    emptyMessage: 'No pending offers...',
-                  ),
-                  // Onglet des dons à collecter
-                  donationListStreamOrphanage(
-                    status: 'Accepted',
-                    emptyMessage: 'No donations to be collected...',
-                  ),
-                  // Onglet des offres refusées
-                  donationListStreamOrphanage(
-                    status: 'Declined',
-                    emptyMessage: 'No denied offers...',
-                  ),
-                ],
-              ),
+              child: TabBarView(children: displayTabsContent()),
             ),
           ],
         ),

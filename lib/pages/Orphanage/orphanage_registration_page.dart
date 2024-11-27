@@ -195,12 +195,6 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
                   return null;
                 },
               ),
-              //   decoration: fieldDecoration('Description'),
-              //   validator: (value) => value == null || value.isEmpty
-              //       ? 'Please enter a description'
-              //       : null,
-              //   onSaved: (value) => description = value!,
-              // ),
               SizedBox(height: 16),
               TextFormField(
                 decoration: fieldDecoration('Education Level'),

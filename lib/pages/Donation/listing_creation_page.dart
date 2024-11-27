@@ -394,7 +394,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     } else {
       setState(() {
         isStartToUpload = true;
-        circularProgressVal = 0.1;
+        circularProgressVal = 0.5;
       });
       showAlertDialog(context);
       uploadImageToStorage();
