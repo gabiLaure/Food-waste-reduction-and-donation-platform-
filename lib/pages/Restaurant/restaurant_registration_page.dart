@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -10,7 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../admin/models/global_data.dart';
 import '../../home.dart';
+import '../../widgets/button_widgets.dart';
+import '../../widgets/toast_messages.dart';
 import '../Orphanage/map_picker.dart';
 
 class RestaurantRegistration extends StatefulWidget {
@@ -19,14 +20,23 @@ class RestaurantRegistration extends StatefulWidget {
 }
 
 class _RestaurantRegistrationState extends State<RestaurantRegistration> {
+  final TextEditingController _controller = TextEditingController();
+
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController restaurantNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController openingHoursController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   final String userProfileID =
       FirebaseAuth.instance.currentUser!.uid.toString();
+
+// Uploading Process
+  bool isStartToUpload = false;
+  bool isUploadComplete = false;
+  bool isAnError = false;
+  double? circularProgressVal;
 
   String restaurantName = '';
   String description = '';
@@ -61,11 +71,114 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _image = pickedFile != null ? File(pickedFile.path) : null;
-    });
+  showAlertDialog(BuildContext context) {
+    // show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: !isUploadComplete
+                  ? Center(child: Text("Registration Loading"))
+                  : Center(child: Text("Loading completed")),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isUploadComplete)
+                    !isAnError
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              CircularProgressIndicator(
+                                value: circularProgressVal,
+                                strokeWidth: 5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.teal.shade700),
+                              ),
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              Text("Please your Restaurant is charging...",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 16.0)
+                                      .copyWith(color: Colors.grey.shade900)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              Text("Error!",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              SizedBox(
+                                height: 50.0,
+                              ),
+                              ButtonWidget(
+                                  text: "Try Again",
+                                  textColor: Colors.white,
+                                  color: Colors.red,
+                                  onClicked: () {
+                                    Navigator.pop(context);
+                                  }),
+                            ],
+                          )
+                  else
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              'assets/images/welcome.png',
+                              height: 50,
+                              width: 50,
+                            ),
+                            SizedBox(height: 30),
+                            Text("The Restaurant has been charged!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 22.0)
+                                    .copyWith(
+                                        color: Colors.grey.shade900,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 50),
+                            ButtonWidget(
+                                text: "Continue",
+                                textColor: Colors.white,
+                                color: Colors.indigo,
+                                onClicked: () {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          HomePage(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> uploadImageToStorage() async {
@@ -96,6 +209,46 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
     } catch (e) {
       print("Error uploading images: $e");
     }
+  }
+
+  void validateRestaurant() {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        isStartToUpload = true;
+        circularProgressVal = 0.5;
+      });
+      showAlertDialog(context);
+      uploadImageToStorage();
+    }
+  }
+
+  void sendSuccessCode() {
+    //print("Post Add Success!");
+    Navigator.pop(context);
+    setState(() {
+      isStartToUpload = false;
+      isUploadComplete = true;
+    });
+    showAlertDialog(context);
+  }
+
+  void sendErrorCode(String error) {
+    ToastMessages().showErrorToast(error);
+    //print("Post Add Error!");
+
+    setState(() {
+      isStartToUpload = false;
+      isAnError = true;
+      isUploadComplete = true;
+    });
+    showAlertDialog(context);
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = pickedFile != null ? File(pickedFile.path) : null;
+    });
   }
 
   Future<void> _uploadAndRegister(imageList) async {
@@ -149,12 +302,22 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
     };
 
     try {
-      await FirebaseFirestore.instance
+      DocumentReference docRef = await FirebaseFirestore.instance
           .collection('restaurants')
           .add(restaurantData);
-      _showSuccessDialog();
+      sendSuccessCode();
+
+      // Récupération de l'ID du document
+      String documentId = docRef.id;
+
+      // Mise à jour de l'objet avec l'ID du document
+      restaurantData['id'] = documentId;
+
+      // Enregistrement dans GlobalData
+      GlobalData.orphanageData = restaurantData;
     } catch (e) {
       print("Failed to add restaurant: $e");
+      ToastMessages().showErrorToast('Failed to add restaurant');
     }
   }
 
@@ -253,7 +416,6 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
               SizedBox(height: 16),
               _buildPhotosContainer(),
               SizedBox(height: 16),
-              SizedBox(height: 16),
               _buildTextField(
                 controller: TextEditingController(
                     text: _address), // _address holds the name of the area
@@ -279,6 +441,15 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
               ),
               SizedBox(height: 16),
               _buildTextField(
+                controller: openingHoursController,
+                hint: 'Opening Hours',
+                onSaved: (value) => openingHours = value!,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Please enter Opening Hours'
+                    : null,
+              ),
+              SizedBox(height: 16),
+              _buildTextField(
                 controller: phoneController,
                 hint: 'Phone',
                 onSaved: (value) => phone = value!,
@@ -300,7 +471,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    uploadImageToStorage();
+                    validateRestaurant();
                   }
                 },
                 child: Text('Register Restaurant'),
@@ -410,7 +581,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
               _showImageSourceDialog();
             },
             icon: Icon(Icons.add), // Icon in the center
-            label: Text('Add food Image'),
+            label: Text('Add Menu Image'),
           ),
         ),
         Visibility(

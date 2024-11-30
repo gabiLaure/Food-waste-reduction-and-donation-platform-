@@ -239,7 +239,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                               ),
                               CircularProgressIndicator(
                                 value: circularProgressVal,
-                                strokeWidth: 6,
+                                strokeWidth: 95,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                     Colors.teal.shade700),
                               ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/pages/Orphanage/map_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -81,9 +82,7 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
         await documentRef.putFile(File(documentPath!));
         documentUrl = await documentRef.getDownloadURL();
       }
-
-      // Save data to Firestore
-      await FirebaseFirestore.instance.collection('orphanages').add({
+      final orphanage = {
         'orphanageName': orphanageController.text.trim(),
         'latitude': _latitude,
         'longitude': _longitude,
@@ -96,8 +95,20 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
         'imageUrl': imageUrl,
         'documentUrl': documentUrl,
         'userProfileID': userProfileID
-      });
+      };
 
+      // Save data to Firestore
+      DocumentReference docRef = await FirebaseFirestore.instance
+          .collection('orphanages')
+          .add(orphanage);
+      // Récupération de l'ID du document
+      String documentId = docRef.id;
+
+      // Mise à jour de l'objet avec l'ID du document
+      orphanage['id'] = documentId;
+
+      // Enregistrement dans GlobalData
+      GlobalData.orphanageData = orphanage;
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

@@ -1,9 +1,12 @@
+import 'package:caritas/admin/models/global_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../admin/screens/edit_grocery_regis.dart';
 import '../../home.dart';
+import '../../widgets/button_widgets.dart';
+import '../../widgets/toast_messages.dart';
+import '../Grocery/supermarket_registration_page.dart';
 import '../Orphanage/orphanage_registration_page.dart';
 import '../Restaurant/restaurant_registration_page.dart';
 
@@ -21,13 +24,142 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String accountTypeName = ''; // This should come from a dropdown or selection
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  // Uploading Process
+  bool isStartToUpload = false;
+  bool isUploadComplete = false;
+  bool isAnError = false;
   double? circularProgressVal;
+
+  showAlertDialog(BuildContext context) {
+    // show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: !isUploadComplete
+                  ? Center(child: Text("Registration Loading"))
+                  : Center(child: Text("Loading completed")),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isUploadComplete)
+                    !isAnError
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              CircularProgressIndicator(
+                                value: circularProgressVal,
+                                strokeWidth: 5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.teal.shade700),
+                              ),
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              Text("Please your account is been created...",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 16.0)
+                                      .copyWith(color: Colors.grey.shade900)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              Text("Error!",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              SizedBox(
+                                height: 50.0,
+                              ),
+                              ButtonWidget(
+                                  text: "Try Again",
+                                  textColor: Colors.white,
+                                  color: Colors.red,
+                                  onClicked: () {
+                                    Navigator.pop(context);
+                                  }),
+                            ],
+                          )
+                  else
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              'assets/images/welcome.png',
+                              height: 50,
+                              width: 50,
+                            ),
+                            SizedBox(height: 30),
+                            Text("The Account has been charged!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 22.0)
+                                    .copyWith(
+                                        color: Colors.grey.shade900,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 50),
+                            ButtonWidget(
+                                text: "Continue",
+                                textColor: Colors.white,
+                                color: Colors.indigo,
+                                onClicked: () {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          HomePage(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            );
+          },
+        );
+      },
+    );
+  }
+
   // Validation function to check if inputs are valid
   bool validateUser() {
     if (_formKey.currentState?.validate() ?? false) {
-      return true;
+      setState(() {
+        isStartToUpload = true;
+        circularProgressVal = 0.5;
+      });
+      showAlertDialog(context);
     }
-    return false;
+    return true;
+  }
+
+  void showMessageError() {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        isStartToUpload = true;
+        circularProgressVal = 0.5;
+      });
+      showAlertDialog(context);
+    }
   }
 
   // Authenticate user with Firebase Auth
@@ -36,7 +168,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Email and password cannot be empty')),
       );
-      return;
     }
 
     try {
@@ -45,24 +176,25 @@ class _RegistrationPageState extends State<RegistrationPage> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-
+      final userInfos = {
+        'userUid': userCredential.user!.uid.toString(),
+        'fullname': fullNameController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'accountType': accountTypeName,
+        'email': emailController.text.trim()
+      };
       // add user to firestore with multiple images
       FirebaseFirestore.instance
           .collection('Users')
           .doc(userCredential.user!.uid.toString())
-          .set({
-            'userUid': userCredential.user!.uid.toString(),
-            'fullname': fullNameController.text.trim(),
-            'phone': phoneController.text.trim(),
-            'accountType': accountTypeName,
-            'email': emailController.text.trim()
-          })
+          .set(userInfos)
           .then(
-            (value) => redirectUser(context),
+            (value) => redirectUser(context, userInfos),
           )
           .catchError((error) => sendErrorCode(error.toString()));
     } on FirebaseAuthException catch (e) {
       String errorMessage;
+      Navigator.pop(context);
       if (e.code == 'email-already-in-use') {
         errorMessage = 'Email already in use.';
       } else if (e.code == 'weak-password') {
@@ -70,40 +202,44 @@ class _RegistrationPageState extends State<RegistrationPage> {
       } else {
         errorMessage = 'Registration failed. Please try again.';
       }
+      switch (e.code) {
+        case 'email-already-in-use':
+          ToastMessages().showErrorToast('Email already in use.');
+          break;
+        case 'weak-password':
+          ToastMessages().showErrorToast('The password is too weak.');
+          break;
+        default:
+          ToastMessages()
+              .showErrorToast('Registration failed. Please try again.');
+          break;
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      ToastMessages().showErrorToast(errorMessage);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed: $e')),
-      );
+      ToastMessages().showErrorToast('Registration failed: $e');
     }
   }
 
   void sendErrorCode(error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(error)),
-    );
+    Navigator.pop(context);
+    ToastMessages().showErrorToast(error);
   }
 
-  void redirectUser(context) {
+  void redirectUser(context, user) {
+    GlobalData.userData = user;
     // Navigate based on account type
     switch (accountTypeName) {
       case 'Individual':
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Your User Account has been created')),
-        );
+        ToastMessages().showSuccessToast('Your User Account has been created');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
         break;
       case 'Orphanage':
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Your User account has been created please fill the Ophanage Registration form')),
+        ToastMessages().showSuccessToast(
+          'Your User account has been created, please fill the Orphanage Registration form',
         );
         Navigator.pushReplacement(
           context,
@@ -111,10 +247,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         );
         break;
       case 'Restaurant':
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Your User account has been created please fill the Restaurant Registration form')),
+        ToastMessages().showSuccessToast(
+          'Your User account has been created please fill the Restaurant Registration form',
         );
         Navigator.pushReplacement(
           context,
@@ -122,19 +256,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
         );
         break;
       case 'Supermarket':
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Your User account has been created please fill the Supermarket Registration form')),
-        );
+        ToastMessages().showSuccessToast(
+            'Your User account has been created please fill the Supermarket Registration form');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => GroceryRegistration()),
         );
         break;
       default:
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invalid account type')),
+        ToastMessages().showErrorToast('Invalid account type');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => RegistrationPage()),
         );
         return;
     }
@@ -260,7 +393,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 authenticateUser(context);
                               }
                             },
-                            child: const Text(
+                            child: Text(
                               'Register',
                               style: TextStyle(
                                   fontSize: 20,
@@ -283,47 +416,3 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ]))));
   }
 }
-// showAlertDialog(BuildContext context) {
-//     // show the dialog
-//     showDialog(
-//       context: context,
-//       barrierDismissible: false,
-//       builder: (context) {
-//         return StatefulBuilder(
-//           builder: (context, setState) {
-//             return AlertDialog(
-//               title:  Center(child: Text("Loading")),
-//               content: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                  Column(
-//                             mainAxisSize: MainAxisSize.min,
-//                             mainAxisAlignment: MainAxisAlignment.center,
-//                             children: [
-//                               SizedBox(
-//                                 height: 30.0,
-//                               ),
-//                               CircularProgressIndicator(
-//                                 value: circularProgressVal,
-//                                 strokeWidth: 6,
-//                                 valueColor: AlwaysStoppedAnimation<Color>(
-//                                     Colors.indigo),
-//                               ),
-//                               SizedBox(
-//                                 height: 30.0,
-//                               ),
-//                               Text("Account Creation...",
-//                                   textAlign: TextAlign.center,
-//                                   style: TextStyle(fontSize: 16.0)
-//                                       .copyWith(color: Colors.grey.shade900)),
-//                             ],
-//                           )],
-//               ),
-//               shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.all(Radius.circular(20.0))),
-//             );
-//           },
-//         );
-//       },
-//     );
-//   }

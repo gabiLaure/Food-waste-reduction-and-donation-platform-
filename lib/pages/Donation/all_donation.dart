@@ -289,6 +289,66 @@ class AllDonations extends StatelessWidget {
     );
   }
 
+  Widget donationListStreamSupermarket(
+      {required String status, required String emptyMessage}) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: firestoreInstance
+          .collection("donations")
+          .where('userInfos.userUid',
+              isEqualTo: GlobalData.userData!['userUid'])
+          .where('donationStatus', isEqualTo: status)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        return !snapshot.hasData
+            ? Container()
+            : snapshot.data!.docs.isEmpty
+                ? Center(child: Text(emptyMessage))
+                : ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot donation = snapshot.data!.docs[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DonationCard(
+                          title: donation['donationTitle'],
+                          quantity: '${donation['quantity']!.toString()} kg',
+                          distance: '-',
+                          collectionTime: donation['donationAvailability'],
+                          widget: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                if (status == 'Pending')
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (status == 'Pending') {
+                                        cancelDonation(donation);
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[200],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: Text('Cancel'),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+      },
+    );
+  }
+
   List<Tab> displayTabs() {
     String accountType = GlobalData.userData?['accountType'] ?? '';
 
@@ -300,6 +360,8 @@ class AllDonations extends StatelessWidget {
           Tab(text: 'Denied Offers'),
         ];
       case 'Restaurant':
+      case 'Individual':
+      case 'Supermarket':
         return [
           Tab(text: 'Pending Offers'),
           Tab(text: 'Collected Offers'),
@@ -337,6 +399,8 @@ class AllDonations extends StatelessWidget {
           ),
         ];
       case 'Restaurant':
+      case 'Individual':
+      case 'Supermarket':
         return [
           // Onglet des offres en attente
           donationListStreamRestaurant(

@@ -5,14 +5,14 @@ class GroceryListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grocerys'),
+        title: Text('Supermarkets'),
         // backgroundColor: Colors.teal,
       ),
       body: ListView.builder(
-        itemCount: Grocerys.length,
+        itemCount: Supermarkets.length,
         itemBuilder: (context, index) {
-          final grocery = Grocerys[index];
-          return GroceryCard(grocery: grocery);
+          final supermarket = Supermarkets[index];
+          return GroceryCard(supermarket: supermarket);
         },
       ),
     );
@@ -20,9 +20,9 @@ class GroceryListPage extends StatelessWidget {
 }
 
 class GroceryCard extends StatelessWidget {
-  final Grocery grocery;
+  final Grocery supermarket;
 
-  GroceryCard({required this.grocery});
+  GroceryCard({required this.supermarket});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class GroceryCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => GroceryDetailPage(grocery: grocery),
+              builder: (context) => GroceryDetailPage(supermarket: supermarket),
             ),
           );
         },
@@ -49,7 +49,7 @@ class GroceryCard extends StatelessWidget {
                 topRight: Radius.circular(15),
               ),
               child: Image.asset(
-                grocery.image,
+                supermarket.image,
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -61,12 +61,12 @@ class GroceryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    grocery.name,
+                    supermarket.name,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5),
                   Text(
-                    grocery.description,
+                    supermarket.description,
                     style: TextStyle(fontSize: 16),
                   ),
                 ],
@@ -80,24 +80,24 @@ class GroceryCard extends StatelessWidget {
 }
 
 class GroceryDetailPage extends StatelessWidget {
-  final Grocery grocery;
+  final Grocery supermarket;
 
-  GroceryDetailPage({required this.grocery});
+  GroceryDetailPage({required this.supermarket});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(grocery.name),
+        title: Text(supermarket.name),
         // backgroundColor: Colors.teal,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HeaderImage(image: grocery.image),
-            DescriptionSection(description: grocery.description),
-            OpeningHoursSection(openingHours: grocery.openingHours),
-            ContactInformation(contactInfo: grocery.contactInfo),
+            HeaderImage(image: supermarket.image),
+            DescriptionSection(description: supermarket.description),
+            OpeningHoursSection(openingHours: supermarket.openingHours),
+            ContactInformation(contactInfo: supermarket.contactInfo),
           ],
         ),
       ),
@@ -257,12 +257,12 @@ class ContactItem extends StatelessWidget {
   }
 }
 
-final List<Grocery> Grocerys = [
+final List<Grocery> Supermarkets = [
   Grocery(
     name: 'Supermarket A',
     description: 'A delightful place to enjoy exquisite cuisine.',
     openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
-    image: 'assets/grocery/supermarket1.jpeg',
+    image: 'assets/supermarket/supermarket1.jpeg',
     contactInfo: ContactInfo(
       address: 'Biyem-Assi Street, Yaounde, Cameroun',
       phone: '+237 6789 456 789',
@@ -272,7 +272,7 @@ final List<Grocery> Grocerys = [
   Grocery(
     name: 'Supermarket B',
     description: 'A loving home for children in need.',
-    image: 'assets/grocery/supermarket2.jpeg',
+    image: 'assets/supermarket/supermarket2.jpeg',
     openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
     contactInfo: ContactInfo(
       address: 'TPO Street, Bafoussam, Cameroun',
@@ -283,7 +283,7 @@ final List<Grocery> Grocerys = [
   Grocery(
     name: 'Supermarket C',
     description: 'A loving home for children in need.',
-    image: 'assets/grocery/supermarket3.jpeg',
+    image: 'assets/supermarket/supermarket3.jpeg',
     openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
     contactInfo: ContactInfo(
       address: 'Chapelle Nsimeyong, Yaounde, Cameroun',
@@ -291,7 +291,7 @@ final List<Grocery> Grocerys = [
       email: 'contact@Grocerya.org',
     ),
   ),
-  // Add more Grocerys here
+  // Add more Supermarkets here
 ];
 
 class Grocery {

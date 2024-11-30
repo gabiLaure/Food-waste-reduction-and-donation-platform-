@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class RestaurantListPage extends StatelessWidget {
@@ -7,11 +8,38 @@ class RestaurantListPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Restaurants'),
       ),
-      body: ListView.builder(
-        itemCount: restaurants.length,
-        itemBuilder: (context, index) {
-          final restaurant = restaurants[index];
-          return RestaurantCard(restaurant: restaurant);
+      body: StreamBuilder<QuerySnapshot>(
+        stream:
+            FirebaseFirestore.instance.collection('restaurants').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Affiche un indicateur de chargement pendant le fetching
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            // Affiche un message d'erreur si la récupération échoue
+            return Center(child: Text('An error occurred!'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            // Affiche un message si aucun orphelinat n'est trouvé
+            return Center(child: Text('No restaurant found.'));
+          }
+
+          // Convertir les documents en objets Orphanage
+          final restaurants = snapshot.data!.docs
+              .map((doc) => Restaurant.fromFirestore(doc))
+              .toList();
+
+          print(restaurants);
+          return ListView.builder(
+            itemCount: restaurants.length,
+            itemBuilder: (context, index) {
+              final restaurant = restaurants[index];
+              return RestaurantCard(restaurant: restaurant);
+            },
+          );
         },
       ),
     );
@@ -48,8 +76,8 @@ class RestaurantCard extends StatelessWidget {
                 topLeft: Radius.circular(15),
                 topRight: Radius.circular(15),
               ),
-              child: Image.asset(
-                restaurant.image,
+              child: Image.network(
+                restaurant.imageUrl,
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -93,11 +121,14 @@ class RestaurantDetailPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HeaderImage(image: restaurant.image),
+            HeaderImage(image: restaurant.imageUrl),
             DescriptionSection(description: restaurant.description),
             OpeningHoursSection(openingHours: restaurant.openingHours),
-            MenuSection(menuItems: restaurant.menuItems),
-            ContactInformation(contactInfo: restaurant.contactInfo),
+            MenuSection(menuItems: restaurant.menuImages),
+            ContactInformation(
+                address: restaurant.address,
+                phone: restaurant.phone,
+                email: restaurant.email),
           ],
         ),
       ),
@@ -117,7 +148,7 @@ class HeaderImage extends StatelessWidget {
       height: 250,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(image),
+          image: NetworkImage(image),
           fit: BoxFit.cover,
         ),
       ),
@@ -198,7 +229,7 @@ class OpeningHoursSection extends StatelessWidget {
 }
 
 class MenuSection extends StatelessWidget {
-  final List<MenuItem> menuItems;
+  final List<dynamic> menuItems;
 
   MenuSection({required this.menuItems});
 
@@ -212,29 +243,17 @@ class MenuSection extends StatelessWidget {
           Text(
             'Menu',
             style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple),
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurple,
+            ),
           ),
           SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: menuItems.map((menuItem) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Container(
-                    height: 270,
-                    width: 180,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(menuItem.image),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                );
+                return MenuItemCard(menuItem: menuItem);
               }).toList(),
             ),
           ),
@@ -245,33 +264,54 @@ class MenuSection extends StatelessWidget {
 }
 
 class MenuItemCard extends StatelessWidget {
-  final MenuItem menuItem;
+  final String menuItem;
 
   MenuItemCard({required this.menuItem});
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
       child: Container(
         height: 270,
         width: 180,
         decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/fruits.jpeg'),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.5), BlendMode.darken),
+          image: DecorationImage(
+            image: NetworkImage(menuItem), // Utilisation de l'image du MenuItem
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Color.fromARGB(255, 149, 145, 145).withOpacity(0.2),
+              BlendMode.darken,
             ),
-            borderRadius: BorderRadius.circular(30)),
+          ),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        // child: Align(
+        //   alignment: Alignment.bottomCenter,
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(8.0),
+        //     child: Text(
+        //       menuItem.name, // Nom du plat ou élément du menu
+        //       style: TextStyle(
+        //         color: Colors.white,
+        //         fontSize: 18,
+        //         fontWeight: FontWeight.bold,
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ),
     );
   }
 }
 
 class ContactInformation extends StatelessWidget {
-  final ContactInfo contactInfo;
+  final String address;
+  final String phone;
+  final String email;
 
-  ContactInformation({required this.contactInfo});
+  ContactInformation(
+      {required this.address, required this.phone, required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -290,15 +330,15 @@ class ContactInformation extends StatelessWidget {
           SizedBox(height: 10),
           ContactItem(
             icon: Icons.location_on,
-            text: contactInfo.address,
+            text: address,
           ),
           ContactItem(
             icon: Icons.phone,
-            text: contactInfo.phone,
+            text: phone,
           ),
           ContactItem(
             icon: Icons.email,
-            text: contactInfo.email,
+            text: email,
           ),
         ],
       ),
@@ -330,88 +370,49 @@ class ContactItem extends StatelessWidget {
   }
 }
 
-final List<Restaurant> restaurants = [
-  Restaurant(
-    name: 'Restaurant A',
-    description: 'A delightful place to enjoy exquisite cuisine.',
-    image: 'assets/restaurant/restaurantA.jpeg',
-    openingHours: 'Mon-Fri: 10am - 10pm\nSat-Sun: 8am - 11pm',
-    menuItems: [
-      MenuItem(image: 'assets/restaurant/menu1.jpeg'),
-      MenuItem(image: 'assets/restaurant/menu1.jpeg'),
-      MenuItem(image: 'assets/restaurant/menu1.jpeg'),
-    ],
-    contactInfo: ContactInfo(
-      address: '123 Main Street, Yaounde, Cameroun',
-      phone: '+237 6789 456 789',
-      email: 'contact@restaurantA.com',
-    ),
-  ),
-  Restaurant(
-    name: 'Restaurant B',
-    description:
-        'Welcome to Bistro Delights, a cozy corner where culinary passion meets a warm and inviting atmosphere.',
-    image: 'assets/restaurant/restaurantB.jpeg',
-    openingHours: 'Mon-Fri: 11am - 11pm\nSat-Sun: 9am - 12am',
-    menuItems: [
-      MenuItem(image: 'assets/restaurant/menu2.jpeg'),
-      MenuItem(image: 'assets/restaurant/menu2.jpeg'),
-      MenuItem(image: 'assets/restaurant/menu2.jpeg'),
-    ],
-    contactInfo: ContactInfo(
-      address: '456 Another St, Yaounde, Cameroun',
-      phone: '+237 6543 210 987',
-      email: 'contact@restaurantB.com',
-    ),
-  ),
-  Restaurant(
-    name: 'Restaurant C',
-    description:
-        'Come enjoy the flavors and hospitality that make Bistro Delights a favorite spot for food lovers.',
-    image: 'assets/restaurant/restaurantC.jpeg',
-    openingHours: 'Mon-Fri: 11am - 11pm\nSat-Sun: 9am - 12am',
-    menuItems: [
-      MenuItem(image: 'assets/restaurant/menu3.jpeg'),
-      MenuItem(image: 'assets/restaurant/menu3.jpeg'),
-      MenuItem(image: 'assets/restaurant/menu3.jpeg'),
-    ],
-    contactInfo: ContactInfo(
-      address: '456 Another St, Yaounde, Cameroun',
-      phone: '+237 6543 210 987',
-      email: 'contact@restaurantC.com',
-    ),
-  ),
-];
-
 class Restaurant {
+  final String id;
   final String name;
-  final String description;
-  final String image;
-  final String openingHours;
-  final List<MenuItem> menuItems;
-  final ContactInfo contactInfo;
-
-  Restaurant({
-    required this.name,
-    required this.description,
-    required this.image,
-    required this.openingHours,
-    required this.menuItems,
-    required this.contactInfo,
-  });
-}
-
-class MenuItem {
-  final String image;
-
-  MenuItem({required this.image});
-}
-
-class ContactInfo {
   final String address;
+  final double latitude;
+  final double longitude;
+  final String description;
+  final String imageUrl;
   final String phone;
+  final List<dynamic> menuImages; // Liste d'images du menu
+  final String openingHours; // Liste des heures d'ouverture
   final String email;
 
-  ContactInfo(
-      {required this.address, required this.phone, required this.email});
+  Restaurant({
+    required this.id,
+    required this.name,
+    required this.address,
+    required this.latitude,
+    required this.longitude,
+    required this.description,
+    required this.imageUrl,
+    required this.phone,
+    required this.menuImages,
+    required this.openingHours,
+    required this.email,
+  });
+
+// Méthode pour convertir un document Firestore en Orphanage
+  factory Restaurant.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Restaurant(
+      id: doc.id,
+      name: data['restaurantName'] ?? '',
+      address: data['address'] ?? '',
+      imageUrl: data['image'] ?? '',
+      latitude: data['latitude'] ?? '',
+      longitude: data['longitude'] ?? '',
+      description: data['description'] ?? '',
+      email: data['email'] ?? '',
+      phone: data['phone'] ?? '',
+      menuImages: data['menuImages'] ?? '',
+      openingHours: data['openingHours'] ?? '',
+      // contactInfo: data['contactInfo'] ?? '',
+    );
+  }
 }

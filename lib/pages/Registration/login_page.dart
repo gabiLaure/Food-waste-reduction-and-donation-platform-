@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../admin/models/global_data.dart';
 import '../../widgets/forgot_password_page.dart';
+import '../Grocery/supermarket_registration_page.dart';
 import '../Orphanage/orphanage_registration_page.dart';
 import 'register_page.dart';
 
@@ -220,6 +221,9 @@ class _LoginPageState extends State<LoginPage> {
       case 'Restaurant':
         fetchRestaurantByUserProfileID(userData);
         break;
+      case 'Supermarket':
+        fetchSupermarketByUserProfileID(userData);
+        break;
 
       default:
         Navigator.pushReplacement(
@@ -318,6 +322,56 @@ class _LoginPageState extends State<LoginPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => RestaurantRegistration()),
+                    );
+                  },
+                  child: const Text('OK'))
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error fetching orphanage: $e');
+    }
+  }
+
+  void fetchSupermarketByUserProfileID(userProfile) async {
+    try {
+      // Query Firestore to find the orphanage with the given userProfileID
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('supermarkets')
+          .where('userProfileID', isEqualTo: userProfileID)
+          .get();
+      // Check if any documents are returned
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the first document (assuming userProfileID is unique)
+        DocumentSnapshot document = querySnapshot.docs.first;
+
+        Map<String, dynamic> orphanageData = {
+          ...document.data() as Map<String, dynamic>,
+          'id': document.id, // Add the document ID
+        };
+
+        // Use the orphanage data as needed
+        GlobalData.orphanageData = orphanageData;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('No Supermarket found'),
+            content: Text(
+                "We can't get an Supermarket related to this account though it has an account type Supermarket. Please register supermarket on this account!"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GroceryRegistration()),
                     );
                   },
                   child: const Text('OK'))

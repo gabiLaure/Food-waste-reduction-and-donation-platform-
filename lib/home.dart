@@ -12,7 +12,7 @@ import 'package:caritas/pages/Home/notification_page.dart';
 import 'package:caritas/widgets/alert_dialogs.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/Grocery/grocery_page.dart';
+import 'pages/Grocery/supermarket_page.dart';
 import 'pages/Home/impact_page.dart';
 import 'pages/Orphanage/orphanage_page.dart';
 import 'pages/Restaurant/restaurant_page.dart';
