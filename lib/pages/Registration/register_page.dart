@@ -6,9 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../home.dart';
 import '../../widgets/button_widgets.dart';
 import '../../widgets/toast_messages.dart';
-import '../Grocery/supermarket_registration_page.dart';
 import '../Orphanage/orphanage_registration_page.dart';
 import '../Restaurant/restaurant_registration_page.dart';
+import '../Supermarket/supermarket_registration.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -250,17 +250,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ToastMessages().showSuccessToast(
           'Your User account has been created please fill the Restaurant Registration form',
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => RestaurantRegistration()),
-        );
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => RestaurantRegistration()));
         break;
       case 'Supermarket':
         ToastMessages().showSuccessToast(
             'Your User account has been created please fill the Supermarket Registration form');
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => GroceryRegistration()),
+          MaterialPageRoute(builder: (context) => SupermarketRegistration()),
         );
         break;
       default:

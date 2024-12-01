@@ -1,6 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:caritas/intro/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -9,6 +10,7 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _storeUserAccess();
     return AnimatedSplashScreen(
         splash: Image.asset(
           'assets/caritas_logo.png',
@@ -20,5 +22,10 @@ class SplashScreen extends StatelessWidget {
         //Color(RGBA(32,159,166,255))
         splashTransition: SplashTransition.scaleTransition,
         nextScreen: OnBoardingScreen());
+  }
+
+  void _storeUserAccess() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasAccessedSplash', true);
   }
 }

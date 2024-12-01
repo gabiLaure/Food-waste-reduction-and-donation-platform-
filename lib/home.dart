@@ -9,6 +9,7 @@ import 'package:caritas/pages/Registration/login_page.dart';
 import 'package:caritas/pages/Home/profile_page.dart';
 import 'package:caritas/pages/Home/feeds_page.dart';
 import 'package:caritas/pages/Home/notification_page.dart';
+import 'package:caritas/pages/Supermarket/supermarket_page.dart';
 import 'package:caritas/widgets/alert_dialogs.dart';
 import 'package:flutter/material.dart';
 
@@ -130,14 +131,14 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               leading: Icon(Icons.local_grocery_store_outlined),
-              title: Text('Grocery'),
+              title: Text('Supermarket'),
               onTap: () {
                 // Handle navigation or other actions
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        GroceryListPage(), // Replace with your actual notification page
+                        SupermarketListPage(), // Replace with your actual notification page
                   ),
                 );
               },

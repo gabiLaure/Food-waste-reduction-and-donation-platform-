@@ -239,7 +239,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                               ),
                               CircularProgressIndicator(
                                 value: circularProgressVal,
-                                strokeWidth: 95,
+                                strokeWidth: 5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                     Colors.teal.shade700),
                               ),
@@ -394,7 +394,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
     } else {
       setState(() {
         isStartToUpload = true;
-        circularProgressVal = 0.5;
+        circularProgressVal = 0.8;
       });
       showAlertDialog(context);
       uploadImageToStorage();

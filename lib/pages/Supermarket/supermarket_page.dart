@@ -1,17 +1,16 @@
-import 'package:caritas/pages/Donation/listing_creation_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class OrphanageListPage extends StatelessWidget {
+class SupermarketListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Orphanages'),
-        // backgroundColor: Colors.teal,
+        title: Text('Supermarkets'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('orphanages').snapshots(),
+        stream:
+            FirebaseFirestore.instance.collection('supermarket').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Affiche un indicateur de chargement pendant le fetching
@@ -25,19 +24,20 @@ class OrphanageListPage extends StatelessWidget {
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             // Affiche un message si aucun orphelinat n'est trouvé
-            return Center(child: Text('No orphanages found.'));
+            return Center(child: Text('No Supermarket found.'));
           }
 
           // Convertir les documents en objets Orphanage
-          final orphanages = snapshot.data!.docs
-              .map((doc) => Orphanage.fromFirestore(doc))
+          final supermarkets = snapshot.data!.docs
+              .map((doc) => Supermarket.fromFirestore(doc))
               .toList();
 
+          print(supermarkets);
           return ListView.builder(
-            itemCount: orphanages.length,
+            itemCount: supermarkets.length,
             itemBuilder: (context, index) {
-              final orphanage = orphanages[index];
-              return OrphanageCard(orphanage: orphanage);
+              final supermarket = supermarkets[index];
+              return SupermarketCard(supermarket: supermarket);
             },
           );
         },
@@ -46,10 +46,10 @@ class OrphanageListPage extends StatelessWidget {
   }
 }
 
-class OrphanageCard extends StatelessWidget {
-  final Orphanage orphanage;
+class SupermarketCard extends StatelessWidget {
+  final Supermarket supermarket;
 
-  OrphanageCard({required this.orphanage});
+  SupermarketCard({required this.supermarket});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,8 @@ class OrphanageCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrphanageDetailPage(orphanage: orphanage),
+              builder: (context) =>
+                  SupermarketDetailPage(supermarket: supermarket),
             ),
           );
         },
@@ -76,7 +77,7 @@ class OrphanageCard extends StatelessWidget {
                 topRight: Radius.circular(15),
               ),
               child: Image.network(
-                orphanage.imageUrl,
+                supermarket.imageUrl,
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -88,12 +89,12 @@ class OrphanageCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    orphanage.name,
+                    supermarket.name,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5),
                   Text(
-                    orphanage.description,
+                    supermarket.description,
                     style: TextStyle(fontSize: 16),
                   ),
                 ],
@@ -106,32 +107,27 @@ class OrphanageCard extends StatelessWidget {
   }
 }
 
-class OrphanageDetailPage extends StatelessWidget {
-  final Orphanage orphanage;
+class SupermarketDetailPage extends StatelessWidget {
+  final Supermarket supermarket;
 
-  OrphanageDetailPage({required this.orphanage});
+  SupermarketDetailPage({required this.supermarket});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(orphanage.name),
-        // backgroundColor: Colors.teal,
+        title: Text(supermarket.name),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HeaderImage(image: orphanage.imageUrl),
-            MissionStatement(mission: orphanage.description),
-            ServicesSection(
-              healthcare: orphanage.healthcare,
-              education: orphanage.education,
-            ),
+            HeaderImage(image: supermarket.imageUrl),
+            DescriptionSection(description: supermarket.description),
+            OpeningHoursSection(openingHours: supermarket.openingHours),
             ContactInformation(
-                address: orphanage.address,
-                phone: orphanage.phone,
-                email: orphanage.email),
-            _buildFloatingActionButton(context),
+                address: supermarket.address,
+                phone: supermarket.phone,
+                email: supermarket.email),
           ],
         ),
       ),
@@ -151,8 +147,7 @@ class HeaderImage extends StatelessWidget {
       height: 250,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image:
-              NetworkImage(image), // Utilisation de NetworkImage pour le lien
+          image: NetworkImage(image),
           fit: BoxFit.cover,
         ),
       ),
@@ -161,7 +156,7 @@ class HeaderImage extends StatelessWidget {
           color: Colors.black54,
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Welcome to Our Orphanage',
+            'Welcome to Our Supermarket',
             style: TextStyle(
               fontSize: 30,
               color: Colors.white,
@@ -174,17 +169,17 @@ class HeaderImage extends StatelessWidget {
   }
 }
 
-class MissionStatement extends StatelessWidget {
-  final String mission;
+class DescriptionSection extends StatelessWidget {
+  final String description;
 
-  MissionStatement({required this.mission});
+  DescriptionSection({required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
-        color: Colors.teal[50],
+        color: Colors.deepPurple[50],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
@@ -192,7 +187,7 @@ class MissionStatement extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            mission,
+            description,
             style: TextStyle(fontSize: 18),
             textAlign: TextAlign.center,
           ),
@@ -202,88 +197,34 @@ class MissionStatement extends StatelessWidget {
   }
 }
 
-class ServicesSection extends StatelessWidget {
-  final String healthcare;
-  final String education;
+class OpeningHoursSection extends StatelessWidget {
+  final String openingHours;
 
-  ServicesSection({required this.healthcare, required this.education});
+  OpeningHoursSection({required this.openingHours});
 
   @override
   Widget build(BuildContext context) {
-    final List<Service> services = [
-      Service(
-        title: 'Healthcare',
-        description: healthcare,
-        icon: Icons.health_and_safety,
-      ),
-      Service(
-        title: 'Education',
-        description: education,
-        icon: Icons.school,
-      ),
-    ];
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Our Mission',
+            'Opening Hours',
             style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple),
           ),
           SizedBox(height: 10),
-          ...services.map((service) => ServiceItem(service: service)),
+          Text(
+            openingHours,
+            style: TextStyle(fontSize: 16),
+          ),
         ],
       ),
     );
   }
-}
-
-class ServiceItem extends StatelessWidget {
-  final Service service;
-
-  ServiceItem({required this.service});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.teal[50],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      elevation: 5,
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: ListTile(
-        leading: Icon(service.icon, color: Colors.teal, size: 40),
-        title: Text(
-          service.title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(
-          service.description,
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
-    );
-  }
-}
-
-// Builds the Floating Action Button
-Widget _buildFloatingActionButton(BuildContext context) {
-  return FloatingActionButton(
-    backgroundColor: Colors.teal[50],
-    onPressed: () => {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ListingCreationPage(),
-        ),
-      )
-    },
-    child: Icon(Icons.volunteer_activism),
-  );
 }
 
 class ContactInformation extends StatelessWidget {
@@ -304,7 +245,9 @@ class ContactInformation extends StatelessWidget {
           Text(
             'Contact Us',
             style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple),
           ),
           SizedBox(height: 10),
           ContactItem(
@@ -337,7 +280,7 @@ class ContactItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.teal),
+          Icon(icon, color: Colors.deepPurple),
           SizedBox(width: 10),
           Text(
             text,
@@ -349,7 +292,7 @@ class ContactItem extends StatelessWidget {
   }
 }
 
-class Orphanage {
+class Supermarket {
   final String id;
   final String name;
   final String address;
@@ -358,11 +301,10 @@ class Orphanage {
   final String description;
   final String imageUrl;
   final String phone;
-  final String healthcare;
-  final String education;
+  final String openingHours; // Liste des heures d'ouverture
   final String email;
 
-  Orphanage({
+  Supermarket({
     required this.id,
     required this.name,
     required this.address,
@@ -371,51 +313,25 @@ class Orphanage {
     required this.description,
     required this.imageUrl,
     required this.phone,
-    required this.healthcare,
-    required this.education,
+    required this.openingHours,
     required this.email,
   });
 
-  // Méthode pour convertir un document Firestore en Orphanage
-  factory Orphanage.fromFirestore(DocumentSnapshot doc) {
+// Méthode pour convertir un document Firestore en Orphanage
+  factory Supermarket.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Orphanage(
+    return Supermarket(
       id: doc.id,
-      name: data['orphanageName'] ?? '',
+      name: data['supermarketName'] ?? '',
       address: data['address'] ?? '',
-      imageUrl: data['imageUrl'] ?? '',
+      imageUrl: data['image'] ?? '',
       latitude: data['latitude'] ?? '',
       longitude: data['longitude'] ?? '',
       description: data['description'] ?? '',
       email: data['email'] ?? '',
       phone: data['phone'] ?? '',
-      healthcare: data['healthcare'] ?? '',
-      education: data['education'] ?? '',
+      openingHours: data['openingHours'] ?? '',
       // contactInfo: data['contactInfo'] ?? '',
     );
   }
-}
-
-class Service {
-  final String title;
-  final String description;
-  final IconData icon;
-
-  Service({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-}
-
-class ContactInfo {
-  final String address;
-  final String phone;
-  final String email;
-
-  ContactInfo({
-    required this.address,
-    required this.phone,
-    required this.email,
-  });
 }
