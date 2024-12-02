@@ -1,10 +1,13 @@
 import 'package:caritas/admin/models/global_data.dart';
+import 'package:caritas/pages/Registration/login_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../home.dart';
 import '../../widgets/button_widgets.dart';
+import '../../widgets/forgot_password_page.dart';
 import '../../widgets/toast_messages.dart';
 import '../Orphanage/orphanage_registration_page.dart';
 import '../Restaurant/restaurant_registration_page.dart';
@@ -29,6 +32,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool isUploadComplete = false;
   bool isAnError = false;
   double? circularProgressVal;
+  bool _isObscured = true;
 
   showAlertDialog(BuildContext context) {
     // show the dialog
@@ -145,7 +149,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         isStartToUpload = true;
-        circularProgressVal = 0.5;
+        circularProgressVal = 0.8;
       });
       showAlertDialog(context);
     }
@@ -156,7 +160,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         isStartToUpload = true;
-        circularProgressVal = 0.5;
+        circularProgressVal = 0.8;
       });
       showAlertDialog(context);
     }
@@ -275,142 +279,284 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Registration')),
         body: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(top: 50.0, left: 16, right: 16),
             child: SingleChildScrollView(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Full Name input
-                        TextFormField(
-                          controller: fullNameController,
-                          decoration: InputDecoration(labelText: 'Full Name'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your full name';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 16),
-
-                        // Phone input
-                        TextFormField(
-                          controller: phoneController,
-                          decoration:
-                              InputDecoration(labelText: 'Phone Number'),
-                          keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your phone number';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 16),
-
-                        // Email input
-                        TextFormField(
-                          controller: emailController,
-                          decoration: InputDecoration(labelText: 'Email'),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter an email address';
-                            }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
-                                .hasMatch(value)) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 16),
-
-                        // Password input
-                        TextFormField(
-                          controller: passwordController,
-                          decoration: InputDecoration(labelText: 'Password'),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a password';
-                            }
-                            if (value.length < 6) {
-                              return 'Password should be at least 6 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 16),
-
-                        // Account type dropdown (example)
-                        DropdownButtonFormField<String>(
-                          value:
-                              accountTypeName.isEmpty ? null : accountTypeName,
-                          hint: Text('Select Account Type'),
-                          items: [
-                            'Individual',
-                            'Orphanage',
-                            'Restaurant',
-                            'Supermarket'
-                          ]
-                              .map((type) => DropdownMenuItem<String>(
-                                    value: type,
-                                    child: Text(type),
-                                  ))
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              accountTypeName = value ?? '';
-                            });
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please select an account type';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20),
-
-                        // Register button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (validateUser()) {
-                                authenticateUser(context);
-                              }
-                            },
-                            child: Text(
-                              'Register',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400),
+                child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/caritas_logo.png',
+                      width: 200,
+                      height: 200,
+                    ),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Full Name input
+                          TextFormField(
+                            controller: fullNameController,
+                            decoration: InputDecoration(
+                              labelText: 'Full Name',
+                              focusColor: Colors.grey[100],
+                              hintStyle: GoogleFonts.crimsonPro(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14.0,
+                                horizontal: 14.0,
+                              ),
+                              border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  borderSide: BorderSide(
+                                    width: 0.2,
+                                  )),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 203, 152, 206),
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
                             ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Color.fromARGB(255, 203, 152, 206),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your full name';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+
+                          // Phone input
+                          TextFormField(
+                            controller: phoneController,
+                            decoration: InputDecoration(
+                              labelText: 'Phone Number',
+                              focusColor: Colors.grey[100],
+                              hintStyle: GoogleFonts.crimsonPro(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14.0,
+                                horizontal: 14.0,
+                              ),
+                              border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  borderSide: BorderSide(
+                                    width: 0.2,
+                                  )),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 203, 152, 206),
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
+                            ),
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your phone number';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+
+                          // Email input
+                          TextFormField(
+                            controller: emailController,
+                            decoration: InputDecoration(
+                              labelText: 'Email',
+                              focusColor: Colors.grey[100],
+                              hintStyle: GoogleFonts.crimsonPro(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14.0,
+                                horizontal: 14.0,
+                              ),
+                              border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  borderSide: BorderSide(
+                                    width: 0.2,
+                                  )),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 203, 152, 206),
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an email address';
+                              }
+                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                  .hasMatch(value)) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+
+                          // Password input
+                          TextFormField(
+                            controller: passwordController,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              focusColor: Colors.grey[100],
+                              hintStyle: GoogleFonts.crimsonPro(),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14.0,
+                                horizontal: 14.0,
+                              ),
+                              border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                  borderSide: BorderSide(
+                                    width: 0.2,
+                                  )),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 203, 152, 206),
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isObscured
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isObscured = !_isObscured;
+                                  });
+                                },
+                              ),
+                            ),
+                            obscureText: _isObscured,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a password';
+                              }
+                              if (value.length < 6) {
+                                return 'Password should be at least 6 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+
+                          // Account type dropdown (example)
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromARGB(255, 203, 152, 206),
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20),
+                              ),
+                            )),
+                            value: accountTypeName.isEmpty
+                                ? null
+                                : accountTypeName,
+                            hint: Text(
+                              'Select Account Type',
+                            ),
+                            items: [
+                              'Individual',
+                              'Orphanage',
+                              'Restaurant',
+                              'Supermarket'
+                            ]
+                                .map((type) => DropdownMenuItem<String>(
+                                      value: type,
+                                      child: Text(type),
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                accountTypeName = value ?? '';
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select an account type';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 20),
+
+                          // Register button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (validateUser()) {
+                                  authenticateUser(context);
+                                }
+                              },
+                              child: Text(
+                                'Register',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Color.fromARGB(255, 203, 152, 206),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: TextButton(
+                                  onPressed: () {
+                                    // Navigate to the registration page when "Register" is pressed
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginPage()),
+                                    );
+                                  },
+                                  child: const Text(
+                                      "Already have an account? Login Instead"),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ]))));
+                  ]),
+            ))));
   }
 }

@@ -215,7 +215,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         isStartToUpload = true;
-        circularProgressVal = 0.5;
+        circularProgressVal = 0.8;
       });
       showAlertDialog(context);
       uploadImageToStorage();

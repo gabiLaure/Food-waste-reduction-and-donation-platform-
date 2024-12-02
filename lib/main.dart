@@ -4,6 +4,7 @@ import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/home.dart';
 import 'package:caritas/intro/screens/splash.dart';
 import 'package:caritas/pages/Registration/login_page.dart';
+import 'package:caritas/pages/Registration/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -70,19 +71,21 @@ class MyApp extends StatelessWidget {
         bool hasAccessed = snapshot.data ?? false;
 
         return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: "Flutter Demo",
-          theme: ThemeData(
-            textTheme: GoogleFonts.crimsonProTextTheme(
-              Theme.of(context).textTheme,
+            debugShowCheckedModeBanner: false,
+            title: "Flutter Demo",
+            theme: ThemeData(
+              textTheme: GoogleFonts.crimsonProTextTheme(
+                Theme.of(context).textTheme,
+              ),
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              useMaterial3: true,
             ),
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
-          home: hasAccessed
-              ? (user != null ? HomePage() : LoginPage())
-              : const SplashScreen(),
-        );
+            // home: hasAccessed
+            //     ? (user != null ? HomePage() : LoginPage())
+            //     : const SplashScreen(),
+            home: HomePage()
+            //home: RegistrationPage()
+            );
       },
     );
   }

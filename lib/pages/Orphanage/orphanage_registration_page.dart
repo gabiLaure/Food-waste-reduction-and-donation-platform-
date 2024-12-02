@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/pages/Orphanage/map_picker.dart';
+import 'package:caritas/widgets/button_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -23,6 +24,10 @@ LatLng? _orphanageLocation;
 String? _address = ''; // To store the address name
 double? _latitude; // To store latitude
 double? _longitude;
+double? circularProgressVal;
+bool isUploadComplete = false;
+bool isAnError = false;
+bool isStartToUpload = false;
 
 final String userProfileID = FirebaseAuth.instance.currentUser!.uid.toString();
 // final UserCredential userCredential;
@@ -44,6 +49,138 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
   File? _image;
   String? documentPath;
   final picker = ImagePicker();
+
+  showAlertDialog(BuildContext context) {
+    // show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: !isUploadComplete
+                  ? Center(child: Text("Orphanage Registration Loading"))
+                  : Center(child: Text("Loading completed")),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isUploadComplete)
+                    !isAnError
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              CircularProgressIndicator(
+                                value: circularProgressVal,
+                                strokeWidth: 5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.teal.shade700),
+                              ),
+                              SizedBox(
+                                height: 30.0,
+                              ),
+                              Text("Please your Orphanage is been created...",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 16.0)
+                                      .copyWith(color: Colors.grey.shade900)),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              Text("Error!",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              SizedBox(
+                                height: 50.0,
+                              ),
+                              ButtonWidget(
+                                  text: "Try Again",
+                                  textColor: Colors.white,
+                                  color: Colors.red,
+                                  onClicked: () {
+                                    Navigator.pop(context);
+                                  }),
+                            ],
+                          )
+                  else
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              'assets/images/welcome.png',
+                              height: 50,
+                              width: 50,
+                            ),
+                            SizedBox(height: 30),
+                            Text("The Orphanage has been created!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 22.0)
+                                    .copyWith(
+                                        color: Colors.grey.shade900,
+                                        fontWeight: FontWeight.bold)),
+                            SizedBox(height: 50),
+                            ButtonWidget(
+                                text: "Continue",
+                                textColor: Colors.white,
+                                color: Colors.indigo,
+                                onClicked: () {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          HomePage(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  bool validateOrphanage() {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        isStartToUpload = true;
+        circularProgressVal = 0.8;
+      });
+      showAlertDialog(context);
+      _uploadAndRegister();
+    }
+    return true;
+  }
+
+  void showMessageError() {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        isStartToUpload = true;
+        circularProgressVal = 0.8;
+      });
+      showAlertDialog(context);
+    }
+  }
 
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -181,7 +318,7 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
               SizedBox(height: 16),
               TextFormField(
                 controller: orphanageController,
-                decoration: InputDecoration(labelText: 'Orphanage'),
+                decoration: fieldDecoration('Orphanage'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your full name';
@@ -198,7 +335,7 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
               SizedBox(height: 16),
               TextFormField(
                 controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: fieldDecoration('Description'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your description';
@@ -292,7 +429,17 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _uploadAndRegister,
-                  child: Text('Register Orphanage'),
+                  child: Text('Register Orphanage',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                  ),
                 ),
               ),
             ],

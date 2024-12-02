@@ -27,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isInValidaAccount = false;
   double? circularProgressVal;
   late String accountType;
+  bool _isObscured = true;
 
   showAlertDialog(BuildContext context) {
     // show the dialog
@@ -453,7 +454,18 @@ class _LoginPageState extends State<LoginPage> {
                         Radius.circular(20),
                       ),
                     ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscured ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscured = !_isObscured;
+                        });
+                      },
+                    ),
                   ),
+                  obscureText: _isObscured,
                 ),
                 const SizedBox(height: 24),
                 SizedBox(

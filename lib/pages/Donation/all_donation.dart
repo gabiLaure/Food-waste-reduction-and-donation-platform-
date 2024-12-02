@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:caritas/widgets/toast_messages.dart';
 
+import 'view_donation.dart';
+
 final String userProfileID = FirebaseAuth.instance.currentUser!.uid.toString();
 
 class DonationCard extends StatelessWidget {
@@ -508,13 +510,13 @@ class AllDonations extends StatelessWidget {
                                 if (status == 'Accepted')
                                   ElevatedButton(
                                     onPressed: () {
-                                      Get.to(() => GiveFeedbackPage(),
-                                          arguments: {
-                                            'donationID':
-                                                donation['donationID'],
-                                            'donationTitle':
-                                                donation['donationTitle']
-                                          });
+                                      // Handle button press
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => DonationsFragment(
+                                                donation)), // Correct the navigation destination
+                                      );
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.green[100],
@@ -523,8 +525,25 @@ class AllDonations extends StatelessWidget {
                                             BorderRadius.circular(8.0),
                                       ),
                                     ),
-                                    child: Text('Feedback'),
+                                    child: Text('View Donation'),
                                   ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Get.to(() => GiveFeedbackPage(),
+                                        arguments: {
+                                          'donationID': donation['donationID'],
+                                          'donationTitle':
+                                              donation['donationTitle']
+                                        });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green[100],
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: Text('Feedback'),
+                                ),
                               ],
                             ),
                           ),
