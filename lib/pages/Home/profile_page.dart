@@ -1,16 +1,45 @@
+import 'dart:io';
+
 import 'package:caritas/models/user_model.dart';
 import 'package:caritas/pages/Donation/edit_page.dart';
+import 'package:caritas/widgets/about_app.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../widgets/alert_dialogs.dart';
+import '../../widgets/notification_preferences.dart';
+import '../../widgets/privacy_setting.dart';
 import '../Orphanage/edit_orphanage_registration.dart';
+import '../Restaurant/restaurant_edit.dart';
+import '../Supermarket/edit_supermarket.dart';
 import 'edit_profil_page.dart';
 
 String orphanageId = 'id';
+String accountTypeName = '';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedImage =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +49,7 @@ class ProfilePage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
-              .collection("Users")
+              .collection("users")
               .where('userUid', isEqualTo: currentUserID)
               .snapshots(),
           builder: (context, dataSnapshot) {
@@ -49,23 +78,24 @@ class ProfilePage extends StatelessWidget {
                     SizedBox(height: 10),
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: Image.network(
-                        userModelClass.profileImage ?? '',
-                        errorBuilder: (context, error, stackTrace) =>
-                            Icon(Icons.person, size: 50),
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          );
-                        },
-                      ).image,
+                      backgroundImage: _image != null
+                          ? FileImage(_image!)
+                              as ImageProvider<Object> // Ensure correct type
+                          : NetworkImage(
+                                  'https://example.com/default_profile_image.jpg')
+                              as ImageProvider<Object>,
+                      child:
+                          _image == null ? Icon(Icons.person, size: 50) : null,
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _pickImage();
+                        // if (_image != null) {
+                        //   await _updateUserProfil(); // Upload image after picking
+                        // }
+                      },
+                      child: Text('Pick Profile Image'),
                     ),
                     SizedBox(height: 16),
                     Text(
@@ -114,18 +144,81 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
+                        Column(
+                          children: [
+                            if (accountTypeName == 'orphanage')
+                              _buildSettingsTile(
+                                'Edit Orphanage',
+                                Icons.house,
+                                () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OrphanageEdit(
+                                          orphanageId: orphanageId),
+                                    ),
+                                  );
+                                },
+                              )
+                            else if (accountTypeName == 'restaurant')
+                              _buildSettingsTile(
+                                'Edit Restaurant',
+                                Icons.restaurant,
+                                () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RestaurantEdit(),
+                                    ),
+                                  );
+                                },
+                              )
+                            else if (accountTypeName == 'supermarket')
+                              _buildSettingsTile(
+                                'Edit Supermarket',
+                                Icons.shopping_cart,
+                                () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditSupermarket(),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
                         _buildSettingsTile(
                           'Notification Preferences',
                           Icons.notifications,
                           () {
                             // Navigate to notification preferences
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NotificationPreferencesPage(),
+                              ),
+                            );
                           },
                         ),
                         _buildSettingsTile('Privacy Settings', Icons.lock, () {
                           // Navigate to privacy settings
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PrivacySettingsPage(),
+                            ),
+                          );
                         }),
                         _buildSettingsTile('About App', Icons.info, () {
                           // Show app information
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AboutAppPage(),
+                            ),
+                          );
                         }),
                       ],
                     ),
@@ -134,7 +227,9 @@ class ProfilePage extends StatelessWidget {
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            SignOutAlertDialog().showAlert(context);
+                          },
                           child: const Text('Logout',
                               style: TextStyle(
                                   fontSize: 20,
@@ -195,3 +290,14 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+
+// class UserModelClass {
+//   String fullname;
+//   String email;
+//   String? profileImageUrl;
+
+//   UserModelClass.fromDocument(DocumentSnapshot doc)
+//       : fullname = doc['fullname'],
+//         email = doc['email'],
+//         profileImageUrl = doc['profileImageUrl'];
+// }

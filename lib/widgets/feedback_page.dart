@@ -167,7 +167,7 @@ class _GiveFeedbackPageState extends State<GiveFeedbackPage> {
 
   sendFeedback() {
     FirebaseFirestore.instance
-        .collection('Feedbacks')
+        .collection('feedbacks')
         .doc(UUIDGenerator().uuidV1())
         .set({
           'feedback': _giveFeedbackController.text,

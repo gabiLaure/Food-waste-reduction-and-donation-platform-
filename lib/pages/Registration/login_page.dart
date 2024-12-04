@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
       String userUid = userCredential.user!.uid.toString();
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('Users')
+          .collection('users')
           .doc(userUid) // Utilisation de l'UID
           .get();
       if (userDoc.exists) {
@@ -212,18 +212,19 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void getUserSupInfo(userData) {
+  Future<void> getUserSupInfo(userData) async {
     // Navigate based on account type
-    GlobalData.userData = userData;
+    await GlobalData.updateUserData(userData);
+
     switch (userData['accountType']) {
       case 'Orphanage':
-        fetchOrphanageByUserProfileID(userData);
+        fetchOrphanageByUserProfileID(userData['userUid']);
         break;
       case 'Restaurant':
-        fetchRestaurantByUserProfileID(userData);
+        fetchRestaurantByUserProfileID(userData['userUid']);
         break;
       case 'Supermarket':
-        fetchSupermarketByUserProfileID(userData);
+        fetchSupermarketByUserProfileID(userData['userUid']);
         break;
 
       default:
@@ -240,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
       // Query Firestore to find the orphanage with the given userProfileID
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('orphanages')
-          .where('userProfileID', isEqualTo: userProfileID)
+          .where('userProfileID', isEqualTo: userProfile)
           .get();
       // Check if any documents are returned
       if (querySnapshot.docs.isNotEmpty) {
@@ -253,7 +254,7 @@ class _LoginPageState extends State<LoginPage> {
         };
 
         // Use the orphanage data as needed
-        GlobalData.orphanageData = orphanageData;
+        await GlobalData.updateOrphanageData(orphanageData);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
@@ -303,7 +304,7 @@ class _LoginPageState extends State<LoginPage> {
         };
 
         // Use the orphanage data as needed
-        GlobalData.orphanageData = orphanageData;
+        await GlobalData.updateOrphanageData(orphanageData);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
@@ -353,7 +354,9 @@ class _LoginPageState extends State<LoginPage> {
         };
 
         // Use the orphanage data as needed
-        GlobalData.orphanageData = orphanageData;
+
+        await GlobalData.updateOrphanageData(orphanageData);
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),

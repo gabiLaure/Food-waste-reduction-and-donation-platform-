@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+// import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/home.dart';
 import 'package:caritas/intro/screens/splash.dart';
@@ -13,14 +14,18 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final user = GlobalData.userData;
+// final user = GlobalData.userData;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  await GlobalData.loadFromLocalStorage();
+
   runApp(const MyApp());
 }
 
@@ -83,7 +88,7 @@ class MyApp extends StatelessWidget {
             // home: hasAccessed
             //     ? (user != null ? HomePage() : LoginPage())
             //     : const SplashScreen(),
-            home: HomePage()
+            home: LoginPage()
             //home: RegistrationPage()
             );
       },

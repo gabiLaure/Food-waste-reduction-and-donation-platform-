@@ -5,6 +5,8 @@ import 'package:caritas/widgets/toast_messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../admin/models/global_data.dart';
+
 class SignOutAlertDialog {
   void showAlert(BuildContext context) {
     showDialog(
@@ -31,6 +33,8 @@ class SignOutAlertDialog {
               ),
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
+                await GlobalData.clearAllData();
+                await GlobalData.clearUserData();
                 ToastMessages().showSuccessToast("Logout successful");
                 //print("Sign Out Success");
                 Navigator.pushAndRemoveUntil(

@@ -189,7 +189,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       };
       // add user to firestore with multiple images
       FirebaseFirestore.instance
-          .collection('Users')
+          .collection('users')
           .doc(userCredential.user!.uid.toString())
           .set(userInfos)
           .then(
@@ -230,8 +230,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     ToastMessages().showErrorToast(error);
   }
 
-  void redirectUser(context, user) {
-    GlobalData.userData = user;
+  Future<void> redirectUser(context, user) async {
+    await GlobalData.updateUserData(user);
     // Navigate based on account type
     switch (accountTypeName) {
       case 'Individual':

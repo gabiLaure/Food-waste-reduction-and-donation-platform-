@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:io';
+import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/generators/uuid_generator.dart';
 import 'package:caritas/home.dart';
 import 'package:caritas/pages/Geotargeting/map.dart';
@@ -18,6 +19,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:caritas/map/screens/current_location_screen.dart';
 
+import '../../widgets/what_type_of_food.dart';
 import '../Orphanage/map_picker.dart';
 import 'view_donation.dart';
 
@@ -100,18 +102,9 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   }
 
   void getCurrentUserInfo() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userProfileID) // Utilisation de l'UID
-        .get();
-    if (userDoc.exists) {
-      Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
-      setState(() {
-        userInfos = userData;
-      });
-    } else {
-      print("An error occured.");
-    }
+    setState(() {
+      userInfos = GlobalData.userData;
+    });
   }
 
   // Fetch the address from latitude and longitude
@@ -407,8 +400,8 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
   // Méthode pour calculer la distance entre deux points géographiques en mètres
   double calculateDistance(double currentLatitude, double currentLongitude,
       double communityLatitude, double communityLongitude) {
-    if (_latitude != null &&
-        _longitude != null &&
+    if (currentLatitude != 0.0 &&
+        currentLongitude != 0.0 &&
         communityLatitude != 0.0 &&
         communityLongitude != 0.0) {
       final distanceInMeters = Geolocator.distanceBetween(currentLatitude,
@@ -469,20 +462,30 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
             onTap: () {
               // Navigate to the page with information about allowed food types
             },
-            child: const Center(
-              child: Text(
-                'What type of food are allowed on Caritas?',
-                style: TextStyle(color: Colors.blue),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  // Navigate to the WhatTypeOfFoodPage when the text is tapped
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => WhatTypeOfFoodPage()),
+                  );
+                },
+                child: Text(
+                  'What type of food are allowed on Caritas?',
+                  style: TextStyle(color: Colors.blue, fontSize: 18),
+                ),
               ),
             ),
           ),
           SizedBox(height: 16),
           SizedBox(height: 24),
+          _buildLocation(),
           orphanages.isNotEmpty
               ? _buildLocalCommunity(orphanages)
               : Center(child: CircularProgressIndicator()),
           SizedBox(height: 16),
-          _buildLocation(),
           _buildPhotosContainer(),
           _buildTitle(),
           _buildDescription(),
@@ -526,9 +529,13 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
         children: [
           GestureDetector(
             onTap: () {
-              // Navigate to the page with information about allowed food types
+              // Navigate to the WhatTypeOfFoodPage when the text is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => WhatTypeOfFoodPage()),
+              );
             },
-            child: const Center(
+            child: Center(
               child: Text(
                 'What type of food are allowed on Caritas?',
                 style: TextStyle(color: Colors.blue),
@@ -537,11 +544,11 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           ),
           SizedBox(height: 16),
           SizedBox(height: 24),
+          _buildLocation(),
           orphanages.isNotEmpty
               ? _buildLocalCommunity(orphanages)
               : Center(child: CircularProgressIndicator()),
           SizedBox(height: 16),
-          _buildLocation(),
           _displayDistance(),
           _buildPhotosContainer(),
           _buildTitle(),
@@ -586,7 +593,11 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
         children: [
           GestureDetector(
             onTap: () {
-              // Navigate to the page with information about allowed food types
+              // Navigate to the WhatTypeOfFoodPage when the text is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => WhatTypeOfFoodPage()),
+              );
             },
             child: const Center(
               child: Text(
@@ -597,11 +608,11 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
           ),
           SizedBox(height: 16),
           SizedBox(height: 24),
+          _buildLocation(),
           orphanages.isNotEmpty
               ? _buildLocalCommunity(orphanages)
               : Center(child: CircularProgressIndicator()),
           SizedBox(height: 16),
-          _buildLocation(),
           _displayDistance(),
           Center(
             child: Text(
@@ -628,6 +639,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                 0.0; // Pas de calcul de distance pour "All Community"
           } else {
             // Calculer la distance pour les autres communautés
+
             _distanceBetweenUs = calculateDistance(
               _latitude!,
               _longitude!,
@@ -674,11 +686,13 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
                     setState(() {
                       _latitude = position.latitude; // Store latitude
                       _longitude = position.longitude; // Store longitude
-                      _distanceBetweenUs = calculateDistance(
-                          position.latitude,
-                          position.longitude,
-                          selectedOrphanage!['latitude'],
-                          selectedOrphanage!['longitude']);
+                      if (selectedOrphanage != null) {
+                        _distanceBetweenUs = calculateDistance(
+                            position.latitude,
+                            position.longitude,
+                            selectedOrphanage!['latitude'],
+                            selectedOrphanage!['longitude']);
+                      }
                     });
                     _getAddressFromCoordinates(position.latitude,
                         position.longitude); // Get address from coordinates

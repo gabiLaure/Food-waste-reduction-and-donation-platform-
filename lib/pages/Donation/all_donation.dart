@@ -79,6 +79,7 @@ class AllDonations extends StatelessWidget {
   final firestoreInstance = FirebaseFirestore.instance;
   late Donation donation;
   late UserModelClass user;
+
   void acceptDonation(DocumentSnapshot<Object?> donation) async {
     try {
       // Met à jour le statut de la donation dans Firestore
@@ -139,10 +140,17 @@ class AllDonations extends StatelessWidget {
   // Widget pour afficher
   Widget donationListStreamOrphanage(
       {required String status, required String emptyMessage}) {
+    final orphanageId = GlobalData.orphanageData!['id'];
+    final userId = GlobalData.userData!['userUid'];
     return StreamBuilder<QuerySnapshot>(
       stream: firestoreInstance
           .collection("donations")
-          .where('orphanage.id', isEqualTo: GlobalData.orphanageData!['id'])
+          .where(
+            Filter.or(
+              Filter('orphanage.id', isEqualTo: orphanageId),
+              Filter('userInfos.userUid', isEqualTo: userId),
+            ),
+          )
           .where('donationStatus', isEqualTo: status)
           .snapshots(),
       builder: (context, snapshot) {
@@ -373,7 +381,7 @@ class AllDonations extends StatelessWidget {
         return [
           Tab(text: 'Pending Offers'),
           Tab(text: 'To be collected'),
-          Tab(text: 'Denied Offers'),
+          Tab(text: 'Cancel Offers'),
         ];
     }
   }

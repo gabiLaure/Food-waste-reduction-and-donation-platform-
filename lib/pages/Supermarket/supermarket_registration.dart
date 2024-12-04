@@ -259,7 +259,7 @@ class _SupermarketRegistrationState extends State<SupermarketRegistration> {
 
     try {
       DocumentReference docRef = await FirebaseFirestore.instance
-          .collection('supermarket')
+          .collection('supermarkets')
           .add(supermarketData);
       sendSuccessCode();
 
@@ -270,7 +270,7 @@ class _SupermarketRegistrationState extends State<SupermarketRegistration> {
       supermarketData['id'] = documentId;
 
       // Enregistrement dans GlobalData
-      GlobalData.orphanageData = supermarketData;
+      await GlobalData.updateOrphanageData(supermarketData);
     } catch (e) {
       print("Failed to add supermarket: $e");
       ToastMessages().showErrorToast('Failed to add supermarket');

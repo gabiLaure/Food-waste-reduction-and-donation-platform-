@@ -314,7 +314,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
       restaurantData['id'] = documentId;
 
       // Enregistrement dans GlobalData
-      GlobalData.orphanageData = restaurantData;
+      await GlobalData.updateOrphanageData(restaurantData);
     } catch (e) {
       print("Failed to add restaurant: $e");
       ToastMessages().showErrorToast('Failed to add restaurant');
@@ -474,7 +474,17 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration> {
                     validateRestaurant();
                   }
                 },
-                child: Text('Register Restaurant'),
+                child: Text('Register Restaurant',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 203, 152, 206),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
               ),
             ],
           ),

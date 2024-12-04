@@ -48,15 +48,8 @@ class DonationPage extends StatelessWidget {
         length: 2,
         child: Column(
           children: <Widget>[
-            _buildTabBar(),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _buildPendingDonationTab(),
-                  _buildPendingRequestTab(),
-                ],
-              ),
-            ),
+            displayTabs(),
+            Expanded(child: displayTabsContent()),
           ],
         ),
       ),
@@ -64,14 +57,43 @@ class DonationPage extends StatelessWidget {
     );
   }
 
-  // Builds the TabBar widget
-  Widget _buildTabBar() {
-    return TabBar(
-      tabs: [
-        Tab(text: 'Pending Donation'),
-        Tab(text: 'Pending Request'),
-      ],
-    );
+  Widget displayTabs() {
+    String accountType = GlobalData.userData?['accountType'] ?? '';
+
+    switch (accountType) {
+      case 'Orphanage':
+        return const TabBar(
+          tabs: [
+            Tab(text: 'Pending Donation'),
+            Tab(text: 'Pending Request'),
+          ],
+        );
+      case 'Restaurant':
+      case 'Individual':
+      case 'Supermarket':
+        return const SizedBox();
+      default:
+        return const SizedBox();
+    }
+  }
+
+  Widget displayTabsContent() {
+    String accountType = GlobalData.userData?['accountType'] ?? '';
+
+    switch (accountType) {
+      case 'Orphanage':
+        return TabBarView(children: [
+          _buildPendingDonationTab(),
+          _buildPendingRequestTab(),
+        ]);
+
+      case 'Restaurant':
+      case 'Individual':
+      case 'Supermarket':
+        return _buildPendingRequestTab();
+      default:
+        return _buildPendingRequestTab();
+    }
   }
 
   // Builds the Pending Donation tab content
@@ -263,6 +285,21 @@ class DonationPage extends StatelessWidget {
     );
   }
 
+  Widget _buildViewDonationButton(donation) {
+    return ElevatedButton(
+      onPressed: () {
+        acceptDonation(donation);
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green[100],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+      child: Text('View Donation'),
+    );
+  }
+
   // Builds the empty state UI when there are no donations or requests
   Widget _buildEmptyState(String message) {
     return Column(
@@ -297,6 +334,44 @@ class DonationPage extends StatelessWidget {
     );
   }
 
+  loadDialogOptions(context) {
+    String accountType = GlobalData.userData?['accountType'] ?? '';
+
+    switch (accountType) {
+      case 'Orphanage':
+        return [
+          _buildDialogButton(
+            context,
+            'Make a Donation',
+            ListingCreationPage(),
+          ),
+          _buildDialogButton(
+            context,
+            'Make a Request',
+            RequestDonation(),
+          ),
+        ];
+      case 'Restaurant':
+      case 'Individual':
+      case 'Supermarket':
+        return [
+          _buildDialogButton(
+            context,
+            'Make a Donation',
+            ListingCreationPage(),
+          ),
+        ];
+      default:
+        return [
+          _buildDialogButton(
+            context,
+            'Make a Donation',
+            ListingCreationPage(),
+          ),
+        ];
+    }
+  }
+
   // Shows the dialog for making a choice
   void _showDialog(BuildContext context) {
     showDialog(
@@ -306,18 +381,7 @@ class DonationPage extends StatelessWidget {
           title: Center(child: Text('Make a choice')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDialogButton(
-                context,
-                'Make a Donation',
-                ListingCreationPage(),
-              ),
-              _buildDialogButton(
-                context,
-                'Make a Request',
-                RequestDonation(),
-              ),
-            ],
+            children: loadDialogOptions(context),
           ),
         );
       },

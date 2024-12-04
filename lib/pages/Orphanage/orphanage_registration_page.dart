@@ -121,16 +121,16 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
                               height: 50,
                               width: 50,
                             ),
-                            SizedBox(height: 30),
+                            const SizedBox(height: 30),
                             Text("The Orphanage has been created!",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                         fontFamily: 'Montserrat',
                                         fontSize: 22.0)
                                     .copyWith(
                                         color: Colors.grey.shade900,
                                         fontWeight: FontWeight.bold)),
-                            SizedBox(height: 50),
+                            const SizedBox(height: 50),
                             ButtonWidget(
                                 text: "Continue",
                                 textColor: Colors.white,
@@ -245,7 +245,7 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
       orphanage['id'] = documentId;
 
       // Enregistrement dans GlobalData
-      GlobalData.orphanageData = orphanage;
+      await GlobalData.updateOrphanageData(orphanage);
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

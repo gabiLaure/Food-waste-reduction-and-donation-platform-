@@ -10,7 +10,7 @@ class SupermarketListPage extends StatelessWidget {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream:
-            FirebaseFirestore.instance.collection('supermarket').snapshots(),
+            FirebaseFirestore.instance.collection('supermarkets').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Affiche un indicateur de chargement pendant le fetching

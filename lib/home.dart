@@ -5,7 +5,6 @@ import 'package:caritas/admin/admin_main.dart';
 import 'package:caritas/pages/Donation/all_donation.dart';
 import 'package:caritas/pages/Home/all_request_page.dart';
 import 'package:caritas/pages/Donation/donation_page.dart';
-import 'package:caritas/pages/Registration/login_page.dart';
 import 'package:caritas/pages/Home/profile_page.dart';
 import 'package:caritas/pages/Home/feeds_page.dart';
 import 'package:caritas/pages/Home/notification_page.dart';
@@ -13,7 +12,6 @@ import 'package:caritas/pages/Supermarket/supermarket_page.dart';
 import 'package:caritas/widgets/alert_dialogs.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/Grocery/supermarket_page.dart';
 import 'pages/Home/impact_page.dart';
 import 'pages/Orphanage/orphanage_page.dart';
 import 'pages/Restaurant/restaurant_page.dart';

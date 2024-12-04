@@ -29,7 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (currentUser != null) {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('Users')
+          .collection('users')
           .doc(currentUser.uid)
           .get();
 
@@ -87,7 +87,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (currentUser != null) {
         // Save general user profile data
         await FirebaseFirestore.instance
-            .collection('Users')
+            .collection('users')
             .doc(currentUser.uid)
             .update({
           'fullname': fullNameController.text.trim(),
@@ -99,12 +99,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
         // Save account-type-specific data
         if (accountTypeName == 'Orphanage') {
           await FirebaseFirestore.instance
-              .collection('Orphanages')
+              .collection('orphanages')
               .doc(currentUser.uid)
               .update({
             'donationFrequency': additionalInfoController.text.trim(),
           });
-        } else if (accountTypeName == 'Restaurant') {
+        } else if (accountTypeName == 'restaurant') {
           await FirebaseFirestore.instance
               .collection('Restaurants')
               .doc(currentUser.uid)
