@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:io';
+import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/generators/uuid_generator.dart';
 import 'package:caritas/home.dart';
 import 'package:caritas/pages/Geotargeting/map.dart';
@@ -19,6 +20,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:caritas/map/screens/current_location_screen.dart';
 
+import '../../widgets/what_type_of_food.dart';
 import '../Orphanage/map_picker.dart';
 
 class RequestDonation extends StatefulWidget {
@@ -79,30 +81,11 @@ class _RequestDonationState extends State<RequestDonation> {
   String _address = ''; // To store the address name
   double? _latitude; // To store latitude
   double? _longitude;
-  Map<String, dynamic>? userInfos;
-
   Position? position;
 
   @override
   void initState() {
     super.initState();
-    // _getCurrentUserLocation();
-    getCurrentUserInfo();
-  }
-
-  void getCurrentUserInfo() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userProfileID) // Utilisation de l'UID
-        .get();
-    if (userDoc.exists) {
-      Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
-      setState(() {
-        userInfos = userData;
-      });
-    } else {
-      print("An error occured.");
-    }
   }
 
   // Fetch the address from latitude and longitude
@@ -119,23 +102,6 @@ class _RequestDonationState extends State<RequestDonation> {
       } catch (e) {
         print("Error fetching address: $e");
       }
-    }
-  }
-
-  String userCurrentAddress = "No location has been selected!";
-  _getCurrentUserLocation() async {
-    try {
-      _determinePosition().then((Position position) {
-        setState(() {
-          _latitude = position.latitude;
-          _longitude = position.longitude;
-        });
-        _getAddressFromCoordinates(position.latitude, position.longitude);
-      }).catchError((e) {
-        print(e);
-      });
-    } catch (error) {
-      ToastMessages().showErrorToast(error.toString());
     }
   }
 
@@ -271,7 +237,8 @@ class _RequestDonationState extends State<RequestDonation> {
         .doc(requestID)
         .set({
           'requestID': requestID,
-          'userInfos': userInfos,
+          'userInfos': GlobalData.userData,
+          'orphanage': GlobalData.orphanageData,
           'requestTitle': _controller.text,
           'quantity': _controllerQuantity.text,
           'requestDescription': _descriptionController.text,
@@ -321,9 +288,13 @@ class _RequestDonationState extends State<RequestDonation> {
         children: [
           GestureDetector(
             onTap: () {
-              // Navigate to the page with information about allowed food types
+              // Navigate to the WhatTypeOfFoodPage when the text is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => WhatTypeOfFoodPage()),
+              );
             },
-            child: const Center(
+            child: Center(
               child: Text(
                 'What type of food are allowed on Caritas?',
                 style: TextStyle(color: Colors.blue),

@@ -43,7 +43,7 @@ class SchedulePage extends StatelessWidget {
                         .where('userInfos.userUid',
                             isEqualTo:
                                 userProfileID) // Filtrer par UID de l'utilisateur actuel
-
+                        .where('donationStatus', isEqualTo: "Pending")
                         .limit(5) // Limiter à 5 résultats
                         .snapshots(),
                     builder: ((context, snapshot) {

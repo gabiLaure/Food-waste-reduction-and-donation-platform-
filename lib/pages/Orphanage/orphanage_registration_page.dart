@@ -196,6 +196,49 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
   }
 
   Future<void> _uploadAndRegister() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Center(child: Text("Registration Loading... ")),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      CircularProgressIndicator(
+                        value: circularProgressVal,
+                        strokeWidth: 6,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.indigo),
+                      ),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      Text("Orphanage account is being created",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16.0)
+                              .copyWith(color: Colors.grey.shade900)),
+                    ],
+                  )
+                ],
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            );
+          },
+        );
+      },
+    );
+
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
@@ -229,9 +272,9 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
         'address': address,
         'phone': phone,
         'email': email,
-        'imageUrl': imageUrl,
+        'image': imageUrl,
         'documentUrl': documentUrl,
-        'userProfileID': userProfileID
+        'userProfileID': userProfileID,
       };
 
       // Save data to Firestore
@@ -246,6 +289,7 @@ class _OrphanageRegistrationState extends State<OrphanageRegistration> {
 
       // Enregistrement dans GlobalData
       await GlobalData.updateOrphanageData(orphanage);
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

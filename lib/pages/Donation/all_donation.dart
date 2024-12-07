@@ -272,6 +272,7 @@ class AllDonations extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
+                                _buildViewDonationButton(context, donation),
                                 if (status == 'Pending')
                                   ElevatedButton(
                                     onPressed: () {
@@ -296,6 +297,24 @@ class AllDonations extends StatelessWidget {
                     },
                   );
       },
+    );
+  }
+
+  Widget _buildViewDonationButton(BuildContext context, donation) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DonationsFragment(donation)),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromARGB(255, 223, 230, 200),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+      child: Text('View Donation'),
     );
   }
 

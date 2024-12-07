@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:caritas/widgets/toast_messages.dart';
+import 'package:get/get_connect/http/src/request/request.dart';
 
 import 'view_request_page.dart';
 
@@ -17,7 +18,6 @@ class RequestCard extends StatelessWidget {
   final String title;
   final String quantity;
   final String distance;
-  final String collectionTime;
   final Widget widget;
 
   const RequestCard({
@@ -25,7 +25,6 @@ class RequestCard extends StatelessWidget {
     required this.title,
     required this.quantity,
     required this.distance,
-    required this.collectionTime,
     // widget
     required this.widget,
   });
@@ -60,7 +59,6 @@ class RequestCard extends StatelessWidget {
                   children: [
                     Icon(Icons.watch_later_outlined),
                     SizedBox(width: 5),
-                    Text("Collection($collectionTime)"),
                   ],
                 ),
               ],
@@ -75,6 +73,7 @@ class RequestCard extends StatelessWidget {
 
 class AllRequests extends StatelessWidget {
   AllRequests({super.key});
+  late Request request;
   final firestoreInstance = FirebaseFirestore.instance;
   //late Request request;
   late UserModelClass user;
@@ -87,7 +86,7 @@ class AllRequests extends StatelessWidget {
           .doc(request['requestID']) // L'ID du document de la request
           .update({
         'requestStatus': 'Accepted', // Nouveau statut
-        'orphanAccept': GlobalData.orphanageData,
+        'userAccept': GlobalData.userData,
         'updatedAt':
             FieldValue.serverTimestamp(), // Met à jour la date si nécessaire
       });
@@ -163,7 +162,6 @@ class AllRequests extends StatelessWidget {
                           quantity: '${request['quantity']!.toString()} kg',
                           distance:
                               '${request['distanceBetweenUs']!.toStringAsFixed(2)} km',
-                          collectionTime: request['requestAvailability'],
                           widget: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -256,7 +254,6 @@ class AllRequests extends StatelessWidget {
                           title: request['requestTitle'],
                           quantity: '${request['quantity']!.toString()} kg',
                           distance: '-',
-                          collectionTime: request['requestAvailability'],
                           widget: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -316,7 +313,6 @@ class AllRequests extends StatelessWidget {
                           title: request['requestTitle'],
                           quantity: '${request['quantity']!.toString()} kg',
                           distance: '-',
-                          collectionTime: request['requestAvailability'],
                           widget: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -468,7 +464,6 @@ class AllRequests extends StatelessWidget {
                           quantity: '${request['quantity']!.toString()} kg',
                           distance:
                               '${request['distanceBetweenUs']!.toStringAsFixed(2)} km',
-                          collectionTime: request['requestAvailability'],
                           widget: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(

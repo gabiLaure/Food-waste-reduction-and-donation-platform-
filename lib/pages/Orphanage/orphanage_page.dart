@@ -383,7 +383,7 @@ class Orphanage {
       id: doc.id,
       name: data['orphanageName'] ?? '',
       address: data['address'] ?? '',
-      imageUrl: data['imageUrl'] ?? '',
+      imageUrl: data['image'] ?? '',
       latitude: data['latitude'] ?? '',
       longitude: data['longitude'] ?? '',
       description: data['description'] ?? '',

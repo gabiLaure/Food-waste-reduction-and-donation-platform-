@@ -1,4 +1,5 @@
 import 'package:caritas/admin/models/global_data.dart';
+import 'package:caritas/pages/Donation/view_donation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:lottie/lottie.dart';
@@ -11,7 +12,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:caritas/widgets/toast_messages.dart';
 
+import '../Request/all_request_page.dart';
 import '../Request/requesting_page.dart';
+import '../Request/view_request.dart';
 import 'all_donation.dart';
 
 class DonationPage extends StatelessWidget {
@@ -36,6 +39,23 @@ class DonationPage extends StatelessWidget {
             FieldValue.serverTimestamp(), // Met à jour la date si nécessaire
       });
       ToastMessages().showSuccessToast('Donation accepted successfully..');
+    } catch (e) {
+      ToastMessages().showErrorToast("Error while accepting donation: $e");
+    }
+  }
+
+  void acceptRequest(Map<String, dynamic> data) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('requests') // Replace with the correct collection name
+          .doc(data['requestID']) // Document ID of the donation
+          .update({
+        'requestStatus': 'Accepted', // Update the status
+        'distanceBetweenUs': data['distanceBetweenUs'],
+        'acceptRequest': GlobalData.userData,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      ToastMessages().showSuccessToast('Request accepted successfully.');
     } catch (e) {
       ToastMessages().showErrorToast("Error while accepting donation: $e");
     }
@@ -71,7 +91,10 @@ class DonationPage extends StatelessWidget {
       case 'Restaurant':
       case 'Individual':
       case 'Supermarket':
-        return const SizedBox();
+        return const Text(
+          'Pending Request',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        );
       default:
         return const SizedBox();
     }
@@ -193,8 +216,8 @@ class DonationPage extends StatelessWidget {
   Widget _buildPendingRequestTab() {
     return StreamBuilder<QuerySnapshot>(
       stream: firestoreInstance
-          .collection('request')
-          .where('donationStatus', isEqualTo: 'Pending')
+          .collection('requests')
+          .where('requestStatus', isEqualTo: 'Pending')
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -246,9 +269,50 @@ class DonationPage extends StatelessWidget {
             final data = nearbyRequests[index];
             final distanceBetweenUs = data['distanceBetweenUs'];
 
-            return ListTile(
-              title: Text(data['requestTitle'] ?? "Unknown Request"),
-              subtitle: Text("${distanceBetweenUs.toStringAsFixed(2)} km away"),
+            // return ListTile(
+            //   title: Text(data['requestTitle'] ?? "Unknown Request"),
+            //   subtitle: Text("${distanceBetweenUs.toStringAsFixed(2)} km away"),
+            // );
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: RequestCard(
+                title: data['requestTitle'],
+                quantity: '${data['quantity']} kg',
+                distance: '${data['distanceBetweenUs'].toStringAsFixed(2)} km',
+                // collectionTime: request['donationAvailability'],
+                widget: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          _buildViewRequestButton(context, data);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[100],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: Text('View'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          acceptRequest(data);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[100],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: Text('Accept'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             );
           },
         );
@@ -285,10 +349,13 @@ class DonationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildViewDonationButton(donation) {
+  Widget _buildViewDonationButton(BuildContext context, donation) {
     return ElevatedButton(
       onPressed: () {
-        acceptDonation(donation);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DonationsFragment(donation)),
+        );
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.green[100],
@@ -297,6 +364,24 @@ class DonationPage extends StatelessWidget {
         ),
       ),
       child: Text('View Donation'),
+    );
+  }
+
+  Widget _buildViewRequestButton(BuildContext context, request) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RequestFragment()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green[100],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+      child: Text('View Request'),
     );
   }
 

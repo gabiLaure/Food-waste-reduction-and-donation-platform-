@@ -480,7 +480,6 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
             ),
           ),
           SizedBox(height: 16),
-          SizedBox(height: 24),
           _buildLocation(),
           orphanages.isNotEmpty
               ? _buildLocalCommunity(orphanages)
@@ -542,8 +541,7 @@ class _ListingCreationPageState extends State<ListingCreationPage> {
               ),
             ),
           ),
-          SizedBox(height: 16),
-          SizedBox(height: 24),
+          SizedBox(height: 10),
           _buildLocation(),
           orphanages.isNotEmpty
               ? _buildLocalCommunity(orphanages)

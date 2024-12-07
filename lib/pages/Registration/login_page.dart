@@ -135,7 +135,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isUserSigned = false;
       isInValidaAccount = true;
-      //Navigator.pop(context);
       showAlertDialog(context);
     });
   }
@@ -153,7 +152,8 @@ class _LoginPageState extends State<LoginPage> {
     } else if (_usernameController.text.isEmpty) {
       _toastMessages.showInfoToast('Mot de passe vide');
     } else {
-      print('Validation Success!');
+      // print('Validation Success!');
+      showAlertDialog(context);
       return true;
     }
 
@@ -184,7 +184,20 @@ class _LoginPageState extends State<LoginPage> {
         // Affichage des données du document
         Map<String, dynamic>? userData =
             userDoc.data() as Map<String, dynamic>?;
-        getUserSupInfo(userData);
+
+        if (userData != null) {
+          final convertUser = {
+            'userUid': userData['userUid']!,
+            'fullname': userData['fullname']!,
+            'phone': userData['phone'],
+            'accountType': userData['accountType'],
+            'email': userData['email'],
+          };
+
+          getUserSupInfo(convertUser);
+        } else {
+          _toastMessages.showErrorToast("An error occured.");
+        }
       } else {
         _toastMessages.showErrorToast("An error occured.");
       }
@@ -199,11 +212,11 @@ class _LoginPageState extends State<LoginPage> {
       // Navigator.pop(context);
       // print('User is signed in!');
     } on FirebaseAuthException catch (e) {
+      ifAnError();
+
       if (e.code == 'user-not-found') {
-        ifAnError();
         _toastMessages.showErrorToast("No user found");
       } else if (e.code == 'wrong-password') {
-        ifAnError();
         _toastMessages.showErrorToast("Incorrect password!");
       } else {
         _toastMessages.showErrorToast("An error has occured.");
@@ -282,6 +295,11 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
+      setState(() {
+        isUserSigned = false;
+        isInValidaAccount = false;
+        Navigator.pop(context);
+      });
       print('Error fetching orphanage: $e');
     }
   }
@@ -294,6 +312,7 @@ class _LoginPageState extends State<LoginPage> {
           .where('userProfileID', isEqualTo: userProfileID)
           .get();
       // Check if any documents are returned
+
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document (assuming userProfileID is unique)
         DocumentSnapshot document = querySnapshot.docs.first;
@@ -332,7 +351,11 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      print('Error fetching orphanage: $e');
+      setState(() {
+        isUserSigned = false;
+        isInValidaAccount = false;
+        Navigator.pop(context);
+      });
     }
   }
 
@@ -384,6 +407,11 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
+      setState(() {
+        isUserSigned = false;
+        isInValidaAccount = false;
+        Navigator.pop(context);
+      });
       print('Error fetching orphanage: $e');
     }
   }
@@ -430,6 +458,16 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
+                  onChanged: (value) {
+                    _usernameController.text = value.trim();
+                    _usernameController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _usernameController.text.length),
+                    );
+                  },
+                  onEditingComplete: () {
+                    FocusScope.of(context).unfocus();
+                    _usernameController.text = _usernameController.text.trim();
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -469,8 +507,18 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   obscureText: _isObscured,
+                  onChanged: (value) {
+                    _passwordController.text = value.trim();
+                    _passwordController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _passwordController.text.length),
+                    );
+                  },
+                  onEditingComplete: () {
+                    FocusScope.of(context).unfocus();
+                    _passwordController.text = _passwordController.text.trim();
+                  },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   height: 50,

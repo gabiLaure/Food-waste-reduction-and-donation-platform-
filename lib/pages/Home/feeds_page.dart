@@ -5,10 +5,7 @@ import 'package:caritas/pages/Donation/view_donation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
-import 'package:intl/intl.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-
+import '../../models/top_user.dart';
 import '../Food Tips/food_category.dart';
 
 class FeedPage extends StatefulWidget {
@@ -21,107 +18,19 @@ class FeedPage extends StatefulWidget {
 class _FeedPageState extends State<FeedPage> {
   DateTime selectedDate = DateTime.now();
   final firestoreInstance = FirebaseFirestore.instance;
-  final List<Map<String, String>> mediaItems = [
-    {'type': 'image', 'path': 'assets/images/orphanage1.jpeg'},
-    {'type': 'image', 'path': 'assets/restaurant/restaurantB.jpeg'},
-    {'type': 'image', 'path': 'assets/grocery/supermarket3.jpeg'},
-    // {'type': 'video', 'path': 'assets/videos/orphanage1.mp4'},
-    // {'type': 'video', 'path': 'assets/videos/orphanage2.mp4'},
-    // {'type': 'video', 'path': 'assets/videos/orphanage3.mp4'},
-  ];
+
   final String userProfileID =
       FirebaseAuth.instance.currentUser!.uid.toString();
 
-  List<VideoPlayerController> _videoControllers = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeVideoControllers();
-  }
-
-  void _initializeVideoControllers() {
-    for (var item in mediaItems) {
-      if (item['type'] == 'video') {
-        VideoPlayerController controller =
-            VideoPlayerController.asset(item['path']!)
-              ..initialize().then((_) {
-                setState(() {});
-              });
-        _videoControllers.add(controller);
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    for (var controller in _videoControllers) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  Widget _buildCarousel() {
-    return CarouselSlider(
-      options: CarouselOptions(
-        height: 200.0,
-        autoPlay: true,
-        enlargeCenterPage: true,
-        aspectRatio: 16 / 9,
-        autoPlayInterval: Duration(seconds: 3),
-      ),
-      items: mediaItems.map((item) {
-        if (item['type'] == 'image') {
-          return Builder(
-            builder: (BuildContext context) {
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.symmetric(horizontal: 5.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  image: DecorationImage(
-                    image: AssetImage(item['path']!),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              );
-            },
-          );
-        } else if (item['type'] == 'video') {
-          int index = mediaItems.indexOf(item) - 2;
-
-          return Builder(
-            builder: (BuildContext context) {
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.symmetric(horizontal: 5.0),
-                child: _videoControllers[index].value.isInitialized
-                    ? AspectRatio(
-                        aspectRatio: _videoControllers[index].value.aspectRatio,
-                        child: VideoPlayer(_videoControllers[index]),
-                      )
-                    : Center(child: CircularProgressIndicator()),
-              );
-            },
-          );
-        } else {
-          return Container();
-        }
-      }).toList(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Column(
               children: [
-                _buildCarousel(),
+                TopUsersCarousel(),
                 SizedBox(height: 8),
                 FoodCategoriesPage(),
                 SizedBox(height: 14),
@@ -207,7 +116,7 @@ class _FeedPageState extends State<FeedPage> {
                           .where('userInfos.userUid',
                               isEqualTo:
                                   userProfileID) // Filtrer par UID de l'utilisateur actuel
-
+                          .where('donationStatus', isEqualTo: "Pending")
                           .limit(5) // Limiter à 5 résultats
                           .snapshots(),
                       builder: ((context, snapshot) {
@@ -248,7 +157,7 @@ Widget _scheduleDonationCard(BuildContext context, DocumentSnapshot donation) {
           ListTile(
             leading: Icon(Icons.fastfood_outlined),
             title: Text(
-              'Thanks for Sharing!',
+              "Thanks for Sharing ${donation['donationTitle']}!",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
             subtitle: Column(

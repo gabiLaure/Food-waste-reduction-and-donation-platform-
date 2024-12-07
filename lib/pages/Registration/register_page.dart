@@ -185,13 +185,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
         'fullname': fullNameController.text.trim(),
         'phone': phoneController.text.trim(),
         'accountType': accountTypeName,
-        'email': emailController.text.trim()
+        'email': emailController.text.trim(),
       };
       // add user to firestore with multiple images
       FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid.toString())
-          .set(userInfos)
+          .set({
+            ...userInfos, // Tous les champs utilisateur
+            'createdAt': FieldValue
+                .serverTimestamp(), // Date de création ajoutée côté Firestore
+          })
           .then(
             (value) => redirectUser(context, userInfos),
           )

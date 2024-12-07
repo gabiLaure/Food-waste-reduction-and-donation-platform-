@@ -2,11 +2,7 @@
 
 // import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/admin/models/global_data.dart';
-import 'package:caritas/home.dart';
-import 'package:caritas/intro/screens/splash.dart';
 import 'package:caritas/pages/Registration/login_page.dart';
-import 'package:caritas/pages/Registration/register_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 // final user = GlobalData.userData;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

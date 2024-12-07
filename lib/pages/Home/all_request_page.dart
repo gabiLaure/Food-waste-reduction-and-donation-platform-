@@ -74,7 +74,7 @@ class DonationCard extends StatelessWidget {
 class AllRequest extends StatelessWidget {
   AllRequest({super.key});
   final firestoreInstance = FirebaseFirestore.instance;
-  late Donation donation;
+  late Donation request;
   late UserModelClass user;
   @override
   Widget build(BuildContext context) {
@@ -99,9 +99,7 @@ class AllRequest extends StatelessWidget {
                 Container(
                   child: StreamBuilder<QuerySnapshot>(
                       stream: firestoreInstance
-                          .collection('Users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .collection("donations")
+                          .collection("requests")
                           .where('listingType', isEqualTo: 'Request')
                           //.where('status', isEqualTo: 'Pending')
                           .snapshots(),
@@ -119,19 +117,19 @@ class AllRequest extends StatelessWidget {
                                 : ListView.builder(
                                     itemCount: snapshot.data!.docs.length,
                                     itemBuilder: (context, index) {
-                                      DocumentSnapshot donation =
+                                      DocumentSnapshot request =
                                           snapshot.data!.docs[index];
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: DonationCard(
-                                          title: donation['title']!,
-                                          //quantity: donation['quantity'],
+                                          title: request['title']!,
+                                          //quantity: request['quantity'],
                                           quantity: "7 kg",
-                                          //distance: donation['distance'],
+                                          //distance: request['distance'],
                                           distance: "100km",
 
                                           collectionTime:
-                                              donation['requestdate'],
+                                              request['requestdate'],
                                           widget: Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Row(
@@ -212,19 +210,19 @@ class AllRequest extends StatelessWidget {
                                 : ListView.builder(
                                     itemCount: snapshot.data!.docs.length,
                                     itemBuilder: (context, index) {
-                                      DocumentSnapshot donation =
+                                      DocumentSnapshot request =
                                           snapshot.data!.docs[index];
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: DonationCard(
                                           title:
-                                              "${"You've Accepted  " + donation['title']}!",
-                                          //quantity: donation['quantity'],
+                                              "${"You've Accepted  " + request['title']}!",
+                                          //quantity: request['quantity'],
                                           quantity: "7 kg",
-                                          //distance: donation['distance'],
+                                          //distance: request['distance'],
                                           distance: "100km",
                                           collectionTime:
-                                              donation['requestdate'],
+                                              request['requestdate'],
                                           widget: Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Row(

@@ -4,14 +4,11 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:caritas/pages/Donation/edit_donation.dart';
-import 'package:caritas/widgets/feedback_page.dart';
 //import 'package:caritas/pages/listing_creation_page.dart';
 import 'package:caritas/pages/Home/notification_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 FlutterView view = WidgetsBinding.instance.platformDispatcher.views.first;
@@ -118,7 +115,6 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
                   Expanded(
                     child: Text(
                       getTimeElapsed(donation['donationDate']),
-                      //"20 days left",
                       style: TextStyle(
                           fontSize: 16,
                           color: Color(0xff9ca5bb),
@@ -274,9 +270,17 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
               ),
               const SizedBox(height: 20),
               Text(
-                donation['donationDescription'],
-                style: TextStyle(fontSize: 16),
+                "This donation includes ${donation['quantity'] ?? 'N/A'} items located at ${donation['distanceBetweenUs'] ?? 'unknown distance'}. "
+                "It is ${donation['donationAvailability'] ?? 'not specified'} for pickup. Details: ${donation['donationDescription'] ?? 'no description provided'}. Consume before: ${donation['donationBestBefore']}",
+                style: TextStyle(fontSize: 20),
                 softWrap: true,
+              ),
+              Text(
+                "Accepted by : ${donation['orphanage']['orphanageName'] ?? 'No one yet'}. ",
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.purple[200],
+                    fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -286,11 +290,27 @@ Widget _donationDetail(DocumentSnapshot donation, BuildContext context) {
   );
 }
 
-String getTimeElapsed(String dateofDonation) {
-  DateFormat dateFormat = DateFormat("dd-MM-yyyy, HH:mm:a");
-  DateTime donationDate = dateFormat.parse(dateofDonation);
+String getTimeElapsed(dynamic donationDate) {
+  DateTime parsedDate;
+
+  // Handle Firestore Timestamp
+  if (donationDate is Timestamp) {
+    parsedDate = donationDate.toDate();
+  }
+  // Handle formatted String date
+  else if (donationDate is String) {
+    try {
+      DateFormat dateFormat = DateFormat("dd-MM-yyyy, HH:mm:a");
+      parsedDate = dateFormat.parse(donationDate);
+    } catch (e) {
+      return 'Invalid date format';
+    }
+  } else {
+    return 'Invalid date';
+  }
+
   final now = DateTime.now();
-  final difference = now.difference(donationDate);
+  final difference = now.difference(parsedDate);
 
   if (difference.inDays >= 365) {
     final years = (difference.inDays / 365).floor();
@@ -309,182 +329,97 @@ String getTimeElapsed(String dateofDonation) {
   }
 }
 
-class VideoPlayerWidget extends StatelessWidget {
-  const VideoPlayerWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const VideoPlayerScreen();
-  }
-}
-
-class VideoPlayerScreen extends StatefulWidget {
-  const VideoPlayerScreen({super.key});
-
-  @override
-  State<VideoPlayerScreen> createState() => _VideoPlayerState();
-}
-
-class _VideoPlayerState extends State<VideoPlayerScreen> {
-  late VideoPlayerController _controller;
-  late Future<void> _initializeVideoPlayerFuture;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Create and store the VideoPlayerController. The VideoPlayerController
-    // offers several different constructors to play videos from assets, files,
-    // or the internet.
-    _controller = VideoPlayerController.networkUrl(
-      Uri.parse(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
-      ),
-    );
-
-    // Initialize the controller and store the Future for later use.
-    _initializeVideoPlayerFuture = _controller.initialize();
-
-    // Use the controller to loop the video.
-    _controller.setLooping(true);
-  }
-
-  @override
-  void dispose() {
-    // Ensure disposing of the VideoPlayerController to free up resources.
-    _controller.dispose();
-
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initializeVideoPlayerFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: Stack(children: [
-                VideoPlayer(_controller),
-                Center(
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white.withOpacity(0.8),
-                    child: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          // If the video is playing, pause it.
-                          if (_controller.value.isPlaying) {
-                            _controller.pause();
-                          } else {
-                            // If the video is paused, play it.
-                            _controller.play();
-                          }
-                        });
-                      },
-                      icon: Icon(
-                        _controller.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: const Color(
-                            0xff209fa6), // Adjust icon color to match theme
-                      ),
-                    ),
-                  ),
-                )
-              ]));
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    );
-  }
-}
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter/widgets.dart';
-
-// class ArticleDetailsPage extends StatelessWidget {
-//   final String image;
-//   final String articleName;
-//   final String articleDescription;
-
-//   ArticleDetailsPage({
-//     required this.image,
-//     required this.articleName,
-//     required this.articleDescription,
-//   });
+// class VideoPlayerWidget extends StatelessWidget {
+//   const VideoPlayerWidget({super.key});
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Article Details'),
-//         actions: [
-//           IconButton(
-//             icon: Icon(Icons.edit),
-//             onPressed: () {
-//               // Handle edit button press
-//             },
-//           ),
-//           IconButton(
-//             icon: Icon(Icons.delete),
-//             onPressed: () {
-//               // Handle delete button press
-//             },
-//           ),
-//           IconButton(
-//             icon: Icon(Icons.share),
-//             onPressed: () {
-//               // Handle share button press
-//             },
-//           ),
-//           IconButton(
-//             icon: Icon(Icons.message),
-//             onPressed: () {
-//               // Handle message button press
-//             },
-//           ),
-//         ],
-//       ),
-//       body: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Image.asset(
-//             image,
-//             height: MediaQuery.of(context).size.height / 2,
-//             fit: BoxFit.cover,
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(16.0),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   articleName,
-//                   style: TextStyle(
-//                     fontSize: 24,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 SizedBox(height: 8),
-//                 Text(articleDescription),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
+//     return const VideoPlayerScreen();
 //   }
 // }
 
-// // Example usage:
-// final sampleArticle = ArticleDetailsPage(
-//   image: 'assets/pp.jpeg', // Replace with donor's profile image URL
-//   articleName: 'Sample Article',
-//   articleDescription:
-//       'This is a placeholder description for the sample article.',
-// );
+// class VideoPlayerScreen extends StatefulWidget {
+//   const VideoPlayerScreen({super.key});
+
+//   @override
+//   State<VideoPlayerScreen> createState() => _VideoPlayerState();
+// }
+
+// class _VideoPlayerState extends State<VideoPlayerScreen> {
+//   late VideoPlayerController _controller;
+//   late Future<void> _initializeVideoPlayerFuture;
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     // Create and store the VideoPlayerController. The VideoPlayerController
+//     // offers several different constructors to play videos from assets, files,
+//     // or the internet.
+//     _controller = VideoPlayerController.networkUrl(
+//       Uri.parse(
+//         'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+//       ),
+//     );
+
+//     // Initialize the controller and store the Future for later use.
+//     _initializeVideoPlayerFuture = _controller.initialize();
+
+//     // Use the controller to loop the video.
+//     _controller.setLooping(true);
+//   }
+
+//   @override
+//   void dispose() {
+//     // Ensure disposing of the VideoPlayerController to free up resources.
+//     _controller.dispose();
+
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder(
+//       future: _initializeVideoPlayerFuture,
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.done) {
+//           return ClipRRect(
+//               borderRadius: BorderRadius.circular(30),
+//               child: Stack(children: [
+//                 VideoPlayer(_controller),
+//                 Center(
+//                   child: CircleAvatar(
+//                     radius: 30,
+//                     backgroundColor: Colors.white.withOpacity(0.8),
+//                     child: IconButton(
+//                       onPressed: () {
+//                         setState(() {
+//                           // If the video is playing, pause it.
+//                           if (_controller.value.isPlaying) {
+//                             _controller.pause();
+//                           } else {
+//                             // If the video is paused, play it.
+//                             _controller.play();
+//                           }
+//                         });
+//                       },
+//                       icon: Icon(
+//                         _controller.value.isPlaying
+//                             ? Icons.pause
+//                             : Icons.play_arrow,
+//                         color: const Color(
+//                             0xff209fa6), // Adjust icon color to match theme
+//                       ),
+//                     ),
+//                   ),
+//                 )
+//               ]));
+//         } else {
+//           return const Center(
+//             child: CircularProgressIndicator(),
+//           );
+//         }
+//       },
+//     );
+//   }
+// }
