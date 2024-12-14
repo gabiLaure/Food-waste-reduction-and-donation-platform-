@@ -1,6 +1,12 @@
+import 'package:caritas/home.dart';
+import 'package:caritas/models/restaurant.dart';
+import 'package:caritas/models/supermarket.dart';
+import 'package:caritas/pages/Restaurant/restaurant_details.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../pages/Supermarket/supermarket_page.dart';
 
 class TopUsersCarousel extends StatelessWidget {
   //  TopUsersCarousel({Key? key}) : super(key: key);
@@ -68,7 +74,6 @@ class TopUsersCarousel extends StatelessWidget {
             .orderBy('createdAt', descending: true)
             .limit(10)
             .get();
-
         for (var user in recentUsersSnapshot.docs) {
           Map<String, dynamic>? linkedDetails = await fetchLinkedDetails(
             user['accountType'],
@@ -83,9 +88,6 @@ class TopUsersCarousel extends StatelessWidget {
           });
         }
       }
-
-      print('users top');
-      print(qualifiedUsers);
     } catch (e) {
       print("Erreur : $e");
     }
@@ -141,18 +143,6 @@ class TopUsersCarousel extends StatelessWidget {
               );
             },
           );
-        } else if (item['type'] == 'video') {
-          int index = mediaItems.indexOf(item) - 2;
-
-          return Builder(
-            builder: (BuildContext context) {
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.symmetric(horizontal: 5.0),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            },
-          );
         } else {
           return Container();
         }
@@ -160,9 +150,44 @@ class TopUsersCarousel extends StatelessWidget {
     );
   }
 
+  void onNavigateDetail(BuildContext context, Map<String, dynamic> user) {
+    // Extract the account type safely
+    final accountType = user['data']?['accountType'];
+    print(accountType);
+    // Navigate based on the accountType
+    switch (accountType) {
+      case 'Restaurant':
+        final Restaurant restaurant =
+            Restaurant.fromObject(user['linkedDetails']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RestaurantDetailPage(restaurant: restaurant),
+          ),
+        );
+        break;
+
+      case 'Supermarket':
+        final Supermarket supermarket =
+            Supermarket.fromObject(user['linkedDetails']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                SupermarketDetailPage(supermarket: supermarket),
+          ),
+        );
+        break;
+
+      default:
+        return;
+    }
+  }
+
   final List<Map<String, String>> mediaItems = [
     {'type': 'image', 'path': 'assets/images/orphanage1.jpeg'},
     {'type': 'image', 'path': 'assets/restaurant/restaurantB.jpeg'},
+    {'type': 'image', 'path': 'assets/grocery/supermarket3.jpeg'},
     {'type': 'image', 'path': 'assets/grocery/supermarket3.jpeg'},
   ];
   Widget build(BuildContext context) {
@@ -189,20 +214,30 @@ class TopUsersCarousel extends StatelessWidget {
           ),
           items: qualifiedUsers.map((user) {
             final imageUrl = user['linkedDetails']?['image'] ??
-                'assets/images/placeholder.png';
+                'assets/images/orphanage1.jpeg';
 
             return Builder(
               builder: (BuildContext context) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.symmetric(horizontal: 5.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    image: DecorationImage(
-                      image: imageUrl.startsWith('http')
-                          ? NetworkImage(imageUrl)
-                          : AssetImage(imageUrl) as ImageProvider,
-                      fit: BoxFit.cover,
+                return GestureDetector(
+                  onTap: () {
+                    // Confirm non-null data before navigation
+                    if (user != null) {
+                      onNavigateDetail(context, user);
+                    } else {
+                      print('User data is null!');
+                    }
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    margin: EdgeInsets.symmetric(horizontal: 5.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      image: DecorationImage(
+                        image: imageUrl.startsWith('http')
+                            ? NetworkImage(imageUrl)
+                            : AssetImage(imageUrl) as ImageProvider,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 );

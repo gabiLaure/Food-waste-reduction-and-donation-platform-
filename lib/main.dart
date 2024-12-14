@@ -2,6 +2,7 @@
 
 // import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/admin/models/global_data.dart';
+import 'package:caritas/home.dart';
 import 'package:caritas/pages/Registration/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +48,10 @@ class MyApp extends StatelessWidget {
   //       useMaterial3: true,
   //     ),
 
-  //     //home: HomePage(),
-  //     //home: SplashScreen(),
+  //     home: HomePage(),
+  //     home: SplashScreen(),
   //     home :  await hasUserAccessedSplash() ? user ? HomePage() : LoginPage() : SplashScreen();
-  //     // home: user == null ? SplashScreen() : HomePage(),
+  //     home: user == null ? SplashScreen() : HomePage(),
   //   );
   // }
   @override
@@ -83,7 +84,8 @@ class MyApp extends StatelessWidget {
             // home: hasAccessed
             //     ? (user != null ? HomePage() : LoginPage())
             //     : const SplashScreen(),
-            home: LoginPage()
+            //home: LoginPage(),
+            home: HomePage()
             //home: RegistrationPage()
             );
       },
