@@ -117,12 +117,11 @@ Widget _scheduleDonationCard(DocumentSnapshot donation, BuildContext context) {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DonationsFragment(
-                          donation)), // Correct the navigation destination
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => DonationsFragment()), // Correct the navigation destination
+                // );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green[100],

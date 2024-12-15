@@ -183,7 +183,7 @@ class DonationPage extends StatelessWidget {
                 distance:
                     '${donation['distanceBetweenUs'].toStringAsFixed(2)} km',
                 collectionTime: donation['donationAvailability'],
-                widget: _buildActionButtons(donation),
+                widget: _buildActionButtons(context, donation),
               ),
             );
           },
@@ -205,7 +205,7 @@ class DonationPage extends StatelessWidget {
             quantity: '${donation['quantity']} kg',
             distance: '${donation['distanceBetweenUs'].toStringAsFixed(2)} km',
             collectionTime: donation['donationAvailability'],
-            widget: _buildActionButtons(donation),
+            widget: _buildActionButtons(context, donation),
           ),
         );
       },
@@ -295,7 +295,7 @@ class DonationPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        child: Text('View'),
+                        child: Text('View Request'),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -321,13 +321,14 @@ class DonationPage extends StatelessWidget {
   }
 
   // Builds buttons for the action (Accept, Decline, etc.)
-  Widget _buildActionButtons(donation) {
+  Widget _buildActionButtons(context, donation) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildAcceptButton(donation),
+          _buildViewDonationButton(context, donation),
+          _buildAcceptButton(donation)
         ],
       ),
     );

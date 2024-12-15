@@ -2,9 +2,12 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:caritas/admin/admin_main.dart';
+import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/pages/Donation/all_donation.dart';
 import 'package:caritas/pages/Home/all_request_page.dart';
 import 'package:caritas/pages/Donation/donation_page.dart';
+import 'package:caritas/pages/Home/map_donation.dart';
+import 'package:caritas/pages/Home/map_orphanage.dart';
 import 'package:caritas/pages/Home/profile_page.dart';
 import 'package:caritas/pages/Home/feeds_page.dart';
 import 'package:caritas/pages/Home/notification_page.dart';
@@ -34,7 +37,9 @@ class _HomePageState extends State<HomePage> {
     // Replace these with your actual pages/screens
 
     FeedPage(),
-    SchedulePage(),
+    GlobalData.userData?['accountType'] == 'Orphanage'
+        ? DonationMapScreen()
+        : OrphanageMapScreen(),
     DonationPage(),
     ImpactPage(),
     ProfilePage()

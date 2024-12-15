@@ -3,7 +3,6 @@
 // import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/home.dart';
-import 'package:caritas/pages/Registration/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

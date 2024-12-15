@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:caritas/admin/models/global_data.dart';
 import 'package:caritas/generators/uuid_generator.dart';
 import 'package:caritas/home.dart';
-import 'package:caritas/pages/Geotargeting/map.dart';
 import 'package:caritas/widgets/button_widgets.dart';
 import 'package:caritas/widgets/toast_messages.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,16 +11,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:caritas/map/screens/current_location_screen.dart';
 
 import '../../widgets/what_type_of_food.dart';
 import '../Orphanage/map_picker.dart';
-import 'view_donation.dart';
 
 class ListingCreationPage extends StatefulWidget {
   @override
